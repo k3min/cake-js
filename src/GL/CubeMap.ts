@@ -1,5 +1,5 @@
-import { FramebufferTarget } from './Framebuffer';
 import DirectDrawSurface, { CubeMapFlags } from './Helpers/DirectDrawSurface';
+import FramebufferTarget from './Helpers/FramebufferTarget';
 import Texture, { Mipmap } from './Texture';
 import gl from './index';
 

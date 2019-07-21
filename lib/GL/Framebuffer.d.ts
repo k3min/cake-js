@@ -8,11 +8,6 @@ export declare enum FramebufferAttachment {
     Depth,
     Color
 }
-export declare enum FramebufferTarget {
-    Texture2D,
-    Renderbuffer,
-    CubeMap
-}
 declare class Framebuffer extends BindableGraphicsObject<Framebuffer, WebGLFramebuffer> {
     name: string;
     readonly attachments: Map<FramebufferAttachment, Texture>;

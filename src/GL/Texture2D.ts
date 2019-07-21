@@ -1,5 +1,5 @@
 import Vector4 from '../Math/Vector4';
-import { FramebufferTarget } from './Framebuffer';
+import FramebufferTarget from './Helpers/FramebufferTarget';
 import gl from './index';
 import Texture, { TextureFormat } from './Texture';
 

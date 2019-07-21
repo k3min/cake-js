@@ -1,6 +1,6 @@
 import Null from '../Helpers/Null';
-import { FramebufferTarget } from './Framebuffer';
 import BindableGraphicsObject from './Helpers/BindableGraphicsObject';
+import FramebufferTarget from './Helpers/FramebufferTarget';
 export declare enum TextureFormat {
     Alpha8 = 0,
     RGB24 = 1,

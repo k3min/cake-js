@@ -1,6 +1,6 @@
 import BindableObject from '../Helpers/BindableObject';
 import Null from '../Helpers/Null';
-import { FramebufferTarget } from './Framebuffer';
+import FramebufferTarget from './Helpers/FramebufferTarget';
 import gl from './index';
 import Texture, { TextureFormat } from './Texture';
 

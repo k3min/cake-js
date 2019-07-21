@@ -1,7 +1,7 @@
 import BindableObject from '../Helpers/BindableObject';
 import Null from '../Helpers/Null';
-import { FramebufferTarget } from './Framebuffer';
 import BindableGraphicsObject from './Helpers/BindableGraphicsObject';
+import FramebufferTarget from './Helpers/FramebufferTarget';
 import gl from './index';
 
 export enum TextureFormat {

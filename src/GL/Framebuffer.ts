@@ -1,6 +1,7 @@
 import BindableObject from '../Helpers/BindableObject';
 import Null from '../Helpers/Null';
 import BindableGraphicsObject from './Helpers/BindableGraphicsObject';
+import FramebufferTarget from './Helpers/FramebufferTarget';
 import gl from './index';
 import Texture from './Texture';
 import Texture2D from './Texture2D';
@@ -10,12 +11,6 @@ export enum FramebufferAttachment {
 	DepthStencil = gl.DEPTH_STENCIL_ATTACHMENT,
 	Depth = gl.DEPTH_ATTACHMENT,
 	Color = gl.COLOR_ATTACHMENT0,
-}
-
-export enum FramebufferTarget {
-	Texture2D = gl.TEXTURE_2D,
-	Renderbuffer = gl.RENDERBUFFER,
-	CubeMap = gl.TEXTURE_CUBE_MAP,
 }
 
 class Framebuffer extends BindableGraphicsObject<Framebuffer, WebGLFramebuffer> {
