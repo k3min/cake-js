@@ -6,11 +6,6 @@ import gl from './index';
 export type ShaderAttribute = number | undefined;
 export type ShaderUniform = Null<WebGLUniformLocation>;
 
-export enum ShaderType {
-	Vertex = gl.VERTEX_SHADER,
-	Fragment = gl.FRAGMENT_SHADER,
-}
-
 class ShaderProgram extends BindableGraphicsObject<ShaderProgram, WebGLProgram> {
 	public attributes: Storage<ShaderAttribute> = new Storage<ShaderAttribute>();
 	public uniforms: Storage<ShaderUniform> = new Storage<ShaderUniform>();
@@ -53,17 +48,17 @@ class ShaderProgram extends BindableGraphicsObject<ShaderProgram, WebGLProgram> 
 		}
 	}
 
-	public attach(type: ShaderType, sources: string[]) {
+	public attach(type: GLenum, sources: string[]) {
 		const shader: WebGLShader = gl.createShader(type) as WebGLShader;
 		const source = sources.join('\n');
 
 		switch (type) {
-			case ShaderType.Vertex:
+			case gl.VERTEX_SHADER:
 				this.vertex = shader;
 				this.vertexSource = source;
 				break;
 
-			case ShaderType.Fragment:
+			case gl.FRAGMENT_SHADER:
 				this.fragment = shader;
 				this.fragmentSource = source;
 				break;

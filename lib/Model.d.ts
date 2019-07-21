@@ -1,5 +1,4 @@
 import Drawable from './Helpers/Drawable';
-import PrimitiveType from './GL/Helpers/PrimitiveType';
 import BindableObject from './Helpers/BindableObject';
 import VertexBuffer from './GL/VertexBuffer';
 import IndexBuffer from './GL/IndexBuffer';
@@ -12,7 +11,7 @@ declare class Model<T extends Indexable> extends BindableObject<Model<T>> implem
     protected readonly identifier: string;
     afterBind(): void;
     afterUnbind(): void;
-    draw(type?: PrimitiveType): void;
+    draw(type?: GLenum): void;
     dispose(): void;
 }
 export default Model;

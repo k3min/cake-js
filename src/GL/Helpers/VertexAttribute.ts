@@ -1,28 +1,18 @@
 import gl from '../index';
 
-export enum VertexAttributeType {
-	Byte = gl.BYTE,
-	Float = gl.FLOAT,
-	Int = gl.INT,
-	Short = gl.SHORT,
-	UnsignedByte = gl.UNSIGNED_BYTE,
-	UnsignedInt = gl.UNSIGNED_INT,
-	UnsignedShort = gl.UNSIGNED_SHORT
-}
-
-const getSize = (type: VertexAttributeType): number => {
+const getSize = (type: GLenum): number => {
 	switch (type) {
-		case VertexAttributeType.Byte:
-		case VertexAttributeType.UnsignedByte:
+		case gl.BYTE:
+		case gl.UNSIGNED_BYTE:
 			return 1;
 
-		case VertexAttributeType.Short:
-		case VertexAttributeType.UnsignedShort:
+		case gl.SHORT:
+		case gl.UNSIGNED_SHORT:
 			return 2;
 
-		case VertexAttributeType.Int:
-		case VertexAttributeType.UnsignedInt:
-		case VertexAttributeType.Float:
+		case gl.INT:
+		case gl.UNSIGNED_INT:
+		case gl.FLOAT:
 			return 4;
 
 		default:
@@ -32,15 +22,15 @@ const getSize = (type: VertexAttributeType): number => {
 
 class VertexAttribute<T extends ArrayLike<number>> {
 	public readonly value: T;
-	public readonly type: VertexAttributeType;
+	public readonly type: GLenum;
 	public readonly size: number;
 	public readonly length: number;
 	public readonly stride: number;
 	public readonly normalized: boolean;
 
-	public constructor(value: T, type: VertexAttributeType = VertexAttributeType.Float, normalized: boolean = false) {
+	public constructor(value: T, type?: GLenum, normalized: boolean = false) {
 		this.value = value;
-		this.type = type;
+		this.type = type || gl.FLOAT;
 		this.normalized = normalized;
 		this.size = getSize(this.type);
 		this.length = value.length;

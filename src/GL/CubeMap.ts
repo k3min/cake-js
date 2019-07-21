@@ -1,21 +1,10 @@
 import DirectDrawSurface, { CubeMapFlags } from './Helpers/DirectDrawSurface';
-import FramebufferTarget from './Helpers/FramebufferTarget';
 import Texture, { Mipmap } from './Texture';
 import gl from './index';
 
-export enum CubeMapFace {
-	PosX = gl.TEXTURE_CUBE_MAP_POSITIVE_X,
-	NegX = gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
-	PosY = gl.TEXTURE_CUBE_MAP_POSITIVE_Y,
-	NegY = gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,
-	PosZ = gl.TEXTURE_CUBE_MAP_POSITIVE_Z,
-	NegZ = gl.TEXTURE_CUBE_MAP_NEGATIVE_Z,
-	Count = 6
-}
-
 class CubeMap extends Texture<WebGLTexture> {
 	public constructor(width: number, height: number, format: number) {
-		super(width, height, format, FramebufferTarget.CubeMap, gl.createTexture, gl.bindTexture, gl.deleteTexture);
+		super(width, height, format, gl.TEXTURE_CUBE_MAP, gl.createTexture, gl.bindTexture, gl.deleteTexture);
 	}
 
 	public static async load(url: string): Promise<CubeMap> {
@@ -43,7 +32,7 @@ class CubeMap extends Texture<WebGLTexture> {
 			offset += 20;
 		}
 
-		this.data = new Array<Mipmap[]>(CubeMapFace.Count);
+		this.data = new Array<Mipmap[]>(6);
 
 		for (let face = 0; face < this.data.length; face++) {
 			let width: number = dds.width;
@@ -88,7 +77,7 @@ class CubeMap extends Texture<WebGLTexture> {
 				let part = data[mipmap];
 
 				gl.texImage2D(
-					CubeMapFace.PosX + face,
+					gl.TEXTURE_CUBE_MAP_POSITIVE_X + face,
 					mipmap,
 					this.pixelInternalFormat,
 					part.width,

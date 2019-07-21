@@ -1,10 +1,10 @@
 import Drawable from './Helpers/Drawable';
-import PrimitiveType from './GL/Helpers/PrimitiveType';
 import BindableObject from './Helpers/BindableObject';
 import VertexBuffer from './GL/VertexBuffer';
 import IndexBuffer from './GL/IndexBuffer';
 import { Indexable } from './GL/Helpers/VertexArrayBuffer';
 import Disposable from './Helpers/Disposable';
+import { gl } from './index';
 
 class Model<T extends Indexable> extends BindableObject<Model<T>> implements Drawable, Disposable {
 	public name: string = 'Model';
@@ -40,8 +40,10 @@ class Model<T extends Indexable> extends BindableObject<Model<T>> implements Dra
 		}
 	}
 
-	public draw(type: PrimitiveType = PrimitiveType.Triangles): void {
+	public draw(type?: GLenum): void {
 		this.bind();
+
+		type = type || gl.TRIANGLES;
 
 		if (this.indices) {
 			this.indices.draw(type);

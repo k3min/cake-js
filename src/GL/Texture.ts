@@ -1,6 +1,5 @@
 import Null from '../Helpers/Null';
 import BindableGraphicsObject from './Helpers/BindableGraphicsObject';
-import FramebufferTarget from './Helpers/FramebufferTarget';
 import gl from './index';
 
 export enum TextureFormat {
@@ -12,37 +11,6 @@ export enum TextureFormat {
 	RGBAFloat,
 }
 
-export enum PixelFormat {
-	Alpha = gl.ALPHA,
-	DepthComponent = gl.DEPTH_COMPONENT,
-	DepthStencil = gl.DEPTH_STENCIL,
-	Luminance = gl.LUMINANCE,
-	LuminanceAlpha = gl.LUMINANCE_ALPHA,
-	Rgb = gl.RGB,
-	Rgba = gl.RGBA,
-}
-
-export enum PixelInternalFormat {
-	Alpha = gl.ALPHA,
-	Luminance = gl.LUMINANCE,
-	LuminanceAlpha = gl.LUMINANCE_ALPHA,
-	Rgb = gl.RGB,
-	Rgba = gl.RGBA,
-}
-
-export enum PixelType {
-	Byte = gl.BYTE,
-	Float = gl.FLOAT,
-	Int = gl.INT,
-	Short = gl.SHORT,
-	UnsignedByte = gl.UNSIGNED_BYTE,
-	UnsignedInt = gl.UNSIGNED_INT,
-	UnsignedShort = gl.UNSIGNED_SHORT,
-	UnsignedShort4444 = gl.UNSIGNED_SHORT_4_4_4_4,
-	UnsignedShort5551 = gl.UNSIGNED_SHORT_5_5_5_1,
-	UnsignedShort565 = gl.UNSIGNED_SHORT_5_6_5,
-}
-
 export interface Mipmap {
 	data: ArrayBufferView;
 	width: number;
@@ -50,13 +18,13 @@ export interface Mipmap {
 }
 
 abstract class Texture<GL extends WebGLObject = WebGLObject> extends BindableGraphicsObject<Texture<GL>, GL> {
-	public readonly target: FramebufferTarget;
+	public readonly target: GLenum;
 
 	protected data: TexImageSource | ArrayBufferView | Mipmap[] | Mipmap[][] | null = null;
 
-	protected readonly pixelInternalFormat: PixelInternalFormat;
-	protected readonly pixelFormat: PixelFormat;
-	protected readonly pixelType: PixelType;
+	protected readonly pixelInternalFormat: GLenum;
+	protected readonly pixelFormat: GLenum;
+	protected readonly pixelType: GLenum;
 
 	public readonly format: TextureFormat;
 
@@ -71,7 +39,7 @@ abstract class Texture<GL extends WebGLObject = WebGLObject> extends BindableGra
 		return 'texture';
 	}
 
-	protected constructor(width: number, height: number, format: TextureFormat, target: FramebufferTarget, genFn: () => GL | null, bindFn: (target: FramebufferTarget, handle: Null<GL>) => void, releaseFn: (handle: GL) => void) {
+	protected constructor(width: number, height: number, format: TextureFormat, target: GLenum, genFn: () => GL | null, bindFn: (target: GLenum, handle: Null<GL>) => void, releaseFn: (handle: GL) => void) {
 		super(genFn, (handle) => bindFn(target, handle), releaseFn);
 
 		this.width = width;
@@ -86,59 +54,59 @@ abstract class Texture<GL extends WebGLObject = WebGLObject> extends BindableGra
 
 	public abstract apply(): void;
 
-	public static getPixelFormat(format: TextureFormat): PixelFormat {
+	public static getPixelFormat(format: TextureFormat): GLenum {
 		switch (format) {
 			case TextureFormat.Alpha8:
-				return PixelFormat.Alpha;
+				return gl.ALPHA;
 
 			case TextureFormat.RGBA32:
 			case TextureFormat.RGBA4444:
 			case TextureFormat.RGBAFloat:
-				return PixelFormat.Rgba;
+				return gl.RGBA;
 
 			case TextureFormat.RGB24:
 			case TextureFormat.RGB565:
-				return PixelFormat.Rgb;
+				return gl.RGB;
 
 			default:
 				throw new Error();
 		}
 	}
 
-	public static getPixelInternalFormat(format: TextureFormat): PixelInternalFormat {
+	public static getPixelInternalFormat(format: TextureFormat): GLenum {
 		switch (format) {
 			case TextureFormat.Alpha8:
-				return PixelInternalFormat.Alpha;
+				return gl.ALPHA;
 
 			case TextureFormat.RGBA4444:
 			case TextureFormat.RGBA32:
 			case TextureFormat.RGBAFloat:
-				return PixelInternalFormat.Rgba;
+				return gl.RGBA;
 
 			case TextureFormat.RGB565:
 			case TextureFormat.RGB24:
-				return PixelInternalFormat.Rgb;
+				return gl.RGB;
 
 			default:
 				throw new Error();
 		}
 	}
 
-	public static getPixelType(format: TextureFormat): PixelType {
+	public static getPixelType(format: TextureFormat): GLenum {
 		switch (format) {
 			case TextureFormat.Alpha8:
 			case TextureFormat.RGBA32:
 			case TextureFormat.RGB24:
-				return PixelType.UnsignedByte;
+				return gl.UNSIGNED_BYTE;
 
 			case TextureFormat.RGBA4444:
-				return PixelType.UnsignedShort4444;
+				return gl.UNSIGNED_SHORT_4_4_4_4;
 
 			case TextureFormat.RGB565:
-				return PixelType.UnsignedShort565;
+				return gl.UNSIGNED_SHORT_5_6_5;
 
 			case TextureFormat.RGBAFloat:
-				return PixelType.Float;
+				return gl.FLOAT;
 
 			default:
 				throw new Error();

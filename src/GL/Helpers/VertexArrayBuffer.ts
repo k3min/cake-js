@@ -1,4 +1,5 @@
-import VertexAttribute, { VertexAttributeType } from './VertexAttribute';
+import { gl } from '../../index';
+import VertexAttribute from './VertexAttribute';
 
 type VA = VertexAttribute<ArrayLike<number>>;
 
@@ -61,40 +62,43 @@ class VertexArrayBuffer<T extends Indexable> extends ArrayBuffer {
 	}
 
 	public set(byteOffset: number, vertexAttribute: VA): number {
-		const type: VertexAttributeType = vertexAttribute.type;
+		const type: GLenum = vertexAttribute.type;
 		const value: ArrayLike<number> = vertexAttribute.value;
 		const size: number = vertexAttribute.size;
 		const byteLength: number = vertexAttribute.stride;
 
 		for (let i = 0; i < vertexAttribute.length; i++) {
 			switch (type) {
-				case VertexAttributeType.UnsignedInt:
+				case gl.UNSIGNED_INT:
 					this.view.setUint32(byteOffset, value[i] * 0xffffffff);
 					break;
 
-				case VertexAttributeType.UnsignedShort:
+				case gl.UNSIGNED_SHORT:
 					this.view.setUint16(byteOffset, value[i] * 0xffff);
 					break;
 
-				case VertexAttributeType.UnsignedByte:
+				case gl.UNSIGNED_BYTE:
 					this.view.setUint8(byteOffset, value[i] * 0xff);
 					break;
 
-				case VertexAttributeType.Int:
+				case gl.INT:
 					this.view.setInt32(byteOffset, value[i] * 0x7fffffff);
 					break;
 
-				case VertexAttributeType.Short:
+				case gl.SHORT:
 					this.view.setInt16(byteOffset, value[i] * 0x7fff);
 					break;
 
-				case VertexAttributeType.Byte:
+				case gl.BYTE:
 					this.view.setInt8(byteOffset, value[i] * 0x7f);
 					break;
 
-				case VertexAttributeType.Float:
+				case gl.FLOAT:
 					this.view.setFloat32(byteOffset, value[i]);
 					break;
+
+				default:
+					throw new Error();
 			}
 
 			byteOffset += size;

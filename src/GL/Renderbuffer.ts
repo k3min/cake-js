@@ -1,6 +1,5 @@
 import BindableObject from '../Helpers/BindableObject';
 import Null from '../Helpers/Null';
-import FramebufferTarget from './Helpers/FramebufferTarget';
 import gl from './index';
 import Texture, { TextureFormat } from './Texture';
 
@@ -18,7 +17,7 @@ class Renderbuffer extends Texture<WebGLRenderbuffer> {
 	}
 
 	public constructor(width: number, height: number, format: TextureFormat, stencil: boolean) {
-		super(width, height, format, FramebufferTarget.Renderbuffer, gl.createRenderbuffer, gl.bindRenderbuffer, gl.deleteRenderbuffer);
+		super(width, height, format, gl.RENDERBUFFER, gl.createRenderbuffer, gl.bindRenderbuffer, gl.deleteRenderbuffer);
 
 		this.stencil = stencil;
 	}
@@ -26,7 +25,7 @@ class Renderbuffer extends Texture<WebGLRenderbuffer> {
 	public apply(): void {
 		this.bind();
 
-		gl.renderbufferStorage(FramebufferTarget.Renderbuffer, this.format, this.width, this.height);
+		gl.renderbufferStorage(this.target, this.format, this.width, this.height);
 	}
 }
 

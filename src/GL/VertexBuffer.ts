@@ -1,6 +1,5 @@
-import PrimitiveType from './Helpers/PrimitiveType';
 import gl from './index';
-import Buffer, { BufferTarget } from './Buffer';
+import Buffer from './Buffer';
 import VertexAttribute from './Helpers/VertexAttribute';
 import VertexArrayBuffer, { Indexable } from './Helpers/VertexArrayBuffer';
 
@@ -10,7 +9,7 @@ class VertexBuffer<T extends Indexable> extends Buffer<VertexArrayBuffer<T>> {
 	}
 
 	public constructor(data: T[]) {
-		super(BufferTarget.Array, new VertexArrayBuffer<T>(data), data.length);
+		super(gl.ARRAY_BUFFER, new VertexArrayBuffer<T>(data), data.length);
 	}
 
 	public afterBind(): void {
@@ -40,8 +39,8 @@ class VertexBuffer<T extends Indexable> extends Buffer<VertexArrayBuffer<T>> {
 		}
 	}
 
-	public draw(type: PrimitiveType = PrimitiveType.Triangles): void {
-		gl.drawArrays(type, 0, this.length);
+	public draw(type?: GLenum): void {
+		gl.drawArrays(type || gl.TRIANGLES, 0, this.length);
 	}
 }
 

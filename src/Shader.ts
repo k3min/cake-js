@@ -1,6 +1,6 @@
 import Disposable from './Helpers/Disposable';
 import gl from './GL';
-import ShaderProgram, { ShaderAttribute, ShaderType, ShaderUniform } from './GL/ShaderProgram';
+import ShaderProgram, { ShaderAttribute, ShaderUniform } from './GL/ShaderProgram';
 import Texture from './GL/Texture';
 import Texture2D from './GL/Texture2D';
 import BindableObject from './Helpers/BindableObject';
@@ -81,8 +81,8 @@ class Shader extends BindableObject<Shader> implements Disposable {
 
 			const attachment: ShaderProgram = new ShaderProgram();
 
-			attachment.attach(ShaderType.Vertex, defines.concat(this.parser.vertexSource));
-			attachment.attach(ShaderType.Fragment, defines.concat(this.parser.fragmentSource));
+			attachment.attach(gl.VERTEX_SHADER, defines.concat(this.parser.vertexSource));
+			attachment.attach(gl.FRAGMENT_SHADER, defines.concat(this.parser.fragmentSource));
 
 			attachment.apply();
 
