@@ -16,6 +16,7 @@ interface GraphicsContext extends WebGLRenderingContext {
 class GL {
 	private readonly enabled: Toggle<GLenum> = new Toggle<GLenum>();
 
+	public readonly canvas: HTMLCanvasElement;
 	public readonly context: WebGLRenderingContext;
 	public readonly ext: WEBGL_draw_buffers;
 	public readonly depth: WEBGL_depth_texture;
@@ -25,8 +26,10 @@ class GL {
 			context: {
 				enable: enableRaw,
 				disable: disableRaw,
+				canvas: _canvas,
 				...context
 			},
+			canvas,
 			getExtensions,
 			enable,
 			disable,
@@ -36,6 +39,7 @@ class GL {
 
 		return {
 			...context,
+			canvas,
 			enableRaw,
 			disableRaw,
 			getExtensions,
@@ -47,7 +51,8 @@ class GL {
 	}
 
 	public constructor() {
-		this.context = document.createElement('canvas').getContext('webgl') as WebGLRenderingContext;
+		this.canvas = document.createElement('canvas') as HTMLCanvasElement;
+		this.context = this.canvas.getContext('webgl') as WebGLRenderingContext;
 		this.ext = this.context.getExtension('WEBGL_draw_buffers') as WEBGL_draw_buffers;
 		this.depth = this.context.getExtension('WEBGL_depth_texture') as WEBGL_depth_texture;
 	}
