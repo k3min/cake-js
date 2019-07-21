@@ -1,100 +1,84 @@
+import Null from '../Helpers/Null';
 import Toggle from '../Helpers/Toggle';
 
 type ToggleFn<T = void> = (cap: GLenum) => T;
-type ExtensionFn = (...name: string[]) => void;
+type ExtensionFn = <T = any>(name: string) => Null<T>;
+type ExtensionsFn = (...name: string[]) => void;
 
 interface GraphicsContext extends WebGLRenderingContext {
+	_enabled: Toggle<GLenum>,
 	enableRaw: ToggleFn,
 	disableRaw: ToggleFn,
-	getExtensions: ExtensionFn,
+	getExtensionRaw: ExtensionFn,
+	getExtension: ExtensionFn,
+	getExtensions: ExtensionsFn,
 	enable: ToggleFn<boolean>,
 	disable: ToggleFn,
 	ext: WEBGL_draw_buffers,
 	depth: WEBGL_depth_texture,
 }
 
-class GL {
-	private readonly enabled: Toggle<GLenum> = new Toggle<GLenum>();
-
-	public readonly canvas: HTMLCanvasElement;
-	public readonly context: WebGLRenderingContext;
-	public readonly ext: WEBGL_draw_buffers;
-	public readonly depth: WEBGL_depth_texture;
-
-	public static get export(): GraphicsContext {
-		const {
-			context: {
-				enable: enableRaw,
-				disable: disableRaw,
-				canvas: _canvas,
-				...context
-			},
-			canvas,
-			getExtensions,
-			enable,
-			disable,
-			ext,
-			depth,
-		} = new GL();
-
-		return {
-			...context,
-			canvas,
-			enableRaw,
-			disableRaw,
-			getExtensions,
-			enable,
-			disable,
-			ext,
-			depth,
-		};
-	}
-
-	public constructor() {
-		this.canvas = document.createElement('canvas') as HTMLCanvasElement;
-		this.context = this.canvas.getContext('webgl') as WebGLRenderingContext;
-		this.ext = this.context.getExtension('WEBGL_draw_buffers') as WEBGL_draw_buffers;
-		this.depth = this.context.getExtension('WEBGL_depth_texture') as WEBGL_depth_texture;
-	}
-
-	public getExtensions(...name: string[]): void {
-		for (let i = 0; i < name.length; i++) {
-			const result = this.context.getExtension(name[i]);
-
-			if (result === null) {
-				throw new Error(`'${ name }' not supported!`);
-			}
-		}
-	}
-
-	public enable(cap: GLenum): boolean {
-		const enable = this.enabled.set(cap, true);
-
-		if (enable) {
-			this.context.enable(cap);
-		}
-
-		return enable;
-	}
-
-	public disable(cap: GLenum): void {
-		if (this.enabled.set(cap, false)) {
-			this.context.disable(cap);
-		}
-	}
-}
-
 if (!('gl' in window)) {
 	Object.defineProperty(window, 'gl', {
-		value: GL.export,
+		value: document.createElement('canvas').getContext('webgl'),
+	});
+
+	Object.defineProperties((window as any).gl, {
+		_enabled: { value: new Toggle<GLenum>() },
+
+		getExtensionRaw: { value: ((window as any).gl as GraphicsContext).getExtension },
+		enableRaw: { value: ((window as any).gl as GraphicsContext).enable },
+		disableRaw: { value: ((window as any).gl as GraphicsContext).disable },
+
+		getExtension: {
+			value<T>(name: string): T {
+				const _this = this as GraphicsContext;
+				const _result = _this.getExtensionRaw<T>(name);
+
+				if (!_result) {
+					throw new Error(`'${ name }' not supported!`);
+				}
+
+				return _result;
+			},
+		},
+
+		getExtensions: {
+			value(...name: string[]): void {
+				const _this = this as GraphicsContext;
+
+				for (let i = 0; i < name.length; i++) {
+					_this.getExtension(name[i]);
+				}
+			},
+		},
+
+		ext: { value: ((window as any).gl as GraphicsContext).getExtension<WEBGL_draw_buffers>('WEBGL_draw_buffers') },
+		depth: { value: ((window as any).gl as GraphicsContext).getExtension<WEBGL_depth_texture>('WEBGL_depth_texture') },
+
+		enable: {
+			value(cap: GLenum): boolean {
+				const _this = this as GraphicsContext;
+				const _enable = _this._enabled.set(cap, true);
+
+				if (_enable) {
+					_this.enableRaw(cap);
+				}
+
+				return _enable;
+			},
+		},
+
+		disable: {
+			value(cap: GLenum): void {
+				const _this = this as GraphicsContext;
+
+				if (_this._enabled.set(cap, false)) {
+					_this.disableRaw(cap);
+				}
+			},
+		},
 	});
 }
-
-export { default as CubeMap } from './CubeMap';
-export { default as Framebuffer } from './Framebuffer';
-export { default as IndexBuffer } from './IndexBuffer';
-export { default as Renderbuffer } from './Renderbuffer';
-export { default as Texture2D } from './Texture2D';
-export { default as VertexBuffer } from './VertexBuffer';
 
 export default (window as any).gl as GraphicsContext;
