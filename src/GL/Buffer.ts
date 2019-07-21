@@ -13,7 +13,7 @@ abstract class Buffer<T extends ArrayBuffer> extends BindableGraphicsObject<Buff
 	}
 
 	protected constructor(target: GLenum, data: T, length: number) {
-		super(gl.createBuffer, (handle) => gl.bindBuffer(target, handle), gl.deleteBuffer);
+		super(() => gl.createBuffer(), (handle) => gl.bindBuffer(target, handle), (handle) => gl.deleteBuffer(handle));
 
 		this.target = target;
 		this.data = data;

@@ -21,7 +21,7 @@ class ShaderProgram extends BindableGraphicsObject<ShaderProgram, WebGLProgram> 
 	}
 
 	public constructor() {
-		super(gl.createProgram, gl.useProgram, gl.deleteProgram);
+		super(() => gl.createProgram(), (handle) => gl.useProgram(handle), (handle) => gl.deleteProgram(handle));
 	}
 
 	public apply() {

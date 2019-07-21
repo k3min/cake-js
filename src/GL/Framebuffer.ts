@@ -22,7 +22,7 @@ class Framebuffer extends BindableGraphicsObject<Framebuffer, WebGLFramebuffer> 
 	}
 
 	public constructor() {
-		super(gl.createFramebuffer, (handle) => gl.bindFramebuffer(gl.FRAMEBUFFER, handle), gl.deleteFramebuffer);
+		super(() => gl.createFramebuffer(), (handle) => gl.bindFramebuffer(gl.FRAMEBUFFER, handle), (handle) => gl.deleteFramebuffer(handle));
 
 		if (this.color || this.depth) {
 			this.apply();

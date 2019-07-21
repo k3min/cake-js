@@ -6,7 +6,7 @@ class Texture2D extends Texture<WebGLTexture> {
 	public readonly texelSize: Vector4 = new Vector4(0, 0, 0, 0);
 
 	public constructor(width: number, height: number, format: TextureFormat) {
-		super(width, height, format, gl.TEXTURE_2D, gl.createTexture, gl.bindTexture, gl.deleteTexture);
+		super(width, height, format, gl.TEXTURE_2D, () => gl.createTexture(), (target, handle) => gl.bindTexture(target, handle), (handle) => gl.deleteTexture(handle));
 	}
 
 	public static async load(url: string, format: TextureFormat): Promise<Texture2D> {

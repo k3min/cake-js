@@ -4,7 +4,7 @@ import gl from './index';
 
 class CubeMap extends Texture<WebGLTexture> {
 	public constructor(width: number, height: number, format: number) {
-		super(width, height, format, gl.TEXTURE_CUBE_MAP, gl.createTexture, gl.bindTexture, gl.deleteTexture);
+		super(width, height, format, gl.TEXTURE_CUBE_MAP, () => gl.createTexture(), (target, handle) => gl.bindTexture(target, handle), (handle) => gl.deleteTexture(handle));
 	}
 
 	public static async load(url: string): Promise<CubeMap> {
