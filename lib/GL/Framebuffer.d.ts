@@ -15,15 +15,15 @@ export declare enum FramebufferTarget {
 }
 declare class Framebuffer extends BindableGraphicsObject<Framebuffer, WebGLFramebuffer> {
     name: string;
-    readonly _attachments: Map<FramebufferAttachment, Texture>;
+    readonly attachments: Map<FramebufferAttachment, Texture>;
     color?: Texture2D;
     depth?: Renderbuffer;
     static readonly bound: Null<Framebuffer>;
     protected readonly identifier: string;
     constructor();
     apply(force?: boolean): void;
-    private _attach;
-    private _detach;
+    private attachAttachment;
+    private detachAttachment;
     attach(slot: FramebufferAttachment, texture: Texture): void;
     detach(slot?: FramebufferAttachment): void;
     dispose(): void;

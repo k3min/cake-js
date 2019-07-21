@@ -21,7 +21,7 @@ export enum FramebufferTarget {
 class Framebuffer extends BindableGraphicsObject<Framebuffer, WebGLFramebuffer> {
 	public name: string = 'Framebuffer';
 
-	public readonly _attachments: Map<FramebufferAttachment, Texture> = new Map<FramebufferAttachment, Texture>();
+	public readonly attachments: Map<FramebufferAttachment, Texture> = new Map<FramebufferAttachment, Texture>();
 
 	public color?: Texture2D;
 	public depth?: Renderbuffer;
@@ -61,7 +61,7 @@ class Framebuffer extends BindableGraphicsObject<Framebuffer, WebGLFramebuffer> 
 		}
 	}
 
-	private _attach(slot: FramebufferAttachment, target: FramebufferTarget, handle: WebGLObject | null): void {
+	private attachAttachment(slot: FramebufferAttachment, target: FramebufferTarget, handle: WebGLObject | null): void {
 		this.bind();
 
 		switch (target) {
@@ -78,39 +78,39 @@ class Framebuffer extends BindableGraphicsObject<Framebuffer, WebGLFramebuffer> 
 		}
 	}
 
-	private _detach(slot: FramebufferAttachment, target: FramebufferTarget): void {
+	private detachAttachment(slot: FramebufferAttachment, target: FramebufferTarget): void {
 		this.bind();
 
-		this._attach(slot, target, null);
+		this.attachAttachment(slot, target, null);
 
-		this._attachments.delete(slot);
+		this.attachments.delete(slot);
 	}
 
 	public attach(slot: FramebufferAttachment, texture: Texture): void {
-		if (this._attachments.get(slot) === texture) {
+		if (this.attachments.get(slot) === texture) {
 			return;
 		}
 
-		this._attach(slot, texture.target, texture.handle);
+		this.attachAttachment(slot, texture.target, texture.handle);
 
-		this._attachments.set(slot, texture);
+		this.attachments.set(slot, texture);
 	}
 
 	public detach(slot?: FramebufferAttachment): void {
 		if (slot === undefined) {
-			this._attachments.forEach((texture, slot) => this._detach(slot, texture.target));
+			this.attachments.forEach((texture, slot) => this.detachAttachment(slot, texture.target));
 			return;
 		}
 
-		const texture = this._attachments.get(slot);
+		const texture = this.attachments.get(slot);
 
 		if (texture === undefined) {
 			return;
 		}
 
-		this._attach(slot, texture.target, null);
+		this.attachAttachment(slot, texture.target, null);
 
-		this._attachments.delete(slot);
+		this.attachments.delete(slot);
 	}
 
 	public dispose(): void {

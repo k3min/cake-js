@@ -13,51 +13,77 @@ interface GraphicsContext extends WebGLRenderingContext {
 	depth: WEBGL_depth_texture,
 }
 
-let enabled: Toggle<GLenum> = new Toggle<GLenum>();
-let context: WebGLRenderingContext = document.createElement('canvas').getContext('webgl') as WebGLRenderingContext;
+class GL {
+	private readonly enabled: Toggle<GLenum> = new Toggle<GLenum>();
 
-const enableRaw: ToggleFn = context.enable;
-const disableRaw: ToggleFn = context.disable;
+	public readonly context: WebGLRenderingContext;
+	public readonly ext: WEBGL_draw_buffers;
+	public readonly depth: WEBGL_depth_texture;
 
-const ext: WEBGL_draw_buffers = context.getExtension('WEBGL_draw_buffers') as WEBGL_draw_buffers;
-const depth: WEBGL_depth_texture = context.getExtension('WEBGL_depth_texture') as WEBGL_depth_texture;
+	public static get export(): GraphicsContext {
+		const {
+			context: {
+				enable: enableRaw,
+				disable: disableRaw,
+				...context
+			},
+			getExtensions,
+			enable,
+			disable,
+			ext,
+			depth,
+		} = new GL();
 
-const getExtensions: ExtensionFn = (...name: string[]): void => {
-	for (let i = 0; i < name.length; i++) {
-		const result = context.getExtension(name[i]);
+		return {
+			...context,
+			enableRaw,
+			disableRaw,
+			getExtensions,
+			enable,
+			disable,
+			ext,
+			depth,
+		};
+	}
 
-		if (result === null) {
-			throw new Error(`'${ name }' not supported!`);
+	public constructor() {
+		this.context = document.createElement('canvas').getContext('webgl') as WebGLRenderingContext;
+		this.ext = this.context.getExtension('WEBGL_draw_buffers') as WEBGL_draw_buffers;
+		this.depth = this.context.getExtension('WEBGL_depth_texture') as WEBGL_depth_texture;
+	}
+
+	public getExtensions(...name: string[]): void {
+		for (let i = 0; i < name.length; i++) {
+			const result = this.context.getExtension(name[i]);
+
+			if (result === null) {
+				throw new Error(`'${ name }' not supported!`);
+			}
 		}
 	}
-};
 
-const enable: ToggleFn<boolean> = (cap: GLenum): boolean => {
-	const enable = enabled.set(cap, true);
+	public enable(cap: GLenum): boolean {
+		const enable = this.enabled.set(cap, true);
 
-	if (enable) {
-		context.enable(cap);
+		if (enable) {
+			this.context.enable(cap);
+		}
+
+		return enable;
 	}
 
-	return enable;
-};
-
-const disable: ToggleFn = (cap: GLenum): void => {
-	if (enabled.set(cap, false)) {
-		context.disable(cap);
+	public disable(cap: GLenum): void {
+		if (this.enabled.set(cap, false)) {
+			this.context.disable(cap);
+		}
 	}
-};
+}
 
-let gl: GraphicsContext = {
-	...context,
-	enableRaw,
-	disableRaw,
-	getExtensions,
-	enable,
-	disable,
-	ext,
-	depth,
-};
+if (!('gl' in window)) {
+	Object.defineProperty(window, 'gl', {
+		value: GL.export,
+	});
+}
 
 export { default as CubeMap } from './CubeMap';
 export { default as Framebuffer } from './Framebuffer';
@@ -66,4 +92,4 @@ export { default as Renderbuffer } from './Renderbuffer';
 export { default as Texture2D } from './Texture2D';
 export { default as VertexBuffer } from './VertexBuffer';
 
-export default gl;
+export default (window as any).gl as GraphicsContext;
