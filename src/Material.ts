@@ -2,7 +2,7 @@ import Base from './Helpers/Base';
 import Texture2D from './GL/Texture2D';
 import Storage from './Helpers/Storage';
 import Shader from './Shader';
-import Keywords from './Helpers/Keywords';
+import Toggle from './Helpers/Toggle';
 import { Vector } from './Math';
 
 class Material extends Base {
@@ -13,7 +13,7 @@ class Material extends Base {
 	private readonly vectors: Storage<Vector> = new Storage<Vector>();
 	private readonly textures: Storage<Texture2D> = new Storage<Texture2D>();
 
-	private readonly keywords: Keywords = new Keywords();
+	private readonly keywords: Toggle = new Toggle();
 
 	public readonly shader: Shader;
 
