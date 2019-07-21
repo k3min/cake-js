@@ -1,4 +1,3 @@
-import BindableObject from '../Helpers/BindableObject';
 import Null from '../Helpers/Null';
 import BindableGraphicsObject from './Helpers/BindableGraphicsObject';
 import FramebufferTarget from './Helpers/FramebufferTarget';
@@ -11,20 +10,6 @@ export enum TextureFormat {
 	RGB565,
 	RGBA4444,
 	RGBAFloat,
-}
-
-export enum TextureWrap {
-	Repeat = gl.REPEAT,
-	Clamp = gl.CLAMP_TO_EDGE,
-}
-
-export enum TextureFilter {
-	Nearest = gl.NEAREST,
-	Linear = gl.LINEAR,
-	NearestNearest = gl.NEAREST_MIPMAP_NEAREST,
-	LinearNearest = gl.LINEAR_MIPMAP_NEAREST,
-	NearestLinear = gl.NEAREST_MIPMAP_LINEAR,
-	LinearLinear = gl.LINEAR_MIPMAP_LINEAR,
 }
 
 export enum PixelFormat {
@@ -58,16 +43,6 @@ export enum PixelType {
 	UnsignedShort565 = gl.UNSIGNED_SHORT_5_6_5,
 }
 
-export interface TextureFiltering {
-	min: TextureFilter;
-	mag: TextureFilter;
-}
-
-export interface TextureWrapping {
-	s: TextureWrap;
-	t: TextureWrap;
-}
-
 export interface Mipmap {
 	data: ArrayBufferView;
 	width: number;
@@ -89,7 +64,7 @@ abstract class Texture<GL extends WebGLObject = WebGLObject> extends BindableGra
 	public height: number;
 
 	public static get bound(): Null<Texture> {
-		return BindableObject.map.get('texture') as Null<Texture>;
+		return BindableGraphicsObject.map.get('texture') as Null<Texture>;
 	}
 
 	protected get identifier(): string {

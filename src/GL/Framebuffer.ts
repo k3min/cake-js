@@ -1,4 +1,3 @@
-import BindableObject from '../Helpers/BindableObject';
 import Null from '../Helpers/Null';
 import BindableGraphicsObject from './Helpers/BindableGraphicsObject';
 import FramebufferTarget from './Helpers/FramebufferTarget';
@@ -22,7 +21,7 @@ class Framebuffer extends BindableGraphicsObject<Framebuffer, WebGLFramebuffer> 
 	public depth?: Renderbuffer;
 
 	public static get bound(): Null<Framebuffer> {
-		return BindableObject.map.get('framebuffer') as Null<Framebuffer>;
+		return BindableGraphicsObject.map.get('framebuffer') as Null<Framebuffer>;
 	}
 
 	protected get identifier(): string {

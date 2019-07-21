@@ -1,5 +1,4 @@
 import Drawable from '../Helpers/Drawable';
-import BindableObject from '../Helpers/BindableObject';
 import Null from '../Helpers/Null';
 import BindableGraphicsObject from './Helpers/BindableGraphicsObject';
 import PrimitiveType from './Helpers/PrimitiveType';
@@ -22,7 +21,7 @@ abstract class Buffer<T extends ArrayBuffer> extends BindableGraphicsObject<Buff
 	public readonly length: number;
 
 	public static get bound(): Null<Buffer<ArrayBuffer>> {
-		return BindableObject.map.get('buffer') as Null<Buffer<ArrayBuffer>>;
+		return BindableGraphicsObject.map.get('buffer') as Null<Buffer<ArrayBuffer>>;
 	}
 
 	protected constructor(target: BufferTarget, data: T, length: number, usage: BufferUsage = BufferUsage.Static) {

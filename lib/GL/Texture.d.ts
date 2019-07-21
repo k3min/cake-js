@@ -9,18 +9,6 @@ export declare enum TextureFormat {
     RGBA4444 = 4,
     RGBAFloat = 5
 }
-export declare enum TextureWrap {
-    Repeat,
-    Clamp
-}
-export declare enum TextureFilter {
-    Nearest,
-    Linear,
-    NearestNearest,
-    LinearNearest,
-    NearestLinear,
-    LinearLinear
-}
 export declare enum PixelFormat {
     Alpha,
     DepthComponent,
@@ -48,14 +36,6 @@ export declare enum PixelType {
     UnsignedShort4444,
     UnsignedShort5551,
     UnsignedShort565
-}
-export interface TextureFiltering {
-    min: TextureFilter;
-    mag: TextureFilter;
-}
-export interface TextureWrapping {
-    s: TextureWrap;
-    t: TextureWrap;
 }
 export interface Mipmap {
     data: ArrayBufferView;
