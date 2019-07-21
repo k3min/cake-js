@@ -3,7 +3,7 @@ import VertexAttribute from './GL/Helpers/VertexAttribute';
 import Model from './Model';
 import IndexBuffer from './GL/IndexBuffer';
 import VertexBuffer from './GL/VertexBuffer';
-import { Vector2 } from './Math';
+import Vector2 from './Math/Vector2';
 
 class Vertex implements Indexable {
 	public readonly position: VertexAttribute<Vector2>;

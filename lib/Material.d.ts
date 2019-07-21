@@ -1,7 +1,7 @@
 import Base from './Helpers/Base';
 import Texture2D from './GL/Texture2D';
 import Shader from './Shader';
-import { Vector } from './Math';
+import Vector from './Math/Vector';
 declare class Material extends Base {
     name: string;
     private readonly ints;

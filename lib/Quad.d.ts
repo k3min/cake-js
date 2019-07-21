@@ -1,7 +1,7 @@
 import { Indexable } from './GL/Helpers/VertexArrayBuffer';
 import VertexAttribute from './GL/Helpers/VertexAttribute';
 import Model from './Model';
-import { Vector2 } from './Math';
+import Vector2 from './Math/Vector2';
 declare class Vertex implements Indexable {
     readonly position: VertexAttribute<Vector2>;
     readonly texcoord: VertexAttribute<Vector2>;

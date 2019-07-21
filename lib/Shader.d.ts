@@ -4,7 +4,8 @@ import Texture from './GL/Texture';
 import BindableObject from './Helpers/BindableObject';
 import Null from './Helpers/Null';
 import Storage from './Helpers/Storage';
-import { Matrix4x4, Vector } from './Math';
+import Matrix4x4 from './Math/Matrix4x4';
+import Vector from './Math/Vector';
 declare class Shader extends BindableObject<Shader> implements Disposable {
     private variants;
     private readonly parser;

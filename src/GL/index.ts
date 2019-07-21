@@ -31,7 +31,7 @@ if (!('gl' in window)) {
 		disableRaw: { value: ((window as any).gl as GraphicsContext).disable },
 
 		getExtension: {
-			value<T>(name: string): T {
+			value: function <T>(name: string): T {
 				const _this = this as GraphicsContext;
 				const _result = _this.getExtensionRaw<T>(name);
 
@@ -44,7 +44,7 @@ if (!('gl' in window)) {
 		},
 
 		getExtensions: {
-			value(...name: string[]): void {
+			value: function (...name: string[]): void {
 				const _this = this as GraphicsContext;
 
 				for (let i = 0; i < name.length; i++) {
@@ -57,7 +57,7 @@ if (!('gl' in window)) {
 		depth: { value: ((window as any).gl as GraphicsContext).getExtension<WEBGL_depth_texture>('WEBGL_depth_texture') },
 
 		enable: {
-			value(cap: GLenum): boolean {
+			value: function (cap: GLenum): boolean {
 				const _this = this as GraphicsContext;
 				const _enable = _this._enabled.set(cap, true);
 
@@ -70,7 +70,7 @@ if (!('gl' in window)) {
 		},
 
 		disable: {
-			value(cap: GLenum): void {
+			value: function (cap: GLenum): void {
 				const _this = this as GraphicsContext;
 
 				if (_this._enabled.set(cap, false)) {

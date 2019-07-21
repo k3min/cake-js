@@ -3,7 +3,7 @@ import Texture2D from './GL/Texture2D';
 import Storage from './Helpers/Storage';
 import Shader from './Shader';
 import Toggle from './Helpers/Toggle';
-import { Vector } from './Math';
+import Vector from './Math/Vector';
 
 class Material extends Base {
 	public name: string = 'Material';

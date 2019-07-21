@@ -8,7 +8,11 @@ import Null from './Helpers/Null';
 import Path from './Helpers/Path';
 import ShaderParser from './Helpers/ShaderParser';
 import Storage from './Helpers/Storage';
-import { Matrix4x4, Vector, Vector2, Vector3, Vector4 } from './Math';
+import Matrix4x4 from './Math/Matrix4x4';
+import Vector from './Math/Vector';
+import Vector2 from './Math/Vector2';
+import Vector3 from './Math/Vector3';
+import Vector4 from './Math/Vector4';
 
 class Shader extends BindableObject<Shader> implements Disposable {
 	private variants: Storage<ShaderProgram> = new Storage<ShaderProgram>();
