@@ -4,10 +4,6 @@ import VertexAttribute from './Helpers/VertexAttribute';
 import VertexArrayBuffer, { Indexable } from './Helpers/VertexArrayBuffer';
 
 class VertexBuffer<T extends Indexable> extends Buffer<VertexArrayBuffer<T>> {
-	protected get identifier(): string {
-		return 'vertexBuffer';
-	}
-
 	public constructor(data: T[]) {
 		super(gl.ARRAY_BUFFER, new VertexArrayBuffer<T>(data), data.length);
 	}

@@ -2,10 +2,6 @@ import gl from './index';
 import Buffer from './Buffer';
 
 class IndexBuffer extends Buffer<Uint16Array> {
-	protected get identifier(): string {
-		return 'indexBuffer';
-	}
-
 	public constructor(data: number[]) {
 		super(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(data), data.length);
 	}

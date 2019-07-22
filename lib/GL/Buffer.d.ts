@@ -5,6 +5,7 @@ declare abstract class Buffer<T extends ArrayBuffer> extends BindableGraphicsObj
     protected readonly data: T;
     private readonly target;
     readonly length: number;
+    protected readonly identifier: string;
     static readonly bound: Null<Buffer<ArrayBuffer>>;
     protected constructor(target: GLenum, data: T, length: number);
     apply(): void;

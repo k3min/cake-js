@@ -8,6 +8,10 @@ abstract class Buffer<T extends ArrayBuffer> extends BindableGraphicsObject<Buff
 	private readonly target: GLenum;
 	public readonly length: number;
 
+	protected get identifier(): string {
+		return 'buffer';
+	}
+
 	public static get bound(): Null<Buffer<ArrayBuffer>> {
 		return BindableGraphicsObject.map.get('buffer') as Null<Buffer<ArrayBuffer>>;
 	}
@@ -20,7 +24,6 @@ abstract class Buffer<T extends ArrayBuffer> extends BindableGraphicsObject<Buff
 		this.length = length;
 
 		this.apply();
-		this.unbind();
 	}
 
 	public apply(): void {
