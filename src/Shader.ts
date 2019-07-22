@@ -6,7 +6,7 @@ import Texture2D from './GL/Texture2D';
 import BindableObject from './Helpers/BindableObject';
 import Null from './Helpers/Null';
 import Path from './Helpers/Path';
-import ShaderParser from './Helpers/ShaderParser';
+import ShaderParser from './GL/Helpers/ShaderParser';
 import Storage from './Helpers/Storage';
 import Matrix4x4 from './Math/Matrix4x4';
 import Vector from './Math/Vector';

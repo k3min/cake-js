@@ -1,4 +1,4 @@
-import gl from '../index';
+import gl from '..';
 
 const getSize = (type: GLenum): number => {
 	switch (type) {

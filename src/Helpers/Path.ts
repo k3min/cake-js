@@ -1,19 +1,43 @@
-class Path {
-	public static getExtension(path: string): string {
-		const split = path.split('.');
+const substr = (path: string, char: string): string => {
+	let index: number = path.lastIndexOf(char);
 
-		return ((split.length > 1) && split.pop()) || '';
+	if (index !== -1) {
+		return path.substr(index + 1, path.length - index);
 	}
 
-	public static getFileName(path: string, extension: boolean = false): string {
-		const split = (path.split('/').pop() || '').split('.');
+	return '';
+};
 
-		if (!extension && split.length > 1) {
-			split.pop();
+const getFileName = (path: string, extension: boolean = false): string => {
+	path = substr(path, '/') || path;
+
+	if (extension) {
+		let index: number = path.lastIndexOf('.');
+
+		if (index !== -1) {
+			path = path.substr(0, index);
 		}
-
-		return split.join('.');
 	}
-}
 
-export default Path;
+	return path;
+};
+
+const getExtension = (path: string): string => {
+	return substr(path, '.');
+};
+
+const getDirectoryName = (path: string): string => {
+	let index: number = path.lastIndexOf('/');
+
+	if (index !== -1) {
+		return path.substr(0, index);
+	}
+
+	return path;
+};
+
+export default {
+	getFileName,
+	getExtension,
+	getDirectoryName,
+};

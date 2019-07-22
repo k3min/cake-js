@@ -1,5 +1,6 @@
-declare class Path {
-    static getExtension(path: string): string;
-    static getFileName(path: string, extension?: boolean): string;
-}
-export default Path;
+declare const _default: {
+    getFileName: (path: string, extension?: boolean) => string;
+    getExtension: (path: string) => string;
+    getDirectoryName: (path: string) => string;
+};
+export default _default;

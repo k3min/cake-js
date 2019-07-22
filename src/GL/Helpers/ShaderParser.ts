@@ -1,5 +1,6 @@
-import Resource, { ResourceType } from './Resource';
-import TextReader from './TextReader';
+import Resource, { ResourceType } from '../../Helpers/Resource';
+import TextReader from '../../Helpers/TextReader';
+import gl from '..';
 
 export enum ShaderSection {
 	Global = 'global',
@@ -8,7 +9,8 @@ export enum ShaderSection {
 }
 
 const SECTION_PATTERN = /(fragment|vertex):/;
-const INCLUDE_PATTERN = /#include ["'`](.*?)["'`]/;
+const INCLUDE_PATTERN = /#include\s+["'`](.*?)["'`]/;
+const EXTENSION_PATTERN = /#extension\s+GL_(.*?)\s*:\s*enable/;
 const DEFINE_PATTERN = /defined\((.*?)\)/;
 
 interface Raw {
@@ -27,6 +29,7 @@ class ShaderParser {
 	};
 
 	private section: ShaderSection = ShaderSection.Global;
+	private readonly extensions: string[] = [];
 
 	public readonly keywords: string[][] = [];
 
@@ -40,6 +43,10 @@ class ShaderParser {
 			}
 
 			if (await this.parseInclude(line)) {
+				continue;
+			}
+
+			if (this.parseExtension(line)) {
 				continue;
 			}
 
@@ -92,10 +99,34 @@ class ShaderParser {
 			return false;
 		}
 
-		const [, define] = match;
+		let [, define] = match;
 
-		if (!this.raw.keywords.includes(define)) {
+		define = define.trim();
+
+		if (!this.raw.keywords.includes(define) && !this.extensions.includes(define)) {
 			this.raw.keywords.push(define);
+		}
+
+		return true;
+	}
+
+	private parseExtension(line: string): boolean {
+		const match = line.match(EXTENSION_PATTERN);
+
+		if (!match) {
+			return false;
+		}
+
+		const [, extension] = match;
+
+		if (!this.extensions.includes(extension)) {
+			this.extensions.push(extension);
+
+			if (gl.getExtensionRaw(extension) === null) {
+				return false;
+			}
+
+			this.raw[this.section].push(`#define ${ extension }`);
 		}
 
 		return true;

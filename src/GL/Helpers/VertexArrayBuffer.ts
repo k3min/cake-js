@@ -1,4 +1,4 @@
-import { gl } from '../../index';
+import gl from '..';
 import VertexAttribute from './VertexAttribute';
 
 type VA = VertexAttribute<ArrayLike<number>>;

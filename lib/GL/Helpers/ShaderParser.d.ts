@@ -1,4 +1,4 @@
-import TextReader from './TextReader';
+import TextReader from '../../Helpers/TextReader';
 export declare enum ShaderSection {
     Global = "global",
     Vertex = "vertex",
@@ -7,6 +7,7 @@ export declare enum ShaderSection {
 declare class ShaderParser {
     private readonly raw;
     private section;
+    private readonly extensions;
     readonly keywords: string[][];
     vertexSource: string[];
     fragmentSource: string[];
@@ -15,6 +16,7 @@ declare class ShaderParser {
     parse(reader: TextReader): Promise<void>;
     private generateKeywords;
     private parseDefine;
+    private parseExtension;
     private parseInclude;
     private parseSection;
 }
