@@ -1,14 +1,14 @@
 import gl from '..';
 import VertexAttribute from './VertexAttribute';
 
-type VA = VertexAttribute<ArrayLike<number>>;
+export type VA = VertexAttribute<ArrayLike<number>>;
 
 export interface Indexable {
 	readonly [attribute: string]: VA;
 }
 
 class VertexArrayBuffer<T extends Indexable> extends ArrayBuffer {
-	public readonly stride: number;
+	public readonly bytesPerElement: number;
 	public readonly attributes: VA[];
 	public readonly view: DataView;
 	public readonly length: number;
@@ -17,24 +17,26 @@ class VertexArrayBuffer<T extends Indexable> extends ArrayBuffer {
 		const item: T = data[0];
 
 		const length: number = data.length;
-		const stride: number = VertexArrayBuffer.getSize(item);
+		const bytesPerElement: number = VertexArrayBuffer.getBytesPerElement(item);
 
-		super(length * stride);
+		super(length * bytesPerElement);
 
 		this.length = length;
-		this.stride = stride;
+		this.bytesPerElement = bytesPerElement;
 		this.attributes = VertexArrayBuffer.getAttributes(item);
 		this.view = new DataView(this);
 
 		let byteOffset: number = 0;
 
-		data.forEach((vertex: T): void => {
-			for (let attribute in vertex) {
-				if (vertex.hasOwnProperty(attribute)) {
-					byteOffset += this.set(byteOffset, vertex[attribute]);
+		for (let i = 0; i < length; i++) {
+			const item: T = data[i];
+
+			for (let attribute in item) {
+				if (item.hasOwnProperty(attribute)) {
+					byteOffset += this.set(byteOffset, item[attribute]);
 				}
 			}
-		});
+		}
 	}
 
 	public static getAttributes<T extends Indexable>(item: T): VA[] {
@@ -42,19 +44,19 @@ class VertexArrayBuffer<T extends Indexable> extends ArrayBuffer {
 
 		for (let attribute in item) {
 			if (item.hasOwnProperty(attribute)) {
-				attributes.push(item[attribute]);
+				attributes.push(item[attribute] as VA);
 			}
 		}
 
 		return attributes;
 	}
 
-	public static getSize<T extends Indexable>(item: T): number {
+	public static getBytesPerElement<T extends Indexable>(item: T): number {
 		let size: number = 0;
 
 		for (let attribute in item) {
 			if (item.hasOwnProperty(attribute)) {
-				size += item[attribute].stride;
+				size += (item[attribute] as VA).byteLength;
 			}
 		}
 
@@ -64,10 +66,11 @@ class VertexArrayBuffer<T extends Indexable> extends ArrayBuffer {
 	public set(byteOffset: number, vertexAttribute: VA): number {
 		const type: GLenum = vertexAttribute.type;
 		const value: ArrayLike<number> = vertexAttribute.value;
-		const size: number = vertexAttribute.size;
-		const byteLength: number = vertexAttribute.stride;
+		const bytesPerElement: GLint = vertexAttribute.bytesPerElement;
+		const byteLength: number = vertexAttribute.byteLength;
+		const length = vertexAttribute.length;
 
-		for (let i = 0; i < vertexAttribute.length; i++) {
+		for (let i = 0; i < length; i++) {
 			switch (type) {
 				case gl.UNSIGNED_INT:
 					this.view.setUint32(byteOffset, value[i] * 0xffffffff);
@@ -101,7 +104,7 @@ class VertexArrayBuffer<T extends Indexable> extends ArrayBuffer {
 					throw new RangeError();
 			}
 
-			byteOffset += size;
+			byteOffset += bytesPerElement;
 		}
 
 		return byteLength;
