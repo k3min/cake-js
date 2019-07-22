@@ -7,12 +7,12 @@ import Storage from './Helpers/Storage';
 import Matrix4x4 from './Math/Matrix4x4';
 import Vector from './Math/Vector';
 declare class Shader extends BindableObject<Shader> implements Disposable {
+    name: string;
     private variants;
     private readonly parser;
     private textureIndices;
     private textureIndex;
     private variant;
-    name: string;
     static floats: Storage<GLfloat>;
     static ints: Storage<GLint>;
     static vectors: Storage<Vector>;
@@ -35,7 +35,8 @@ declare class Shader extends BindableObject<Shader> implements Disposable {
     static setVector(name: string, value: Vector): void;
     static setMatrix4x4(name: string, value: Matrix4x4): void;
     static setTexture(name: string, value: Texture): void;
-    afterBind(): void;
+    protected onUnbind(): void;
+    protected onBind(): void;
     dispose(): void;
     private uniformNotFound;
 }

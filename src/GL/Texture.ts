@@ -18,6 +18,8 @@ export interface Mipmap {
 }
 
 abstract class Texture<GL extends WebGLObject = WebGLObject> extends BindableGraphicsObject<Texture<GL>, GL> {
+	public name: string = 'Texture';
+
 	public readonly target: GLenum;
 
 	protected data: TexImageSource | ArrayBufferView | Mipmap[] | Mipmap[][] | null = null;

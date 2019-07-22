@@ -15,6 +15,8 @@ import Vector3 from './Math/Vector3';
 import Vector4 from './Math/Vector4';
 
 class Shader extends BindableObject<Shader> implements Disposable {
+	public name: string = 'Shader';
+
 	private variants: Storage<ShaderProgram> = new Storage<ShaderProgram>();
 
 	private readonly parser: ShaderParser = new ShaderParser();
@@ -24,8 +26,6 @@ class Shader extends BindableObject<Shader> implements Disposable {
 
 	// @ts-ignore
 	private variant: ShaderProgram;
-
-	public name: string = 'Shader';
 
 	public static floats: Storage<GLfloat> = new Storage<GLfloat>();
 	public static ints: Storage<GLint> = new Storage<GLint>();
@@ -226,7 +226,11 @@ class Shader extends BindableObject<Shader> implements Disposable {
 		Shader.textures.set(name, value);
 	}
 
-	public afterBind(): void {
+	protected onUnbind(): void {
+		this.variant.unbind();
+	}
+
+	protected onBind(): void {
 		this.variant.bind();
 
 		Shader.floats.forEach((value, name) => this.setFloat(name, value));

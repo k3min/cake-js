@@ -1,14 +1,14 @@
-import Framebuffer from './GL/Framebuffer';
+import FrameBuffer from './GL/FrameBuffer';
 import Disposable from './Helpers/Disposable';
 import Null from './Helpers/Null';
 import { gl } from './index';
 import Quad from './Quad';
 import Material from './Material';
 import Texture2D from './GL/Texture2D';
-import Renderbuffer from './GL/Renderbuffer';
+import RenderBuffer from './GL/RenderBuffer';
 
 class Graphics implements Disposable {
-	private framebuffer: Null<Framebuffer> = null;
+	private framebuffer: Null<FrameBuffer> = null;
 
 	public quad: Null<Quad> = null;
 
@@ -24,9 +24,9 @@ class Graphics implements Disposable {
 		}
 	}
 
-	public setRenderTarget(color?: Null<Texture2D>, depth?: Null<Renderbuffer>): void {
+	public setRenderTarget(color?: Null<Texture2D>, depth?: Null<RenderBuffer>): void {
 		if (!this.framebuffer) {
-			this.framebuffer = new Framebuffer();
+			this.framebuffer = new FrameBuffer();
 		}
 
 		if (!color) {

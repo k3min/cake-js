@@ -2,13 +2,13 @@ import Null from '../Helpers/Null';
 import BindableGraphicsObject from './Helpers/BindableGraphicsObject';
 import Texture from './Texture';
 import Texture2D from './Texture2D';
-import Renderbuffer from './Renderbuffer';
-declare class Framebuffer extends BindableGraphicsObject<Framebuffer, WebGLFramebuffer> {
+import RenderBuffer from './RenderBuffer';
+declare class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> {
     name: string;
     readonly attachments: Map<GLenum, Texture>;
     color: Null<Texture2D>;
-    depth: Null<Renderbuffer>;
-    static readonly bound: Null<Framebuffer>;
+    depth: Null<RenderBuffer>;
+    static readonly bound: Null<FrameBuffer>;
     protected readonly identifier: string;
     constructor();
     apply(force?: boolean): void;
@@ -18,4 +18,4 @@ declare class Framebuffer extends BindableGraphicsObject<Framebuffer, WebGLFrame
     detach(slot?: GLenum): void;
     dispose(): void;
 }
-export default Framebuffer;
+export default FrameBuffer;

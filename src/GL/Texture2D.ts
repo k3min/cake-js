@@ -4,6 +4,8 @@ import gl from './index';
 import Texture, { TextureFormat } from './Texture';
 
 class Texture2D extends Texture<WebGLTexture> {
+	public name: string = 'Texture2D';
+
 	public readonly texelSize: Vector4 = new Vector4(0, 0, 0, 0);
 
 	public constructor(width: number, height: number, format: TextureFormat) {

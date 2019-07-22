@@ -4,19 +4,20 @@ import VertexBuffer from './GL/VertexBuffer';
 import IndexBuffer from './GL/IndexBuffer';
 import { Indexable } from './GL/Helpers/VertexArrayBuffer';
 import Disposable from './Helpers/Disposable';
+import Null from './Helpers/Null';
 import { gl } from './index';
 
-class Model<T extends Indexable> extends BindableObject<Model<T>> implements Drawable, Disposable {
+class Model<I extends Indexable> extends BindableObject<Model<I>> implements Drawable, Disposable {
 	public name: string = 'Model';
 
-	protected vertices?: VertexBuffer<T>;
-	protected indices?: IndexBuffer;
+	protected vertices: VertexBuffer<I> | null = null;
+	protected indices: Null<IndexBuffer> = null;
 
 	protected get identifier(): string {
 		return 'model';
 	}
 
-	public afterBind(): void {
+	protected onBind(): void {
 		if (!this.vertices) {
 			return;
 		}
@@ -28,15 +29,13 @@ class Model<T extends Indexable> extends BindableObject<Model<T>> implements Dra
 		}
 	}
 
-	public afterUnbind(): void {
-		if (!this.vertices) {
-			return;
-		}
+	protected onUnbind(): void {
+		if (this.vertices) {
+			this.vertices.unbind();
 
-		this.vertices.unbind();
-
-		if (this.indices) {
-			this.indices.unbind();
+			if (this.indices) {
+				this.indices.unbind();
+			}
 		}
 	}
 
@@ -49,7 +48,7 @@ class Model<T extends Indexable> extends BindableObject<Model<T>> implements Dra
 			this.indices.draw(type);
 		} else {
 			if (!this.vertices) {
-				console.warn(`Model (${ this.name }): \`this.vertices\` is undefined`);
+				console.warn(`Model (${ this.name }): no vertices`);
 				return;
 			}
 
@@ -62,12 +61,12 @@ class Model<T extends Indexable> extends BindableObject<Model<T>> implements Dra
 
 		if (this.vertices) {
 			this.vertices.dispose();
-			this.vertices = undefined;
+			this.vertices = null;
 		}
 
 		if (this.indices) {
 			this.indices.dispose();
-			this.indices = undefined;
+			this.indices = null;
 		}
 	}
 }

@@ -4,6 +4,7 @@ import BindableGraphicsObject from './Helpers/BindableGraphicsObject';
 export declare type ShaderAttribute = number | undefined;
 export declare type ShaderUniform = Null<WebGLUniformLocation>;
 declare class ShaderProgram extends BindableGraphicsObject<ShaderProgram, WebGLProgram> {
+    name: string;
     attributes: Storage<ShaderAttribute>;
     uniforms: Storage<ShaderUniform>;
     private vertex;

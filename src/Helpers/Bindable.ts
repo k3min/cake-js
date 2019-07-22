@@ -1,7 +1,7 @@
 interface Bindable {
 	bind(): boolean;
 
-	unbind(): void;
+	unbind(): boolean;
 }
 
 export default Bindable;

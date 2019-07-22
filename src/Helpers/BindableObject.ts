@@ -4,57 +4,47 @@ import Null from './Null';
 import Storage from './Storage';
 
 abstract class BindableObject<T extends BindableObject<T>> extends Base implements Bindable {
+	public name: string = 'BindableObject';
+
 	protected static map: Storage<Null<Bindable>> = new Storage<Null<Bindable>>();
 
 	protected abstract get identifier(): string;
 
 	public bind(): boolean {
-		const bound: Null<BindableObject<T>> = BindableObject.map.get(this.identifier) as Null<BindableObject<T>>;
+		const previous: Null<BindableObject<T>> = BindableObject.map.get(this.identifier) as Null<BindableObject<T>>;
 
-		if (bound === this) {
+		if (previous === this) {
 			return false;
 		}
 
-		if (bound) {
+		if (previous) {
 			//bound.unbind();
 		}
 
-		this.beforeBind(bound as Null<T>);
-
 		BindableObject.map.set(this.identifier, this);
 
-		this.afterBind();
+		this.onBind();
 
 		return true;
 	}
 
-	public unbind(): void {
-		const bound: Null<BindableObject<T>> = BindableObject.map.get(this.identifier) as Null<BindableObject<T>>;
+	public unbind(): boolean {
+		const previous: Null<BindableObject<T>> = BindableObject.map.get(this.identifier) as Null<BindableObject<T>>;
 
-		if (!bound) {
-			return;
+		if (!previous) {
+			return false;
 		}
 
-		this.beforeUnbind(bound as T);
+		this.onUnbind();
 
 		BindableObject.map.set(this.identifier, null);
 
-		this.afterUnbind();
+		return true;
 	}
 
-	// @ts-ignore
-	protected beforeBind(previous: Null<T>): void {
-	}
+	protected abstract onBind(): void;
 
-	protected afterBind(): void {
-	}
-
-	// @ts-ignore
-	protected beforeUnbind(previous: T): void {
-	}
-
-	protected afterUnbind(): void {
-	}
+	protected abstract onUnbind(): void;
 
 	public dispose(): void {
 		this.unbind();

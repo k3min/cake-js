@@ -3,13 +3,13 @@ import Null from '../Helpers/Null';
 import gl from './index';
 import Texture, { TextureFormat } from './Texture';
 
-class Renderbuffer extends Texture<WebGLRenderbuffer> {
-	public name: string = 'Renderbuffer';
+class RenderBuffer extends Texture<WebGLRenderbuffer> {
+	public name: string = 'RenderBuffer';
 
 	public readonly stencil: boolean;
 
-	public static get bound(): Null<Renderbuffer> {
-		return BindableObject.map.get('renderbuffer') as Null<Renderbuffer>;
+	public static get bound(): Null<RenderBuffer> {
+		return BindableObject.map.get('renderbuffer') as Null<RenderBuffer>;
 	}
 
 	protected get identifier(): string {
@@ -29,4 +29,4 @@ class Renderbuffer extends Texture<WebGLRenderbuffer> {
 	}
 }
 
-export default Renderbuffer;
+export default RenderBuffer;

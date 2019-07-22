@@ -3,18 +3,18 @@ import BindableGraphicsObject from './Helpers/BindableGraphicsObject';
 import gl from './index';
 import Texture from './Texture';
 import Texture2D from './Texture2D';
-import Renderbuffer from './Renderbuffer';
+import RenderBuffer from './RenderBuffer';
 
-class Framebuffer extends BindableGraphicsObject<Framebuffer, WebGLFramebuffer> {
-	public name: string = 'Framebuffer';
+class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> {
+	public name: string = 'FrameBuffer';
 
 	public readonly attachments: Map<GLenum, Texture> = new Map<GLenum, Texture>();
 
 	public color: Null<Texture2D> = null;
-	public depth: Null<Renderbuffer> = null;
+	public depth: Null<RenderBuffer> = null;
 
-	public static get bound(): Null<Framebuffer> {
-		return BindableGraphicsObject.map.get('framebuffer') as Null<Framebuffer>;
+	public static get bound(): Null<FrameBuffer> {
+		return BindableGraphicsObject.map.get('framebuffer') as Null<FrameBuffer>;
 	}
 
 	protected get identifier(): string {
@@ -26,7 +26,6 @@ class Framebuffer extends BindableGraphicsObject<Framebuffer, WebGLFramebuffer> 
 
 		if (this.color || this.depth) {
 			this.apply();
-			this.unbind();
 		}
 	}
 
@@ -44,7 +43,7 @@ class Framebuffer extends BindableGraphicsObject<Framebuffer, WebGLFramebuffer> 
 		if (!force && gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
 			this.dispose();
 
-			throw new Error('Framebuffer not complete');
+			throw new Error('FrameBuffer not complete');
 		}
 	}
 
@@ -106,4 +105,4 @@ class Framebuffer extends BindableGraphicsObject<Framebuffer, WebGLFramebuffer> 
 	}
 }
 
-export default Framebuffer;
+export default FrameBuffer;

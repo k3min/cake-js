@@ -7,6 +7,8 @@ export type ShaderAttribute = number | undefined;
 export type ShaderUniform = Null<WebGLUniformLocation>;
 
 class ShaderProgram extends BindableGraphicsObject<ShaderProgram, WebGLProgram> {
+	public name: string = 'ShaderProgram';
+
 	public attributes: Storage<ShaderAttribute> = new Storage<ShaderAttribute>();
 	public uniforms: Storage<ShaderUniform> = new Storage<ShaderUniform>();
 

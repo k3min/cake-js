@@ -4,6 +4,8 @@ import BindableGraphicsObject from './Helpers/BindableGraphicsObject';
 import gl from './index';
 
 abstract class Buffer<T extends ArrayBuffer> extends BindableGraphicsObject<Buffer<T>, WebGLBuffer> implements Drawable {
+	public name: string = 'Buffer';
+
 	protected readonly data: T;
 	private readonly target: GLenum;
 	public readonly length: number;

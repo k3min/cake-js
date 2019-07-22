@@ -1,7 +1,7 @@
 import Disposable from './Disposable';
 
 abstract class Base implements Disposable {
-	public name?: string;
+	public abstract name: string;
 
 	public abstract dispose(): void;
 }

@@ -3,6 +3,8 @@ import Disposable from '../../Helpers/Disposable';
 import Null from '../../Helpers/Null';
 
 abstract class BindableGraphicsObject<T extends BindableGraphicsObject<T, GL>, GL extends WebGLObject> extends BindableObject<T> implements Disposable {
+	public name: string = 'BindableGraphicsObject';
+
 	public readonly handle: GL;
 
 	private readonly bindFn: (handle: Null<GL>) => void;
@@ -17,11 +19,11 @@ abstract class BindableGraphicsObject<T extends BindableGraphicsObject<T, GL>, G
 		this.deleteFn = releaseFn;
 	}
 
-	protected afterBind(): void {
+	protected onBind(): void {
 		this.bindFn(this.handle);
 	}
 
-	protected afterUnbind(): void {
+	protected onUnbind(): void {
 		this.bindFn(null);
 	}
 
