@@ -61,10 +61,6 @@ class Shader extends BindableObject<Shader> implements Disposable {
 		return 'shader';
 	}
 
-	public static get bound(): Null<Shader> {
-		return BindableObject.map.get('shader') as Null<Shader>;
-	}
-
 	public static async load(url: string): Promise<Shader> {
 		const shader: Shader = new Shader();
 

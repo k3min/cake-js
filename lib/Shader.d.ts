@@ -22,7 +22,6 @@ declare class Shader extends BindableObject<Shader> implements Disposable {
     readonly uniforms: Storage<ShaderUniform>;
     keywords: Null<string[]>;
     protected readonly identifier: string;
-    static readonly bound: Null<Shader>;
     static load(url: string): Promise<Shader>;
     apply(): void;
     setFloat(name: string, value: GLfloat): void;

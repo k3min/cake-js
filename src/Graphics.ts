@@ -45,7 +45,7 @@ class Graphics implements Disposable {
 		this.framebuffer.color = color;
 		this.framebuffer.depth = depth || null;
 
-		this.framebuffer.apply(true);
+		this.framebuffer.apply();
 	}
 
 	public blit(a: Null<Texture2D>, b: Null<Texture2D>, material: Material): void {

@@ -8,10 +8,9 @@ declare class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFrame
     readonly attachments: Map<GLenum, Texture>;
     color: Null<Texture2D>;
     depth: Null<RenderBuffer>;
-    static readonly bound: Null<FrameBuffer>;
     protected readonly identifier: string;
     constructor();
-    apply(force?: boolean): void;
+    apply(): void;
     private attachAttachment;
     private detachAttachment;
     attach(slot: GLenum, texture: Texture): void;

@@ -1,5 +1,3 @@
-import BindableObject from '../Helpers/BindableObject';
-import Null from '../Helpers/Null';
 import gl from './index';
 import Texture, { TextureFormat } from './Texture';
 
@@ -7,10 +5,6 @@ class RenderBuffer extends Texture<WebGLRenderbuffer> {
 	public name: string = 'RenderBuffer';
 
 	public readonly stencil: boolean;
-
-	public static get bound(): Null<RenderBuffer> {
-		return BindableObject.map.get('renderbuffer') as Null<RenderBuffer>;
-	}
 
 	protected get identifier(): string {
 		return 'renderbuffer';

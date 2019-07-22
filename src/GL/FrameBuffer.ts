@@ -13,23 +13,15 @@ class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> 
 	public color: Null<Texture2D> = null;
 	public depth: Null<RenderBuffer> = null;
 
-	public static get bound(): Null<FrameBuffer> {
-		return BindableGraphicsObject.map.get('framebuffer') as Null<FrameBuffer>;
-	}
-
 	protected get identifier(): string {
 		return 'framebuffer';
 	}
 
 	public constructor() {
 		super(() => gl.createFramebuffer(), (handle) => gl.bindFramebuffer(gl.FRAMEBUFFER, handle), (handle) => gl.deleteFramebuffer(handle));
-
-		if (this.color || this.depth) {
-			this.apply();
-		}
 	}
 
-	public apply(force: boolean = false): void {
+	public apply(): void {
 		this.bind();
 
 		if (this.depth) {
@@ -40,7 +32,7 @@ class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> 
 			this.attach(gl.COLOR_ATTACHMENT0, this.color);
 		}
 
-		if (!force && gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
+		if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
 			this.dispose();
 
 			throw new Error('FrameBuffer not complete');
@@ -85,6 +77,7 @@ class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> 
 	public detach(slot?: GLenum): void {
 		if (!slot) {
 			this.attachments.forEach((texture, slot) => this.detachAttachment(slot, texture.target));
+			this.attachments.clear();
 			return;
 		}
 

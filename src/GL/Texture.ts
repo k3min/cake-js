@@ -33,10 +33,6 @@ abstract class Texture<GL extends WebGLObject = WebGLObject> extends BindableGra
 	public width: number;
 	public height: number;
 
-	public static get bound(): Null<Texture> {
-		return BindableGraphicsObject.map.get('texture') as Null<Texture>;
-	}
-
 	protected get identifier(): string {
 		return 'texture';
 	}

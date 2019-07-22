@@ -1,17 +1,16 @@
 import Bindable from './Bindable';
 import Base from './Base';
-import Null from './Null';
 import Storage from './Storage';
 
 abstract class BindableObject<T extends BindableObject<T>> extends Base implements Bindable {
 	public name: string = 'BindableObject';
 
-	protected static map: Storage<Null<Bindable>> = new Storage<Null<Bindable>>();
+	protected static map: Storage<Bindable> = new Storage<Bindable>();
 
 	protected abstract get identifier(): string;
 
 	public bind(): boolean {
-		const previous: Null<BindableObject<T>> = BindableObject.map.get(this.identifier) as Null<BindableObject<T>>;
+		const previous: Bindable | undefined = BindableObject.map.get(this.identifier);
 
 		if (previous === this) {
 			return false;
@@ -29,7 +28,7 @@ abstract class BindableObject<T extends BindableObject<T>> extends Base implemen
 	}
 
 	public unbind(): boolean {
-		const previous: Null<BindableObject<T>> = BindableObject.map.get(this.identifier) as Null<BindableObject<T>>;
+		const previous: Bindable | undefined = BindableObject.map.get(this.identifier);
 
 		if (!previous) {
 			return false;
@@ -37,7 +36,7 @@ abstract class BindableObject<T extends BindableObject<T>> extends Base implemen
 
 		this.onUnbind();
 
-		BindableObject.map.set(this.identifier, null);
+		BindableObject.map.delete(this.identifier);
 
 		return true;
 	}

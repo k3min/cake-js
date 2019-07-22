@@ -1,5 +1,4 @@
 import Drawable from '../Helpers/Drawable';
-import Null from '../Helpers/Null';
 import BindableGraphicsObject from './Helpers/BindableGraphicsObject';
 import gl from './index';
 
@@ -12,10 +11,6 @@ abstract class Buffer<T extends ArrayBuffer> extends BindableGraphicsObject<Buff
 
 	protected get identifier(): string {
 		return 'buffer';
-	}
-
-	public static get bound(): Null<Buffer<ArrayBuffer>> {
-		return BindableGraphicsObject.map.get('buffer') as Null<Buffer<ArrayBuffer>>;
 	}
 
 	protected constructor(target: GLenum, data: T, length: number) {

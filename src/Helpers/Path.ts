@@ -13,7 +13,7 @@ const substr = (path: string, char: string): string => {
 const getFileName = (path: string, extension: boolean = false): string => {
 	path = substr(path, DIRECTORY_SEPARATOR) || path;
 
-	if (extension) {
+	if (!extension) {
 		let index: number = path.lastIndexOf('.');
 
 		if (index !== -1) {

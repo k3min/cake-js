@@ -23,7 +23,6 @@ declare abstract class Texture<GL extends WebGLObject = WebGLObject> extends Bin
     readonly format: TextureFormat;
     width: number;
     height: number;
-    static readonly bound: Null<Texture>;
     protected readonly identifier: string;
     protected constructor(width: number, height: number, format: TextureFormat, target: GLenum, genFn: () => Null<GL>, bindFn: (handle: Null<GL>) => void, releaseFn: (handle: GL) => void);
     set(name: GLenum, value: GLenum): void;
