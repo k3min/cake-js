@@ -13,6 +13,8 @@ class VertexBuffer<T extends Indexable> extends Buffer<VertexArrayBuffer<T>> {
 	}
 
 	public afterBind(): void {
+		super.afterBind();
+
 		let offset: number = 0;
 
 		for (let index = 0; index < this.data.attributes.length; index++) {
@@ -37,6 +39,8 @@ class VertexBuffer<T extends Indexable> extends Buffer<VertexArrayBuffer<T>> {
 		for (let index = 0; index < this.data.attributes.length; index++) {
 			gl.disableVertexAttribArray(index);
 		}
+
+		super.afterUnbind();
 	}
 
 	public draw(type?: GLenum): void {

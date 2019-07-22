@@ -6,11 +6,9 @@ import Renderbuffer from './GL/Renderbuffer';
 declare class Graphics implements Disposable {
     private framebuffer?;
     quad?: Quad;
-    copy?: Material;
-    init(shader?: string): Promise<void>;
     dispose(): void;
     setRenderTarget(color?: Texture2D, depth?: Renderbuffer): void;
-    blit(a: Texture2D, b: Texture2D, material?: Material): void;
+    blit(a: Texture2D, b: Texture2D, material: Material): void;
 }
 declare let graphics: Graphics;
 export default graphics;
