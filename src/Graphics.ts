@@ -1,5 +1,6 @@
 import Framebuffer from './GL/Framebuffer';
 import Disposable from './Helpers/Disposable';
+import Null from './Helpers/Null';
 import { gl } from './index';
 import Quad from './Quad';
 import Material from './Material';
@@ -7,28 +8,28 @@ import Texture2D from './GL/Texture2D';
 import Renderbuffer from './GL/Renderbuffer';
 
 class Graphics implements Disposable {
-	private framebuffer?: Framebuffer;
+	private framebuffer: Null<Framebuffer> = null;
 
-	public quad?: Quad;
+	public quad: Null<Quad> = null;
 
 	public dispose(): void {
-		if (this.framebuffer !== undefined) {
+		if (this.framebuffer) {
 			this.framebuffer.dispose();
-			this.framebuffer = undefined;
+			this.framebuffer = null;
 		}
 
-		if (this.quad !== undefined) {
+		if (this.quad) {
 			this.quad.dispose();
-			this.quad = undefined;
+			this.quad = null;
 		}
 	}
 
-	public setRenderTarget(color?: Texture2D, depth?: Renderbuffer): void {
-		if (this.framebuffer === undefined) {
+	public setRenderTarget(color?: Null<Texture2D>, depth?: Null<Renderbuffer>): void {
+		if (!this.framebuffer) {
 			this.framebuffer = new Framebuffer();
 		}
 
-		if (color === undefined) {
+		if (!color) {
 			this.framebuffer.unbind();
 			return;
 		}
@@ -42,23 +43,23 @@ class Graphics implements Disposable {
 		this.framebuffer.detach(gl.COLOR_ATTACHMENT0);
 
 		this.framebuffer.color = color;
-		this.framebuffer.depth = depth;
+		this.framebuffer.depth = depth || null;
 
 		this.framebuffer.apply(true);
 	}
 
-	public blit(a: Texture2D, b: Texture2D, material: Material): void {
-		if (this.quad === undefined) {
+	public blit(a: Null<Texture2D>, b: Null<Texture2D>, material: Material): void {
+		if (!this.quad) {
 			this.quad = new Quad();
 		}
 
 		this.setRenderTarget(b);
 
-		if (b !== undefined) {
+		if (b) {
 			gl.viewport(0, 0, b.width, b.height);
 		}
 
-		if (a !== undefined) {
+		if (a) {
 			material.setTexture('_MainTex', a);
 		}
 

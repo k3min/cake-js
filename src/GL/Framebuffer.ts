@@ -10,8 +10,8 @@ class Framebuffer extends BindableGraphicsObject<Framebuffer, WebGLFramebuffer> 
 
 	public readonly attachments: Map<GLenum, Texture> = new Map<GLenum, Texture>();
 
-	public color?: Texture2D;
-	public depth?: Renderbuffer;
+	public color: Null<Texture2D> = null;
+	public depth: Null<Renderbuffer> = null;
 
 	public static get bound(): Null<Framebuffer> {
 		return BindableGraphicsObject.map.get('framebuffer') as Null<Framebuffer>;
@@ -48,7 +48,7 @@ class Framebuffer extends BindableGraphicsObject<Framebuffer, WebGLFramebuffer> 
 		}
 	}
 
-	private attachAttachment(slot: GLenum, target: GLenum, handle: WebGLObject | null): void {
+	private attachAttachment(slot: GLenum, target: GLenum, handle: Null<WebGLObject>): void {
 		this.bind();
 
 		switch (target) {
@@ -84,14 +84,14 @@ class Framebuffer extends BindableGraphicsObject<Framebuffer, WebGLFramebuffer> 
 	}
 
 	public detach(slot?: GLenum): void {
-		if (slot === undefined) {
+		if (!slot) {
 			this.attachments.forEach((texture, slot) => this.detachAttachment(slot, texture.target));
 			return;
 		}
 
 		const texture = this.attachments.get(slot);
 
-		if (texture === undefined) {
+		if (!texture) {
 			return;
 		}
 

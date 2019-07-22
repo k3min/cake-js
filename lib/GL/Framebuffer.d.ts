@@ -6,8 +6,8 @@ import Renderbuffer from './Renderbuffer';
 declare class Framebuffer extends BindableGraphicsObject<Framebuffer, WebGLFramebuffer> {
     name: string;
     readonly attachments: Map<GLenum, Texture>;
-    color?: Texture2D;
-    depth?: Renderbuffer;
+    color: Null<Texture2D>;
+    depth: Null<Renderbuffer>;
     static readonly bound: Null<Framebuffer>;
     protected readonly identifier: string;
     constructor();
