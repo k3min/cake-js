@@ -21,7 +21,7 @@ class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> 
 		super(() => gl.createFramebuffer(), (handle) => gl.bindFramebuffer(gl.FRAMEBUFFER, handle), (handle) => gl.deleteFramebuffer(handle));
 	}
 
-	public apply(): void {
+	public apply(check: boolean = true): void {
 		this.bind();
 
 		if (this.depth) {
@@ -32,7 +32,7 @@ class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> 
 			this.attach(gl.COLOR_ATTACHMENT0, this.color);
 		}
 
-		if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
+		if (check && gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
 			this.dispose();
 
 			throw new Error('FrameBuffer not complete');

@@ -8,8 +8,7 @@ import Texture2D from './GL/Texture2D';
 import RenderBuffer from './GL/RenderBuffer';
 
 class Graphics implements Disposable {
-	private framebuffer: Null<FrameBuffer> = null;
-
+	public framebuffer: Null<FrameBuffer> = null;
 	public quad: Null<Quad> = null;
 
 	public dispose(): void {
@@ -45,7 +44,7 @@ class Graphics implements Disposable {
 		this.framebuffer.color = color;
 		this.framebuffer.depth = depth || null;
 
-		this.framebuffer.apply();
+		this.framebuffer.apply(false);
 	}
 
 	public blit(a: Null<Texture2D>, b: Null<Texture2D>, material: Material): void {
@@ -69,6 +68,10 @@ class Graphics implements Disposable {
 	}
 }
 
-let graphics: Graphics = new Graphics();
+if (!('graphics' in window)) {
+	Object.defineProperty(window, 'graphics', {
+		value: new Graphics(),
+	});
+}
 
-export default graphics;
+export default (window as any).graphics;
