@@ -9,6 +9,7 @@ export { default as Material } from './Material';
 export { default as Model } from './Model';
 export { default as Quad } from './Quad';
 export { default as Shader } from './Shader';
+export { default as Graphics } from './Graphics';
 export { default as Math } from './Math';
 export { default as Vector2 } from './Math/Vector2';
 export { default as Vector3 } from './Math/Vector3';
