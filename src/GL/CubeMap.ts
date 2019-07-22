@@ -1,3 +1,4 @@
+import Path from '../Helpers/Path';
 import DirectDrawSurface, { CubeMapFlags } from './Helpers/DirectDrawSurface';
 import Texture, { Mipmap } from './Texture';
 import gl from './index';
@@ -16,7 +17,7 @@ class CubeMap extends Texture<WebGLTexture> {
 
 		const result: CubeMap = new CubeMap(dds.width, dds.height, dds.textureFormat);
 
-		result.name = url;
+		result.name = Path.getFileName(url);
 
 		result.parse(dds);
 

@@ -1,3 +1,4 @@
+import Path from '../../Helpers/Path';
 import Resource, { ResourceType } from '../../Helpers/Resource';
 import TextReader from '../../Helpers/TextReader';
 import gl from '..';
@@ -36,13 +37,16 @@ class ShaderParser {
 	public vertexSource: string[] = [];
 	public fragmentSource: string[] = [];
 
-	private async parseSource(reader: TextReader): Promise<void> {
+	private async parse(url: string): Promise<void> {
+		const path = Path.getDirectoryName(url);
+		const reader: TextReader = await Resource.load<TextReader>(url, ResourceType.GLSL);
+
 		for (let line of reader) {
 			if (this.parseSection(line)) {
 				continue;
 			}
 
-			if (await this.parseInclude(line)) {
+			if (await this.parseInclude(line, path)) {
 				continue;
 			}
 
@@ -56,20 +60,16 @@ class ShaderParser {
 		}
 	}
 
-	public static async load(url: string): Promise<TextReader> {
-		return await Resource.load<TextReader>(url, ResourceType.GLSL);
-	}
-
-	public async parse(reader: TextReader): Promise<void> {
-		await this.parseSource(reader);
+	public async load(url: string): Promise<void> {
+		await this.parse(url);
 
 		this.vertexSource = this.raw[ShaderSection.Global].concat(this.raw[ShaderSection.Vertex]);
 		this.fragmentSource = this.raw[ShaderSection.Global].concat(this.raw[ShaderSection.Fragment]);
 
-		this.generateKeywords();
+		this.apply();
 	}
 
-	private generateKeywords(): void {
+	private apply(): void {
 		this.raw.keywords.sort();
 
 		const count = this.raw.keywords.length;
@@ -132,7 +132,7 @@ class ShaderParser {
 		return true;
 	}
 
-	private async parseInclude(line: string): Promise<boolean> {
+	private async parseInclude(line: string, path: string): Promise<boolean> {
 		const match = line.match(INCLUDE_PATTERN);
 
 		if (!match) {
@@ -141,7 +141,7 @@ class ShaderParser {
 
 		const [, url] = match;
 
-		await this.parseSource(await ShaderParser.load(url));
+		await this.parse(Path.combine(path, url));
 
 		return true;
 	}

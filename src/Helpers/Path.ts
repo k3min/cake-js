@@ -1,3 +1,5 @@
+const DIRECTORY_SEPARATOR = '/';
+
 const substr = (path: string, char: string): string => {
 	let index: number = path.lastIndexOf(char);
 
@@ -9,7 +11,7 @@ const substr = (path: string, char: string): string => {
 };
 
 const getFileName = (path: string, extension: boolean = false): string => {
-	path = substr(path, '/') || path;
+	path = substr(path, DIRECTORY_SEPARATOR) || path;
 
 	if (extension) {
 		let index: number = path.lastIndexOf('.');
@@ -27,7 +29,7 @@ const getExtension = (path: string): string => {
 };
 
 const getDirectoryName = (path: string): string => {
-	let index: number = path.lastIndexOf('/');
+	let index: number = path.lastIndexOf(DIRECTORY_SEPARATOR);
 
 	if (index !== -1) {
 		return path.substr(0, index);
@@ -36,8 +38,14 @@ const getDirectoryName = (path: string): string => {
 	return path;
 };
 
+const combine = (...paths: string[]) => paths.join(DIRECTORY_SEPARATOR)
+                                             .split(DIRECTORY_SEPARATOR)
+                                             .filter((part: string): boolean => !!part)
+                                             .join(DIRECTORY_SEPARATOR);
+
 export default {
 	getFileName,
 	getExtension,
 	getDirectoryName,
+	combine,
 };

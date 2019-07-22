@@ -70,7 +70,7 @@ class Shader extends BindableObject<Shader> implements Disposable {
 
 		shader.name = Path.getFileName(url);
 
-		await shader.parser.parse(await ShaderParser.load(url));
+		await shader.parser.load(url);
 
 		shader.apply();
 

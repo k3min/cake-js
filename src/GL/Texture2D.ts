@@ -1,3 +1,4 @@
+import Path from '../Helpers/Path';
 import Vector4 from '../Math/Vector4';
 import gl from './index';
 import Texture, { TextureFormat } from './Texture';
@@ -16,7 +17,7 @@ class Texture2D extends Texture<WebGLTexture> {
 			image.onload = () => {
 				const result = new Texture2D(image.width, image.height, format);
 
-				result.name = url;
+				result.name = Path.getFileName(url);
 				result.data = image;
 
 				result.apply();
