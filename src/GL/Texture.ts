@@ -41,8 +41,8 @@ abstract class Texture<GL extends WebGLObject = WebGLObject> extends BindableGra
 		return 'texture';
 	}
 
-	protected constructor(width: number, height: number, format: TextureFormat, target: GLenum, genFn: () => GL | null, bindFn: (target: GLenum, handle: Null<GL>) => void, releaseFn: (handle: GL) => void) {
-		super(genFn, (handle) => bindFn(target, handle), releaseFn);
+	protected constructor(width: number, height: number, format: TextureFormat, target: GLenum, genFn: () => Null<GL>, bindFn: (handle: Null<GL>) => void, releaseFn: (handle: GL) => void) {
+		super(genFn, bindFn, releaseFn);
 
 		this.width = width;
 		this.height = height;
@@ -52,6 +52,10 @@ abstract class Texture<GL extends WebGLObject = WebGLObject> extends BindableGra
 		this.pixelInternalFormat = Texture.getPixelInternalFormat(this.format);
 		this.pixelFormat = Texture.getPixelFormat(this.format);
 		this.pixelType = Texture.getPixelType(this.format);
+	}
+
+	public set(name: GLenum, value: GLenum): void {
+		gl.texParameteri(this.target, name, value);
 	}
 
 	public abstract apply(): void;

@@ -17,7 +17,7 @@ class RenderBuffer extends Texture<WebGLRenderbuffer> {
 	}
 
 	public constructor(width: number, height: number, format: TextureFormat, stencil: boolean) {
-		super(width, height, format, gl.RENDERBUFFER, () => gl.createRenderbuffer(), (target, handle) => gl.bindRenderbuffer(target, handle), (handle) => gl.deleteRenderbuffer(handle));
+		super(width, height, format, gl.RENDERBUFFER, () => gl.createRenderbuffer(), (handle) => gl.bindRenderbuffer(gl.RENDERBUFFER, handle), (handle) => gl.deleteRenderbuffer(handle));
 
 		this.stencil = stencil;
 	}

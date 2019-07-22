@@ -9,7 +9,7 @@ class Texture2D extends Texture<WebGLTexture> {
 	public readonly texelSize: Vector4 = new Vector4(0, 0, 0, 0);
 
 	public constructor(width: number, height: number, format: TextureFormat) {
-		super(width, height, format, gl.TEXTURE_2D, () => gl.createTexture(), (target, handle) => gl.bindTexture(target, handle), (handle) => gl.deleteTexture(handle));
+		super(width, height, format, gl.TEXTURE_2D, () => gl.createTexture(), (handle) => gl.bindTexture(gl.TEXTURE_2D, handle), (handle) => gl.deleteTexture(handle));
 	}
 
 	public static async load(url: string, format: TextureFormat): Promise<Texture2D> {
@@ -33,6 +33,12 @@ class Texture2D extends Texture<WebGLTexture> {
 
 	public apply(): void {
 		this.bind();
+
+		this.set(gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		this.set(gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+		this.set(gl.TEXTURE_WRAP_S, gl.REPEAT);
+		this.set(gl.TEXTURE_WRAP_T, gl.REPEAT);
 
 		this.texelSize[0] = this.width;
 		this.texelSize[1] = this.height;

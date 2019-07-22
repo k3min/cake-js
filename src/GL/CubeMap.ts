@@ -7,7 +7,7 @@ class CubeMap extends Texture<WebGLTexture> {
 	public name: string = 'CubeMap';
 
 	public constructor(width: number, height: number, format: number) {
-		super(width, height, format, gl.TEXTURE_CUBE_MAP, () => gl.createTexture(), (target, handle) => gl.bindTexture(target, handle), (handle) => gl.deleteTexture(handle));
+		super(width, height, format, gl.TEXTURE_CUBE_MAP, () => gl.createTexture(), (handle) => gl.bindTexture(gl.TEXTURE_CUBE_MAP, handle), (handle) => gl.deleteTexture(handle));
 	}
 
 	public static async load(url: string): Promise<CubeMap> {

@@ -25,7 +25,8 @@ declare abstract class Texture<GL extends WebGLObject = WebGLObject> extends Bin
     height: number;
     static readonly bound: Null<Texture>;
     protected readonly identifier: string;
-    protected constructor(width: number, height: number, format: TextureFormat, target: GLenum, genFn: () => GL | null, bindFn: (target: GLenum, handle: Null<GL>) => void, releaseFn: (handle: GL) => void);
+    protected constructor(width: number, height: number, format: TextureFormat, target: GLenum, genFn: () => Null<GL>, bindFn: (handle: Null<GL>) => void, releaseFn: (handle: GL) => void);
+    set(name: GLenum, value: GLenum): void;
     abstract apply(): void;
     static getPixelFormat(format: TextureFormat): GLenum;
     static getPixelInternalFormat(format: TextureFormat): GLenum;
