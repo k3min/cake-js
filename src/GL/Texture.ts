@@ -69,7 +69,7 @@ abstract class Texture<GL extends WebGLObject = WebGLObject> extends BindableGra
 				return gl.RGB;
 
 			default:
-				throw new Error();
+				throw new RangeError();
 		}
 	}
 
@@ -88,7 +88,7 @@ abstract class Texture<GL extends WebGLObject = WebGLObject> extends BindableGra
 				return gl.RGB;
 
 			default:
-				throw new Error();
+				throw new RangeError();
 		}
 	}
 
@@ -109,7 +109,7 @@ abstract class Texture<GL extends WebGLObject = WebGLObject> extends BindableGra
 				return gl.FLOAT;
 
 			default:
-				throw new Error();
+				throw new RangeError();
 		}
 	}
 }

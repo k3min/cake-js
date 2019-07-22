@@ -233,7 +233,7 @@ class DirectDrawSurface {
 				return TextureFormat.RGBA32;
 
 			default:
-				throw new Error();
+				throw new RangeError();
 		}
 	}
 
@@ -279,7 +279,7 @@ class DirectDrawSurface {
 		switch (this.headerDX10.resourceDimension) {
 			case ResourceDimension.Texture1D:
 				if ((this.header.flags & HeaderFlags.Height) !== 0 && this.header.height !== 1) {
-					throw new RangeError('Unexpected height!');
+					throw new ReferenceError('Unexpected height!');
 				}
 
 				break;
@@ -299,7 +299,7 @@ class DirectDrawSurface {
 				break;
 
 			default:
-				throw new RangeError('Unexpected dimension!');
+				throw new RangeError();
 		}
 	}
 

@@ -12,7 +12,7 @@ class CubeMap extends Texture<WebGLTexture> {
 		const dds: DirectDrawSurface = await DirectDrawSurface.load(url);
 
 		if ((dds.header.cubeMapFlags & CubeMapFlags.CubeMap) === 0) {
-			throw new Error();
+			throw new TypeError();
 		}
 
 		const result: CubeMap = new CubeMap(dds.width, dds.height, dds.textureFormat);

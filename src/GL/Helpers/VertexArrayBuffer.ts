@@ -98,7 +98,7 @@ class VertexArrayBuffer<T extends Indexable> extends ArrayBuffer {
 					break;
 
 				default:
-					throw new Error();
+					throw new RangeError();
 			}
 
 			byteOffset += size;

@@ -25,7 +25,7 @@ class Resource {
 				return new TextReader(await response.text()) as T;
 
 			default:
-				throw new Error();
+				throw new RangeError();
 		}
 	}
 }

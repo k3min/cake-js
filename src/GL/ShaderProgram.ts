@@ -64,7 +64,7 @@ class ShaderProgram extends BindableGraphicsObject<ShaderProgram, WebGLProgram> 
 				break;
 
 			default:
-				throw new Error();
+				throw new RangeError();
 		}
 
 		gl.shaderSource(shader, source);

@@ -36,7 +36,7 @@ if (!('gl' in window)) {
 				const _result = _this.getExtensionRaw<T>(name);
 
 				if (!_result) {
-					throw new Error(`'${ name }' not supported!`);
+					throw new ReferenceError(`'${ name }' not supported!`);
 				}
 
 				return _result;
