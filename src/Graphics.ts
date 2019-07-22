@@ -23,7 +23,7 @@ class Graphics implements Disposable {
 		}
 	}
 
-	public setRenderTarget(color?: Null<Texture2D>, depth?: Null<RenderBuffer>): void {
+	public setRenderTarget(color: Null<Texture2D> = null, depth: Null<RenderBuffer> = null): void {
 		if (!this.framebuffer) {
 			this.framebuffer = new FrameBuffer();
 		}
@@ -74,4 +74,4 @@ if (!('graphics' in window)) {
 	});
 }
 
-export default (window as any).graphics;
+export default (window as any).graphics as Graphics;

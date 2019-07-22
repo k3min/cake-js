@@ -1,5 +1,5 @@
+import Texture from './GL/Texture';
 import Base from './Helpers/Base';
-import Texture2D from './GL/Texture2D';
 import Storage from './Helpers/Storage';
 import Shader from './Shader';
 import Toggle from './Helpers/Toggle';
@@ -11,7 +11,7 @@ class Material extends Base {
 	private readonly ints: Storage<GLint> = new Storage<GLint>();
 	private readonly floats: Storage<GLfloat> = new Storage<GLfloat>();
 	private readonly vectors: Storage<Vector> = new Storage<Vector>();
-	private readonly textures: Storage<Texture2D> = new Storage<Texture2D>();
+	private readonly textures: Storage<Texture> = new Storage<Texture>();
 
 	private readonly keywords: Toggle = new Toggle();
 
@@ -26,7 +26,7 @@ class Material extends Base {
 
 	public use(): void {
 		if (!this.shader) {
-			console.warn(`Material (${ this.name }): \`this.shader\` is null`);
+			console.warn(`Material (${ this.name }): shader is null`);
 			return;
 		}
 
@@ -44,7 +44,7 @@ class Material extends Base {
 		this.keywords.set(name, value);
 	}
 
-	public setTexture(name: string, value: Texture2D): void {
+	public setTexture(name: string, value: Texture): void {
 		this.textures.set(name, value);
 	}
 

@@ -5,7 +5,8 @@ declare class VertexAttribute<T extends ArrayLike<number>> {
     readonly bytesPerElement: number;
     readonly byteLength: number;
     readonly normalized: GLboolean;
-    constructor(value: T, type?: GLenum, normalized?: boolean);
+    readonly littleEndian: boolean;
+    constructor(value: T, type?: GLenum, normalized?: boolean, littleEndian?: boolean);
     private static getBytesPerElement;
 }
 export default VertexAttribute;

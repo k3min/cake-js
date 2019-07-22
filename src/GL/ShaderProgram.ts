@@ -38,15 +38,15 @@ class ShaderProgram extends BindableGraphicsObject<ShaderProgram, WebGLProgram> 
 		}
 
 		for (let index = 0; index < gl.getProgramParameter(this.handle, gl.ACTIVE_ATTRIBUTES); index++) {
-			const { name } = gl.getActiveAttrib(this.handle, index) as WebGLActiveInfo;
+			const info: WebGLActiveInfo = gl.getActiveAttrib(this.handle, index) as WebGLActiveInfo;
 
-			this.attributes.set(name, index);
+			this.attributes.set(info.name, index);
 		}
 
 		for (let index = 0; index < gl.getProgramParameter(this.handle, gl.ACTIVE_UNIFORMS); index++) {
-			const { name } = gl.getActiveUniform(this.handle, index) as WebGLActiveInfo;
+			const info: WebGLActiveInfo = gl.getActiveUniform(this.handle, index) as WebGLActiveInfo;
 
-			this.uniforms.set(name, gl.getUniformLocation(this.handle, name));
+			this.uniforms.set(info.name, gl.getUniformLocation(this.handle, info.name));
 		}
 	}
 

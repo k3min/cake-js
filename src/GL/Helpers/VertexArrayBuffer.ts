@@ -69,15 +69,16 @@ class VertexArrayBuffer<T extends Indexable> extends ArrayBuffer {
 		const bytesPerElement: GLint = vertexAttribute.bytesPerElement;
 		const byteLength: number = vertexAttribute.byteLength;
 		const length = vertexAttribute.length;
+		const littleEndian = vertexAttribute.littleEndian;
 
 		for (let i = 0; i < length; i++) {
 			switch (type) {
 				case gl.UNSIGNED_INT:
-					this.view.setUint32(byteOffset, value[i] * 0xffffffff);
+					this.view.setUint32(byteOffset, value[i] * 0xffffffff, littleEndian);
 					break;
 
 				case gl.UNSIGNED_SHORT:
-					this.view.setUint16(byteOffset, value[i] * 0xffff);
+					this.view.setUint16(byteOffset, value[i] * 0xffff, littleEndian);
 					break;
 
 				case gl.UNSIGNED_BYTE:
@@ -85,11 +86,11 @@ class VertexArrayBuffer<T extends Indexable> extends ArrayBuffer {
 					break;
 
 				case gl.INT:
-					this.view.setInt32(byteOffset, value[i] * 0x7fffffff);
+					this.view.setInt32(byteOffset, value[i] * 0x7fffffff, littleEndian);
 					break;
 
 				case gl.SHORT:
-					this.view.setInt16(byteOffset, value[i] * 0x7fff);
+					this.view.setInt16(byteOffset, value[i] * 0x7fff, littleEndian);
 					break;
 
 				case gl.BYTE:
@@ -97,7 +98,7 @@ class VertexArrayBuffer<T extends Indexable> extends ArrayBuffer {
 					break;
 
 				case gl.FLOAT:
-					this.view.setFloat32(byteOffset, value[i]);
+					this.view.setFloat32(byteOffset, value[i], littleEndian);
 					break;
 
 				default:

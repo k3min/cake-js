@@ -1,5 +1,6 @@
 import { Indexable } from './GL/Helpers/VertexArrayBuffer';
 import VertexAttribute from './GL/Helpers/VertexAttribute';
+import { gl } from './index';
 import Model from './Model';
 import IndexBuffer from './GL/IndexBuffer';
 import VertexBuffer from './GL/VertexBuffer';
@@ -10,8 +11,8 @@ class Vertex implements Indexable {
 	public readonly texcoord: VertexAttribute<Vector2>;
 
 	public constructor(position: Vector2, texcoord: Vector2) {
-		this.position = new VertexAttribute<Vector2>(position);
-		this.texcoord = new VertexAttribute<Vector2>(texcoord);
+		this.position = new VertexAttribute<Vector2>(position, gl.FLOAT, false, true);
+		this.texcoord = new VertexAttribute<Vector2>(texcoord, gl.UNSIGNED_SHORT, true, true);
 	}
 
 	[index: string]: VertexAttribute<ArrayLike<number>>;

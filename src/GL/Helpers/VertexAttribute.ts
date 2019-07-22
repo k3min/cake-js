@@ -7,14 +7,16 @@ class VertexAttribute<T extends ArrayLike<number>> {
 	public readonly bytesPerElement: number;
 	public readonly byteLength: number;
 	public readonly normalized: GLboolean;
+	public readonly littleEndian: boolean;
 
-	public constructor(value: T, type?: GLenum, normalized: boolean = false) {
+	public constructor(value: T, type?: GLenum, normalized: boolean = false, littleEndian: boolean = false) {
 		this.value = value;
 		this.type = type || gl.FLOAT;
 		this.normalized = normalized;
 		this.length = value.length;
 		this.bytesPerElement = VertexAttribute.getBytesPerElement(this.type);
 		this.byteLength = this.length * this.bytesPerElement;
+		this.littleEndian = littleEndian;
 	}
 
 	private static getBytesPerElement(type: GLenum): number {

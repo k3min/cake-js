@@ -4,6 +4,7 @@ export { default as FrameBuffer } from './GL/FrameBuffer';
 export { default as IndexBuffer } from './GL/IndexBuffer';
 export { default as RenderBuffer } from './GL/RenderBuffer';
 export { default as Texture2D } from './GL/Texture2D';
+export { default as Font } from './GL/Font';
 export { default as VertexBuffer } from './GL/VertexBuffer';
 export { default as Material } from './Material';
 export { default as Model } from './Model';

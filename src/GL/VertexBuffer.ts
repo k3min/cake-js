@@ -28,7 +28,7 @@ class VertexBuffer<T extends Indexable> extends Buffer<VertexArrayBuffer<T>> {
 				offset,
 			);
 
-			offset += attribute.bytesPerElement;
+			offset += attribute.byteLength;
 		}
 	}
 

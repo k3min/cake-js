@@ -37,8 +37,8 @@ class Texture2D extends Texture<WebGLTexture> {
 		this.set(gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 		this.set(gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
-		this.set(gl.TEXTURE_WRAP_S, gl.REPEAT);
-		this.set(gl.TEXTURE_WRAP_T, gl.REPEAT);
+		this.set(gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		this.set(gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
 		this.texelSize[0] = this.width;
 		this.texelSize[1] = this.height;

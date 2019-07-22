@@ -1,5 +1,5 @@
+import Texture from './GL/Texture';
 import Base from './Helpers/Base';
-import Texture2D from './GL/Texture2D';
 import Shader from './Shader';
 import Vector from './Math/Vector';
 declare class Material extends Base {
@@ -13,7 +13,7 @@ declare class Material extends Base {
     constructor(shader: Shader);
     use(): void;
     setKeyword(name: string, value: boolean): void;
-    setTexture(name: string, value: Texture2D): void;
+    setTexture(name: string, value: Texture): void;
     setVector(name: string, value: Vector): void;
     setInt(name: string, value: GLint): void;
     setFloat(name: string, value: GLfloat): void;
