@@ -49,6 +49,10 @@ class WavefrontParser {
 		const reader: TextReader = await Resource.load<TextReader>(path, ResourceType.OBJ);
 
 		for (let line of reader) {
+			if (line[0] === '#') {
+				continue;
+			}
+
 			const parts: string[] = line.split(' ');
 			const token: Token = parts.shift() as Token;
 

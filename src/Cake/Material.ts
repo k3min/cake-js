@@ -59,7 +59,7 @@ class Material extends Base {
 	}
 
 	protected disposing(): void {
-		//
+		this.shader.dispose();
 	}
 }
 

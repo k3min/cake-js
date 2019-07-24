@@ -1,4 +1,7 @@
 import Math from './Math';
+import Vector2 from './Vector2';
+import Vector3 from './Vector3';
+import Vector4 from './Vector4';
 
 const bOrA = (a: number, b?: number): number => ((b !== undefined) ? b : a);
 
@@ -145,6 +148,23 @@ abstract class Vector extends Float32Array {
 
 	public '+='(x: X, y?: number, z?: number, w?: number): Vector {
 		return this.add(x, y, z, w);
+	}
+
+	public set(x: X, y?: number, z?: number, w?: number): Vector {
+		return this.op((_, b) => b, x, y, z, w);
+	}
+
+	public static parse(value: number[]): Vector {
+		switch (value.length) {
+			case Vector2.LENGTH:
+				return new Vector2(value);
+			case Vector3.LENGTH:
+				return new Vector3(value);
+			case Vector4.LENGTH:
+				return new Vector4(value);
+			default:
+				throw new RangeError();
+		}
 	}
 
 	public abstract clone(): Vector;

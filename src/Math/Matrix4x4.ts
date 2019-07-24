@@ -181,13 +181,11 @@ class Matrix4x4 extends Float32Array {
 		super(16);
 	}
 
-	public inverse(result?: Matrix4x4): Matrix4x4 {
-		result = result || new Matrix4x4();
-
-		const a00 = this[0], a01 = this[1], a02 = this[2], a03 = this[3];
-		const a10 = this[4], a11 = this[5], a12 = this[6], a13 = this[7];
-		const a20 = this[8], a21 = this[9], a22 = this[10], a23 = this[11];
-		const a30 = this[12], a31 = this[13], a32 = this[14], a33 = this[15];
+	public static inverse(matrix: Matrix4x4, result: Matrix4x4): void {
+		const a00 = matrix[0], a01 = matrix[1], a02 = matrix[2], a03 = matrix[3];
+		const a10 = matrix[4], a11 = matrix[5], a12 = matrix[6], a13 = matrix[7];
+		const a20 = matrix[8], a21 = matrix[9], a22 = matrix[10], a23 = matrix[11];
+		const a30 = matrix[12], a31 = matrix[13], a32 = matrix[14], a33 = matrix[15];
 
 		const b00 = (a00 * a11) - (a01 * a10);
 		const b01 = (a00 * a12) - (a02 * a10);
@@ -220,13 +218,9 @@ class Matrix4x4 extends Float32Array {
 		result[13] = ((a00 * b09) - (a01 * b07) + (a02 * b06)) * det;
 		result[14] = ((a31 * b01) - (a30 * b03) - (a32 * b00)) * det;
 		result[15] = ((a20 * b03) - (a21 * b01) + (a22 * b00)) * det;
-
-		return result;
 	}
 
-	public static multiply(a: Matrix4x4, b: Matrix4x4, result?: Matrix4x4): Matrix4x4 {
-		result = result || new Matrix4x4();
-
+	public static multiply(a: Matrix4x4, b: Matrix4x4, result: Matrix4x4): void {
 		let b0, b1, b2, b3;
 
 		const a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3];
@@ -273,8 +267,6 @@ class Matrix4x4 extends Float32Array {
 		result[13] = (b0 * a01) + (b1 * a11) + (b2 * a21) + (b3 * a31);
 		result[14] = (b0 * a02) + (b1 * a12) + (b2 * a22) + (b3 * a32);
 		result[15] = (b0 * a03) + (b1 * a13) + (b2 * a23) + (b3 * a33);
-
-		return result;
 	}
 
 	public static perspective(fov: number, aspect: number, near: number, far: number): Matrix4x4 {
@@ -298,11 +290,11 @@ class Matrix4x4 extends Float32Array {
 		return this;
 	}
 
-	public static lookAt(position: Vector3, target: Vector3, up: Vector3): Matrix4x4 {
-		return (new Matrix4x4()).lookAt(position, target, up);
+	public static lookAt(position: Vector3, target: Vector3): Matrix4x4 {
+		return (new Matrix4x4()).lookAt(position, target);
 	}
 
-	public lookAt(position: Vector3, target: Vector3, up: Vector3): Matrix4x4 {
+	public lookAt(position: Vector3, target: Vector3): Matrix4x4 {
 		const xPos = position[0];
 		const yPos = position[1];
 		const zPos = position[2];
@@ -311,9 +303,9 @@ class Matrix4x4 extends Float32Array {
 		const yTarget = target[1];
 		const zTarget = target[2];
 
-		const xUp = up[0];
-		const yUp = up[1];
-		const zUp = up[2];
+		const xUp = 0;
+		const yUp = 1;
+		const zUp = 0;
 
 		let z0 = xPos - xTarget;
 		let z1 = yPos - yTarget;

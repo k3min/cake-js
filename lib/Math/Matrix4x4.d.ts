@@ -20,12 +20,12 @@ declare class Matrix4x4 extends Float32Array {
     static readonly identity: Matrix4x4;
     readonly transpose: Matrix4x4;
     constructor();
-    inverse(result?: Matrix4x4): Matrix4x4;
-    static multiply(a: Matrix4x4, b: Matrix4x4, result?: Matrix4x4): Matrix4x4;
+    static inverse(matrix: Matrix4x4, result: Matrix4x4): void;
+    static multiply(a: Matrix4x4, b: Matrix4x4, result: Matrix4x4): void;
     static perspective(fov: number, aspect: number, near: number, far: number): Matrix4x4;
     perspective(fov: number, aspect: number, near: number, far: number): Matrix4x4;
-    static lookAt(position: Vector3, target: Vector3, up: Vector3): Matrix4x4;
-    lookAt(position: Vector3, target: Vector3, up: Vector3): Matrix4x4;
+    static lookAt(position: Vector3, target: Vector3): Matrix4x4;
+    lookAt(position: Vector3, target: Vector3): Matrix4x4;
     setRow(i: number, v: Vector4): void;
 }
 export default Matrix4x4;
