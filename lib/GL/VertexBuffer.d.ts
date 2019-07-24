@@ -1,8 +1,6 @@
-import Indexable from '../Helpers/Indexable';
+import { Indexable } from '../Helpers';
 import Buffer from './Buffer';
-import { PrimitiveType } from './Helpers/Drawable';
-import VertexArrayBuffer from './Helpers/VertexArrayBuffer';
-import VertexAttribute from './Helpers/VertexAttribute';
+import { PrimitiveType, VertexArrayBuffer, VertexAttribute } from './Helpers';
 declare class VertexBuffer<T extends Indexable<VertexAttribute>> extends Buffer<VertexArrayBuffer<T>> {
     name: string;
     constructor(data: T[]);

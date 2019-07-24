@@ -1,20 +1,16 @@
-import Null from '../Helpers/Null';
-import Drawable, { PrimitiveType } from './Helpers/Drawable';
-import VertexAttribute from './Helpers/VertexAttribute';
+import { Drawable, PrimitiveType, VertexAttribute } from './Helpers';
 import IndexBuffer from './IndexBuffer';
 import VertexBuffer from './VertexBuffer';
-import BindableObject from '../Helpers/BindableObject';
-import Disposable from '../Helpers/Disposable';
-import Indexable from '../Helpers/Indexable';
+import { BindableObject, Disposable, Indexable, Null } from '../Helpers';
 
-class Model<T extends Indexable<VertexAttribute>> extends BindableObject<Model<T>> implements Drawable, Disposable {
-	public name: string = 'Model';
+class Mesh<T extends Indexable<VertexAttribute>> extends BindableObject<Mesh<T>> implements Drawable, Disposable {
+	public name: string = 'Mesh';
 
 	protected indexBuffer: Null<IndexBuffer> = null;
 	protected vertexBuffer: Null<VertexBuffer<T>> = null;
 
 	protected get identifier(): string {
-		return 'Model';
+		return 'Mesh';
 	}
 
 	protected onBind(): void {
@@ -64,4 +60,4 @@ class Model<T extends Indexable<VertexAttribute>> extends BindableObject<Model<T
 	}
 }
 
-export default Model;
+export default Mesh;

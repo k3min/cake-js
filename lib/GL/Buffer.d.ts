@@ -1,5 +1,4 @@
-import Drawable, { PrimitiveType } from './Helpers/Drawable';
-import BindableGraphicsObject from './Helpers/BindableGraphicsObject';
+import { PrimitiveType, Drawable, BindableGraphicsObject } from './Helpers';
 export declare enum BufferType {
     Array = 34962,
     ElementArray = 34963

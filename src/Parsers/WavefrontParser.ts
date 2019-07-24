@@ -1,16 +1,20 @@
-import DataType from './DataType';
-import Indexable from '../../Helpers/Indexable';
-import TextReader from '../../Helpers/TextReader';
-import Resource, { ResourceType } from '../../Helpers/Resource';
-import VertexAttribute from './VertexAttribute';
-import Vector2 from '../../Math/Vector2';
-import Vector3 from '../../Math/Vector3';
+import { DataType, VertexAttribute } from '../GL/Helpers';
+import { Indexable, TextReader, Resource, ResourceType } from '../Helpers';
+import { Vector2, Vector3 } from '../Math';
 
 enum Token {
 	Vertex = 'v',
 	Texcoord = 'vt',
 	Normal = 'vn',
 	Face = 'f'
+}
+
+interface Raw {
+	readonly [Token.Vertex]: number[];
+	readonly [Token.Texcoord]: number[];
+	readonly [Token.Normal]: number[];
+
+	readonly [token: string]: number[];
 }
 
 export class Vertex implements Indexable<VertexAttribute> {
@@ -25,14 +29,6 @@ export class Vertex implements Indexable<VertexAttribute> {
 	}
 
 	readonly [index: string]: VertexAttribute;
-}
-
-interface Raw {
-	readonly [Token.Vertex]: number[];
-	readonly [Token.Texcoord]: number[];
-	readonly [Token.Normal]: number[];
-
-	readonly [token: string]: number[];
 }
 
 class WavefrontParser {

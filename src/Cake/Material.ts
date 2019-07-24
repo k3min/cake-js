@@ -1,10 +1,6 @@
-import Texture from '../GL/Texture';
-import Base from '../Helpers/Base';
-import Storage from '../Helpers/Storage';
-import Matrix4x4 from '../Math/Matrix4x4';
-import Shader from '../GL/Shader';
-import Toggle from '../Helpers/Toggle';
-import Vector from '../Math/Vector';
+import { Texture, Shader } from '../GL';
+import { Matrix4x4, Vector } from '../Math';
+import { Base, Storage, Toggle } from '../Helpers';
 
 class Material extends Base {
 	public name: string = 'Material';

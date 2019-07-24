@@ -1,6 +1,5 @@
-import Null from '../Helpers/Null';
-import Storage from '../Helpers/Storage';
-import BindableGraphicsObject from './Helpers/BindableGraphicsObject';
+import { Null, Storage } from '../Helpers';
+import { BindableGraphicsObject } from './Helpers';
 import GL from './GL';
 
 const ERROR_PATTERN: RegExp = /ERROR: \d+:(\d+): '(\w+)' : (.*)/;

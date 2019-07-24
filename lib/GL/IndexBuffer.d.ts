@@ -1,5 +1,5 @@
 import Buffer from './Buffer';
-import { PrimitiveType } from './Helpers/Drawable';
+import { PrimitiveType } from './Helpers';
 declare class IndexBuffer extends Buffer<Uint16Array> {
     name: string;
     constructor(data: number[]);

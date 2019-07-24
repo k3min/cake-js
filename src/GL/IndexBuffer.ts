@@ -1,7 +1,6 @@
 import Buffer, { BufferType } from './Buffer';
 import GL from './GL';
-import DataType from './Helpers/DataType';
-import { PrimitiveType } from './Helpers/Drawable';
+import { DataType, PrimitiveType } from './Helpers';
 
 class IndexBuffer extends Buffer<Uint16Array> {
 	public name: string = 'IndexBuffer';

@@ -1,5 +1,5 @@
-import Null from '../Helpers/Null';
-import BindableGraphicsObject from './Helpers/BindableGraphicsObject';
+import { Null } from '../Helpers';
+import { BindableGraphicsObject } from './Helpers';
 import GL from './GL';
 import Texture, { TextureTarget } from './Texture';
 import Texture2D from './Texture2D';

@@ -1,7 +1,6 @@
-import Indexable from '../../Helpers/Indexable';
-import VertexAttribute from './VertexAttribute';
-import Vector2 from '../../Math/Vector2';
-import Vector3 from '../../Math/Vector3';
+import { VertexAttribute } from '../GL/Helpers';
+import { Indexable } from '../Helpers';
+import { Vector2, Vector3 } from '../Math';
 export declare class Vertex implements Indexable<VertexAttribute> {
     readonly position: VertexAttribute<Vector3>;
     readonly texcoord: VertexAttribute<Vector2>;

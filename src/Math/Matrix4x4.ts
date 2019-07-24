@@ -1,4 +1,4 @@
-import Math from './index';
+import Math from './Math';
 import Vector3 from './Vector3';
 import Vector4 from './Vector4';
 

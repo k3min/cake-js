@@ -1,5 +1,5 @@
-import Path from '../Helpers/Path';
-import Vector4 from '../Math/Vector4';
+import { Path } from '../Helpers';
+import { Vector4 } from '../Math';
 import GL from './GL';
 import Texture, { TextureFormat, TextureTarget } from './Texture';
 

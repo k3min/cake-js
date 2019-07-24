@@ -1,8 +1,3 @@
-export declare enum ShaderSection {
-    Global = "global",
-    Vertex = "vertex",
-    Fragment = "fragment"
-}
 declare class ShaderParser {
     private readonly raw;
     private section;

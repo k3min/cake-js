@@ -1,5 +1,5 @@
-import Null from '../Helpers/Null';
-import BindableGraphicsObject from './Helpers/BindableGraphicsObject';
+import { Null } from '../Helpers';
+import { BindableGraphicsObject } from './Helpers';
 export declare enum TextureFormat {
     Alpha8 = 0,
     RGB24 = 1,

@@ -1,4 +1,4 @@
-import Vector4 from '../Math/Vector4';
+import { Vector4 } from '../Math';
 import Texture, { TextureFormat } from './Texture';
 declare class Texture2D extends Texture<WebGLTexture> {
     name: string;

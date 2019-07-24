@@ -1,8 +1,6 @@
-import Texture from '../GL/Texture';
-import Base from '../Helpers/Base';
-import Matrix4x4 from '../Math/Matrix4x4';
-import Shader from '../GL/Shader';
-import Vector from '../Math/Vector';
+import { Texture, Shader } from '../GL';
+import { Matrix4x4, Vector } from '../Math';
+import { Base } from '../Helpers';
 declare class Material extends Base {
     name: string;
     private readonly ints;

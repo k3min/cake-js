@@ -1,6 +1,5 @@
-import Indexable from '../Helpers/Indexable';
-import Null from '../Helpers/Null';
-import BindableGraphicsObject from './Helpers/BindableGraphicsObject';
+import { Indexable, Null } from '../Helpers';
+import { BindableGraphicsObject } from './Helpers';
 import GL from './GL';
 
 export enum TextureFormat {

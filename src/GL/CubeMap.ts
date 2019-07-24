@@ -1,7 +1,7 @@
-import Path from '../Helpers/Path';
-import DirectDrawSurface, { CubeMapFlags } from './Helpers/DirectDrawSurface';
-import Texture, { Mipmap, TextureTarget } from './Texture';
 import GL from './GL';
+import { Path } from '../Helpers';
+import { DirectDrawSurfaceParser, CubeMapFlags } from '../Parsers';
+import Texture, { Mipmap, TextureTarget } from './Texture';
 
 class CubeMap extends Texture<WebGLTexture> {
 	public name: string = 'CubeMap';
@@ -11,9 +11,9 @@ class CubeMap extends Texture<WebGLTexture> {
 	}
 
 	public static async load(url: string): Promise<CubeMap> {
-		const dds: DirectDrawSurface = await DirectDrawSurface.load(url);
+		const dds: DirectDrawSurfaceParser = await DirectDrawSurfaceParser.load(url);
 
-		if ((dds.header.cubeMapFlags & CubeMapFlags.CubeMap) === 0) {
+		if ((dds.ddsHeader.cubeMapFlags & CubeMapFlags.CubeMap) === 0) {
 			throw new TypeError();
 		}
 
@@ -26,12 +26,12 @@ class CubeMap extends Texture<WebGLTexture> {
 		return result;
 	}
 
-	private parse(dds: DirectDrawSurface): void {
+	private parse(dds: DirectDrawSurfaceParser): void {
 		let offset: number = 0;
 
-		offset += 4 + dds.header.size;
+		offset += 4 + dds.ddsHeader.size;
 
-		if (dds.dx10) {
+		if (dds.isDX10) {
 			offset += 20;
 		}
 

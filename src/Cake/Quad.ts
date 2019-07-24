@@ -1,10 +1,7 @@
-import DataType from '../GL/Helpers/DataType';
-import VertexAttribute from '../GL/Helpers/VertexAttribute';
-import IndexBuffer from '../GL/IndexBuffer';
-import VertexBuffer from '../GL/VertexBuffer';
-import Indexable from '../Helpers/Indexable';
-import Vector2 from '../Math/Vector2';
-import Model from '../GL/Model';
+import { VertexAttribute, DataType } from '../GL/Helpers';
+import { Mesh, IndexBuffer, VertexBuffer } from '../GL';
+import { Indexable } from '../Helpers';
+import { Vector2 } from '../Math';
 
 class Vertex implements Indexable<VertexAttribute> {
 	public readonly position: VertexAttribute;
@@ -18,7 +15,7 @@ class Vertex implements Indexable<VertexAttribute> {
 	readonly [index: string]: VertexAttribute;
 }
 
-class Quad extends Model<Vertex> {
+class Quad extends Mesh<Vertex> {
 	public name: string = 'Quad';
 
 	public constructor() {

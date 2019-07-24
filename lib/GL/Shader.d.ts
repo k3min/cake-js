@@ -1,10 +1,6 @@
 import Texture from './Texture';
-import BindableObject from '../Helpers/BindableObject';
-import Disposable from '../Helpers/Disposable';
-import Null from '../Helpers/Null';
-import Storage from '../Helpers/Storage';
-import Matrix4x4 from '../Math/Matrix4x4';
-import Vector from '../Math/Vector';
+import { BindableObject, Disposable, Null, Storage } from '../Helpers';
+import { Matrix4x4, Vector } from '../Math';
 /**
  * @todo Implement blending, culling, etc.
  */
@@ -20,6 +16,7 @@ declare class Shader extends BindableObject<Shader> implements Disposable {
     static vectors: Storage<Vector>;
     static matrices: Storage<Matrix4x4>;
     static textures: Storage<Texture>;
+    private readonly log;
     readonly attributes: Storage<number>;
     readonly uniforms: Storage<WebGLUniformLocation>;
     keywords: Null<string[]>;

@@ -2,8 +2,6 @@ export {
 	default as GL,
 	CubeMap,
 	FrameBuffer,
-	IndexBuffer,
-	VertexBuffer,
 	Texture2D,
 	RenderBuffer,
 	TextureFormat,
@@ -13,7 +11,7 @@ export {
 
 export {
 	Material,
-	Wavefront,
+	Model,
 	Quad,
 	Graphics,
 } from './Cake';

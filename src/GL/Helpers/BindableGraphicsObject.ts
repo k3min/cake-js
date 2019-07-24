@@ -1,6 +1,4 @@
-import BindableObject from '../../Helpers/BindableObject';
-import Disposable from '../../Helpers/Disposable';
-import Null from '../../Helpers/Null';
+import { Null, Disposable, BindableObject } from '../../Helpers';
 
 abstract class BindableGraphicsObject<T extends BindableGraphicsObject<T, GL>, GL extends WebGLObject> extends BindableObject<T> implements Disposable {
 	public name: string = 'BindableGraphicsObject';
@@ -10,7 +8,7 @@ abstract class BindableGraphicsObject<T extends BindableGraphicsObject<T, GL>, G
 	private readonly bindFn: (handle: Null<GL>) => void;
 	private readonly deleteFn: (handle: GL) => void;
 
-	protected constructor(genFn: () => GL | null, bindFn: (handle: Null<GL>) => void, releaseFn: (handle: GL) => void) {
+	protected constructor(genFn: () => Null<GL>, bindFn: (handle: Null<GL>) => void, releaseFn: (handle: GL) => void) {
 		super();
 
 		this.handle = genFn() as GL;

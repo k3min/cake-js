@@ -1,18 +1,10 @@
 import GL from './GL';
-import ShaderParser from './Helpers/ShaderParser';
+import { ShaderParser } from '../Parsers';
 import ShaderProgram, { ShaderType } from './ShaderProgram';
 import Texture from './Texture';
 import Texture2D from './Texture2D';
-import BindableObject from '../Helpers/BindableObject';
-import Disposable from '../Helpers/Disposable';
-import Null from '../Helpers/Null';
-import Path from '../Helpers/Path';
-import Storage from '../Helpers/Storage';
-import Matrix4x4 from '../Math/Matrix4x4';
-import Vector from '../Math/Vector';
-import Vector2 from '../Math/Vector2';
-import Vector3 from '../Math/Vector3';
-import Vector4 from '../Math/Vector4';
+import { BindableObject, Disposable, Null, Path, Storage, Indexable } from '../Helpers';
+import { Matrix4x4, Vector, Vector2, Vector3, Vector4 } from '../Math';
 
 /**
  * @todo Implement blending, culling, etc.
@@ -36,6 +28,8 @@ class Shader extends BindableObject<Shader> implements Disposable {
 	public static vectors: Storage<Vector> = new Storage<Vector>();
 	public static matrices: Storage<Matrix4x4> = new Storage<Matrix4x4>();
 	public static textures: Storage<Texture> = new Storage<Texture>();
+
+	private readonly log: Indexable<string> = {};
 
 	public get attributes(): Storage<number> {
 		return this.variant.attributes;
@@ -192,9 +186,9 @@ class Shader extends BindableObject<Shader> implements Disposable {
 			return;
 		}
 
-		if (texture as Texture2D) {
+		if (texture instanceof Texture2D) {
 			const name2 = `${ name }_TexelSize`;
-			const value2: Vector4 = (texture as Texture2D).texelSize;
+			const value2: Vector4 = texture.texelSize;
 
 			const uniform2: WebGLUniformLocation = this.uniforms.get(name2) as WebGLUniformLocation;
 
@@ -257,7 +251,15 @@ class Shader extends BindableObject<Shader> implements Disposable {
 	}
 
 	private uniformNotFound(type: string, name: string): void {
-		console.warn(`Shader (${ this.name }): uniform (${ type }) ${ name } not found!`);
+		const log: string = `Shader (${ this.name }): uniform (${ type }) ${ name } not found!`;
+
+		if (this.log[log]) {
+			return;
+		}
+
+		console.warn(log);
+
+		this.log[log] = log;
 	}
 }
 

@@ -1,5 +1,4 @@
-import Bindable from '../../Helpers/Bindable';
-import Indexable from '../../Helpers/Indexable';
+import { Bindable, Indexable } from '../../Helpers';
 import gl from '../GL';
 import DataType from './DataType';
 import VertexAttribute from './VertexAttribute';
@@ -10,10 +9,16 @@ class VertexArrayBuffer<T extends Indexable<VertexAttribute>> extends ArrayBuffe
 	private readonly view: DataView;
 
 	public constructor(data: T[]) {
+		const length: number = data.length;
 		const item: T = data[0];
 
-		const length: number = data.length;
-		const bytesPerElement: number = VertexArrayBuffer.getBytesPerElement(item);
+		let bytesPerElement: number = 0;
+
+		for (let attribute in item) {
+			if (item.hasOwnProperty(attribute)) {
+				bytesPerElement += (item[attribute] as VertexAttribute).byteLength;
+			}
+		}
 
 		super(length * bytesPerElement);
 
@@ -38,18 +43,6 @@ class VertexArrayBuffer<T extends Indexable<VertexAttribute>> extends ArrayBuffe
 				}
 			}
 		}
-	}
-
-	public static getBytesPerElement<T extends Indexable<VertexAttribute>>(item: T): number {
-		let size: number = 0;
-
-		for (let attribute in item) {
-			if (item.hasOwnProperty(attribute)) {
-				size += (item[attribute] as VertexAttribute).byteLength;
-			}
-		}
-
-		return size;
 	}
 
 	public set(byteOffset: number, vertexAttribute: VertexAttribute): number {

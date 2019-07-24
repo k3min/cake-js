@@ -1,5 +1,4 @@
-import Null from '../Helpers/Null';
-import Toggle from '../Helpers/Toggle';
+import { Null, Toggle } from '../Helpers';
 declare type ToggleFn<T = void> = (cap: GLenum) => T;
 declare type ExtensionFn = <T = any>(name: string) => Null<T>;
 declare type ExtensionsFn = (...name: string[]) => void;

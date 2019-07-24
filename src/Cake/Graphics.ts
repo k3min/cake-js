@@ -1,9 +1,5 @@
-import GL from '../GL';
-import FrameBuffer, { FrameBufferAttachment } from '../GL/FrameBuffer';
-import RenderBuffer from '../GL/RenderBuffer';
-import Texture2D from '../GL/Texture2D';
-import Disposable from '../Helpers/Disposable';
-import Null from '../Helpers/Null';
+import GL, { FrameBuffer, FrameBufferAttachment, RenderBuffer, Texture2D } from '../GL';
+import { Disposable, Null } from '../Helpers';
 import Material from './Material';
 import Quad from './Quad';
 

@@ -1,10 +1,7 @@
-import Null from '../../Helpers/Null';
-import Path from '../../Helpers/Path';
-import Resource, { ResourceType } from '../../Helpers/Resource';
-import TextReader from '../../Helpers/TextReader';
+import { Null, Path, Resource, ResourceType, TextReader } from '../Helpers';
 import gl from '../GL';
 
-export enum ShaderSection {
+enum ShaderSection {
 	Global = 'global',
 	Vertex = 'vertex',
 	Fragment = 'fragment'
