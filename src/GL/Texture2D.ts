@@ -1,7 +1,7 @@
 import Path from '../Helpers/Path';
 import Vector4 from '../Math/Vector4';
-import gl from './index';
-import Texture, { TextureFormat } from './Texture';
+import GL from './GL';
+import Texture, { TextureFormat, TextureTarget } from './Texture';
 
 class Texture2D extends Texture<WebGLTexture> {
 	public name: string = 'Texture2D';
@@ -9,14 +9,14 @@ class Texture2D extends Texture<WebGLTexture> {
 	public readonly texelSize: Vector4 = new Vector4(0, 0, 0, 0);
 
 	public constructor(width: number, height: number, format: TextureFormat) {
-		super(width, height, format, gl.TEXTURE_2D, () => gl.createTexture(), (handle) => gl.bindTexture(gl.TEXTURE_2D, handle), (handle) => gl.deleteTexture(handle));
+		super(width, height, format, TextureTarget.Texture2D, () => GL.createTexture(), (handle) => GL.bindTexture(TextureTarget.Texture2D, handle), (handle) => GL.deleteTexture(handle));
 	}
 
 	public static async load(url: string, format: TextureFormat): Promise<Texture2D> {
 		return new Promise<Texture2D>((resolve) => {
 			const image = new Image();
 
-			image.onload = () => {
+			image.addEventListener('load', () => {
 				const result = new Texture2D(image.width, image.height, format);
 
 				result.name = Path.getFileName(url);
@@ -25,7 +25,7 @@ class Texture2D extends Texture<WebGLTexture> {
 				result.apply();
 
 				resolve(result);
-			};
+			});
 
 			image.src = url;
 		});
@@ -34,31 +34,35 @@ class Texture2D extends Texture<WebGLTexture> {
 	public apply(): void {
 		this.bind();
 
-		this.set(gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-		this.set(gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		this.set(GL.TEXTURE_MIN_FILTER, GL.LINEAR);
+		this.set(GL.TEXTURE_MAG_FILTER, GL.LINEAR);
 
-		this.set(gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-		this.set(gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+		this.set(GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+		this.set(GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
 
 		this.texelSize[0] = this.width;
 		this.texelSize[1] = this.height;
 		this.texelSize[2] = 1 / this.width;
 		this.texelSize[3] = 1 / this.height;
 
-		if (this.data !== null && this.data instanceof Image) {
-			gl.texImage2D(
+		if (this.data !== null && this.data as TexImageSource) {
+			GL.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, true);
+
+			GL.texImage2D(
 				this.target,
 				0,
-				this.pixelInternalFormat,
+				this.pixelFormat,
 				this.pixelFormat,
 				this.pixelType,
 				this.data as TexImageSource,
 			);
+
+			GL.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, false);
 		} else {
-			gl.texImage2D(
+			GL.texImage2D(
 				this.target,
 				0,
-				this.pixelInternalFormat,
+				this.pixelFormat,
 				this.width,
 				this.height,
 				0,

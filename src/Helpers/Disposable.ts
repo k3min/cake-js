@@ -1,5 +1,5 @@
 interface Disposable {
-	dispose(): void;
+	dispose(): boolean;
 }
 
 export default Disposable;

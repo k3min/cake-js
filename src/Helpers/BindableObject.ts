@@ -1,16 +1,21 @@
 import Bindable from './Bindable';
 import Base from './Base';
-import Storage from './Storage';
+import Indexable from './Indexable';
+import Null from './Null';
 
 abstract class BindableObject<T extends BindableObject<T>> extends Base implements Bindable {
 	public name: string = 'BindableObject';
 
-	protected static map: Storage<Bindable> = new Storage<Bindable>();
+	public static map: Indexable<Null<Bindable>> = {};
 
 	protected abstract get identifier(): string;
 
 	public bind(): boolean {
-		const previous: Bindable | undefined = BindableObject.map.get(this.identifier);
+		if (this.disposed) {
+			throw new ReferenceError(`${ this.identifier } (${ this.name }): disposed`);
+		}
+
+		const previous: Bindable = BindableObject.map[this.identifier] as Bindable;
 
 		if (previous === this) {
 			return false;
@@ -20,7 +25,7 @@ abstract class BindableObject<T extends BindableObject<T>> extends Base implemen
 			//bound.unbind();
 		}
 
-		BindableObject.map.set(this.identifier, this);
+		BindableObject.map[this.identifier] = this;
 
 		this.onBind();
 
@@ -28,7 +33,7 @@ abstract class BindableObject<T extends BindableObject<T>> extends Base implemen
 	}
 
 	public unbind(): boolean {
-		const previous: Bindable | undefined = BindableObject.map.get(this.identifier);
+		const previous: Bindable = BindableObject.map[this.identifier] as Bindable;
 
 		if (!previous) {
 			return false;
@@ -36,7 +41,7 @@ abstract class BindableObject<T extends BindableObject<T>> extends Base implemen
 
 		this.onUnbind();
 
-		BindableObject.map.delete(this.identifier);
+		BindableObject.map[this.identifier] = null;
 
 		return true;
 	}
@@ -45,8 +50,14 @@ abstract class BindableObject<T extends BindableObject<T>> extends Base implemen
 
 	protected abstract onUnbind(): void;
 
-	public dispose(): void {
-		this.unbind();
+	public dispose(): boolean {
+		const disposed: boolean = super.dispose();
+
+		if (!disposed) {
+			this.unbind();
+		}
+
+		return disposed;
 	}
 }
 

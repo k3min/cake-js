@@ -1,20 +1,25 @@
-import Drawable from '../Helpers/Drawable';
+import Drawable, { PrimitiveType } from './Helpers/Drawable';
 import BindableGraphicsObject from './Helpers/BindableGraphicsObject';
-import gl from './index';
+import GL from './GL';
+
+export enum BufferType {
+	Array = 34962, // GL_ARRAY_BUFFER
+	ElementArray = 34963
+}
 
 abstract class Buffer<T extends ArrayBuffer> extends BindableGraphicsObject<Buffer<T>, WebGLBuffer> implements Drawable {
 	public name: string = 'Buffer';
 
 	protected readonly data: T;
-	private readonly target: GLenum;
+	private readonly target: BufferType;
 	public readonly length: number;
 
 	protected get identifier(): string {
-		return 'buffer';
+		return 'Buffer';
 	}
 
-	protected constructor(target: GLenum, data: T, length: number) {
-		super(() => gl.createBuffer(), (handle) => gl.bindBuffer(target, handle), (handle) => gl.deleteBuffer(handle));
+	protected constructor(target: BufferType, data: T, length: number) {
+		super(() => GL.createBuffer(), (handle) => GL.bindBuffer(target, handle), (handle) => GL.deleteBuffer(handle));
 
 		this.target = target;
 		this.data = data;
@@ -26,14 +31,10 @@ abstract class Buffer<T extends ArrayBuffer> extends BindableGraphicsObject<Buff
 	public apply(): void {
 		this.bind();
 
-		gl.bufferData(this.target, this.data, gl.STATIC_DRAW);
+		GL.bufferData(this.target, this.data, GL.STATIC_DRAW);
 	}
 
-	public static unbind(type: GLenum): void {
-		gl.bindBuffer(type, null);
-	}
-
-	public abstract draw(type: GLenum): void;
+	public abstract draw(type: PrimitiveType): void;
 }
 
 export default Buffer;

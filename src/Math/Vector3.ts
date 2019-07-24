@@ -48,7 +48,7 @@ class Vector3 extends Vector {
 	}
 
 	public clone(): Vector3 {
-		return new Vector3(this);
+		return new Vector3(this[0], this[1], this[2]);
 	}
 }
 

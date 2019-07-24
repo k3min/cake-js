@@ -1,16 +1,21 @@
 import Null from '../Helpers/Null';
 import Storage from '../Helpers/Storage';
 import BindableGraphicsObject from './Helpers/BindableGraphicsObject';
-import gl from './index';
+import GL from './GL';
 
-export type ShaderAttribute = number | undefined;
-export type ShaderUniform = Null<WebGLUniformLocation>;
+const ERROR_PATTERN: RegExp = /ERROR: \d+:(\d+): '(\w+)' : (.*)/;
+const STACK_PATTERN: RegExp = /^\/\*\* @(.*) \*\//;
+
+export enum ShaderType {
+	Fragment = 35632, // GL_FRAGMENT_SHADER
+	Vertex,
+}
 
 class ShaderProgram extends BindableGraphicsObject<ShaderProgram, WebGLProgram> {
 	public name: string = 'ShaderProgram';
 
-	public attributes: Storage<ShaderAttribute> = new Storage<ShaderAttribute>();
-	public uniforms: Storage<ShaderUniform> = new Storage<ShaderUniform>();
+	public readonly attributes: Storage<number> = new Storage<number>();
+	public readonly uniforms: Storage<WebGLUniformLocation> = new Storage<WebGLUniformLocation>();
 
 	private vertex: Null<WebGLShader> = null;
 	private fragment: Null<WebGLShader> = null;
@@ -19,48 +24,48 @@ class ShaderProgram extends BindableGraphicsObject<ShaderProgram, WebGLProgram> 
 	public fragmentSource: string = '';
 
 	protected get identifier(): string {
-		return 'shaderProgram';
+		return 'ShaderProgram';
 	}
 
 	public constructor() {
-		super(() => gl.createProgram(), (handle) => gl.useProgram(handle), (handle) => gl.deleteProgram(handle));
+		super(() => GL.createProgram(), (handle) => GL.useProgram(handle), (handle) => GL.deleteProgram(handle));
 	}
 
 	public apply() {
-		gl.linkProgram(this.handle);
+		GL.linkProgram(this.handle);
 
-		if (gl.getProgramParameter(this.handle, gl.LINK_STATUS) <= 0) {
-			const log = gl.getProgramInfoLog(this.handle) as string;
+		if (GL.getProgramParameter(this.handle, GL.LINK_STATUS) <= 0) {
+			const log = GL.getProgramInfoLog(this.handle) as string;
 
 			this.dispose();
 
 			throw new Error(log);
 		}
 
-		for (let index = 0; index < gl.getProgramParameter(this.handle, gl.ACTIVE_ATTRIBUTES); index++) {
-			const info: WebGLActiveInfo = gl.getActiveAttrib(this.handle, index) as WebGLActiveInfo;
+		for (let index = 0; index < GL.getProgramParameter(this.handle, GL.ACTIVE_ATTRIBUTES); index++) {
+			const info: WebGLActiveInfo = GL.getActiveAttrib(this.handle, index) as WebGLActiveInfo;
 
 			this.attributes.set(info.name, index);
 		}
 
-		for (let index = 0; index < gl.getProgramParameter(this.handle, gl.ACTIVE_UNIFORMS); index++) {
-			const info: WebGLActiveInfo = gl.getActiveUniform(this.handle, index) as WebGLActiveInfo;
+		for (let index = 0; index < GL.getProgramParameter(this.handle, GL.ACTIVE_UNIFORMS); index++) {
+			const info: WebGLActiveInfo = GL.getActiveUniform(this.handle, index) as WebGLActiveInfo;
 
-			this.uniforms.set(info.name, gl.getUniformLocation(this.handle, info.name));
+			this.uniforms.set(info.name, GL.getUniformLocation(this.handle, info.name) as WebGLUniformLocation);
 		}
 	}
 
-	public attach(type: GLenum, sources: string[]) {
-		const shader: WebGLShader = gl.createShader(type) as WebGLShader;
+	public attach(type: ShaderType, sources: string[]): boolean {
+		const shader: WebGLShader = GL.createShader(type) as WebGLShader;
 		const source = sources.join('\n');
 
 		switch (type) {
-			case gl.VERTEX_SHADER:
+			case ShaderType.Vertex:
 				this.vertex = shader;
 				this.vertexSource = source;
 				break;
 
-			case gl.FRAGMENT_SHADER:
+			case ShaderType.Fragment:
 				this.fragment = shader;
 				this.fragmentSource = source;
 				break;
@@ -69,31 +74,60 @@ class ShaderProgram extends BindableGraphicsObject<ShaderProgram, WebGLProgram> 
 				throw new RangeError();
 		}
 
-		gl.shaderSource(shader, source);
+		GL.shaderSource(shader, source);
 
-		gl.compileShader(shader);
+		GL.compileShader(shader);
 
-		if (gl.getShaderParameter(shader, gl.COMPILE_STATUS) <= 0) {
-			const log = gl.getShaderInfoLog(shader) as string;
-
-			this.dispose();
-
-			throw new SyntaxError(log);
+		if (GL.getShaderParameter(shader, GL.COMPILE_STATUS) > 0) {
+			GL.attachShader(this.handle, shader);
+			return true;
 		}
 
-		gl.attachShader(this.handle, shader);
+		const log = GL.getShaderInfoLog(shader) as string;
+
+		this.dispose();
+
+		let errors: string[] = log.split('\n');
+
+		errors = errors.map((line: string): string => {
+			const match: RegExpMatchArray = line.match(ERROR_PATTERN) as RegExpMatchArray;
+
+			if (!match) {
+				return '';
+			}
+
+			const [, number, fn, error] = match;
+
+			const source: string = sources[(+number) - 1].trim();
+
+			const match2: RegExpMatchArray = source.match(STACK_PATTERN) as RegExpMatchArray;
+
+			if (!match2) {
+				return '';
+			}
+
+			const [, stack] = match2;
+
+			return `${ error[0].toUpperCase() + error.slice(1) } (${ fn }@${ stack })`;
+		});
+
+		errors = errors.filter((error: string): boolean => !!error);
+
+		console.error(`ShaderProgram (${ this.name }): SyntaxError\n${ errors.join('\n') }\n`);
+
+		return false;
 	}
 
-	public dispose(): void {
-		super.dispose();
-
+	protected disposing(): void {
 		if (this.vertex) {
-			gl.deleteShader(this.vertex);
+			GL.deleteShader(this.vertex);
 		}
 
 		if (this.fragment) {
-			gl.deleteShader(this.fragment);
+			GL.deleteShader(this.fragment);
 		}
+
+		super.disposing();
 	}
 }
 

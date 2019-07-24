@@ -32,7 +32,7 @@ class Vector2 extends Vector {
 	}
 
 	public clone(): Vector2 {
-		return new Vector2(this);
+		return new Vector2(this[0], this[1]);
 	}
 }
 

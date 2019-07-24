@@ -1,12 +1,12 @@
-declare class VertexAttribute<T extends ArrayLike<number>> {
+import DataType from './DataType';
+declare class VertexAttribute<T extends ArrayLike<number> = ArrayLike<number>> {
     readonly value: T;
-    readonly type: GLenum;
-    readonly length: GLint;
+    readonly type: DataType;
+    readonly length: number;
     readonly bytesPerElement: number;
     readonly byteLength: number;
-    readonly normalized: GLboolean;
+    readonly normalized: boolean;
     readonly littleEndian: boolean;
-    constructor(value: T, type?: GLenum, normalized?: boolean, littleEndian?: boolean);
-    private static getBytesPerElement;
+    constructor(value: T, type?: DataType, normalized?: boolean, littleEndian?: boolean);
 }
 export default VertexAttribute;

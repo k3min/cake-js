@@ -1,4 +1,4 @@
-import Math from './index';
+import Math from './Math';
 
 const bOrA = (a: number, b?: number): number => ((b !== undefined) ? b : a);
 

@@ -27,9 +27,7 @@ abstract class BindableGraphicsObject<T extends BindableGraphicsObject<T, GL>, G
 		this.bindFn(null);
 	}
 
-	public dispose(): void {
-		super.dispose();
-
+	protected disposing(): void {
 		this.deleteFn(this.handle);
 	}
 }

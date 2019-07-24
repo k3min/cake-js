@@ -1,14 +1,28 @@
+import Indexable from '../Helpers/Indexable';
 import Null from '../Helpers/Null';
 import BindableGraphicsObject from './Helpers/BindableGraphicsObject';
-import gl from './index';
+import GL from './GL';
 
 export enum TextureFormat {
 	Alpha8,
 	RGB24,
 	RGBA32,
-	RGB565,
-	RGBA4444,
+	R5G6B5,
+	RGBA16,
 	RGBAFloat,
+}
+
+export enum PixelFormat {
+	Alpha = 6406, // GL_ALPHA
+	RGB,
+	RGBA
+}
+
+export enum PixelType {
+	Uint8 = 5121, // GL_UNSIGNED_BYTE
+	Float32 = 5126, // GL_FLOAT
+	Uint16 = 32819, // GL_UNSIGNED_SHORT_4_4_4_4
+	Uint565 = 33635, // GL_UNSIGNED_SHORT_5_6_5
 }
 
 export interface Mipmap {
@@ -17,16 +31,22 @@ export interface Mipmap {
 	height: number;
 }
 
-abstract class Texture<GL extends WebGLObject = WebGLObject> extends BindableGraphicsObject<Texture<GL>, GL> {
+export enum TextureTarget {
+	Texture2D = 3553, // GL_TEXTURE_2D
+	CubeMap = 34067, // GL_TEXTURE_CUBE_MAP
+	RenderBuffer = 36161, // GL_RENDERBUFFER
+}
+
+abstract class Texture<T extends WebGLObject = WebGLObject> extends BindableGraphicsObject<Texture<T>, T> {
 	public name: string = 'Texture';
 
-	public readonly target: GLenum;
+	public readonly target: TextureTarget;
+	private readonly parameters: Indexable<GLenum> = {};
 
 	protected data: TexImageSource | ArrayBufferView | Mipmap[] | Mipmap[][] | null = null;
 
-	protected readonly pixelInternalFormat: GLenum;
-	protected readonly pixelFormat: GLenum;
-	protected readonly pixelType: GLenum;
+	protected readonly pixelFormat: PixelFormat;
+	protected readonly pixelType: PixelType;
 
 	public readonly format: TextureFormat;
 
@@ -34,10 +54,10 @@ abstract class Texture<GL extends WebGLObject = WebGLObject> extends BindableGra
 	public height: number;
 
 	protected get identifier(): string {
-		return 'texture';
+		return 'Texture';
 	}
 
-	protected constructor(width: number, height: number, format: TextureFormat, target: GLenum, genFn: () => Null<GL>, bindFn: (handle: Null<GL>) => void, releaseFn: (handle: GL) => void) {
+	protected constructor(width: number, height: number, format: TextureFormat, target: TextureTarget, genFn: () => Null<T>, bindFn: (handle: Null<T>) => void, releaseFn: (handle: T) => void) {
 		super(genFn, bindFn, releaseFn);
 
 		this.width = width;
@@ -45,70 +65,56 @@ abstract class Texture<GL extends WebGLObject = WebGLObject> extends BindableGra
 		this.format = format;
 		this.target = target;
 
-		this.pixelInternalFormat = Texture.getPixelInternalFormat(this.format);
 		this.pixelFormat = Texture.getPixelFormat(this.format);
 		this.pixelType = Texture.getPixelType(this.format);
 	}
 
 	public set(name: GLenum, value: GLenum): void {
-		gl.texParameteri(this.target, name, value);
+		if (this.parameters[name] === value) {
+			return;
+		}
+
+		this.parameters[name] = value;
+
+		GL.texParameteri(this.target, name, value);
 	}
 
 	public abstract apply(): void;
 
-	public static getPixelFormat(format: TextureFormat): GLenum {
+	public static getPixelFormat(format: TextureFormat): PixelFormat {
 		switch (format) {
 			case TextureFormat.Alpha8:
-				return gl.ALPHA;
+				return PixelFormat.Alpha;
 
 			case TextureFormat.RGBA32:
-			case TextureFormat.RGBA4444:
+			case TextureFormat.RGBA16:
 			case TextureFormat.RGBAFloat:
-				return gl.RGBA;
+				return PixelFormat.RGBA;
 
 			case TextureFormat.RGB24:
-			case TextureFormat.RGB565:
-				return gl.RGB;
+			case TextureFormat.R5G6B5:
+				return PixelFormat.RGB;
 
 			default:
 				throw new RangeError();
 		}
 	}
 
-	public static getPixelInternalFormat(format: TextureFormat): GLenum {
-		switch (format) {
-			case TextureFormat.Alpha8:
-				return gl.ALPHA;
-
-			case TextureFormat.RGBA4444:
-			case TextureFormat.RGBA32:
-			case TextureFormat.RGBAFloat:
-				return gl.RGBA;
-
-			case TextureFormat.RGB565:
-			case TextureFormat.RGB24:
-				return gl.RGB;
-
-			default:
-				throw new RangeError();
-		}
-	}
-
-	public static getPixelType(format: TextureFormat): GLenum {
+	public static getPixelType(format: TextureFormat): PixelType {
 		switch (format) {
 			case TextureFormat.Alpha8:
 			case TextureFormat.RGBA32:
 			case TextureFormat.RGB24:
-				return gl.UNSIGNED_BYTE;
+				return PixelType.Uint8;
 
-			case TextureFormat.RGBA4444:
-				return gl.UNSIGNED_SHORT_4_4_4_4;
+			case TextureFormat.RGBA16:
+				return PixelType.Uint16;
 
-			case TextureFormat.RGB565:
-				return gl.UNSIGNED_SHORT_5_6_5;
+			case TextureFormat.R5G6B5:
+				return PixelType.Uint565;
 
 			case TextureFormat.RGBAFloat:
-				return gl.FLOAT;
+				return PixelType.Float32;
 
 			default:
 				throw new RangeError();

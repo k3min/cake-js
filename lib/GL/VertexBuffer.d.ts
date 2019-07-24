@@ -1,10 +1,13 @@
+import Indexable from '../Helpers/Indexable';
 import Buffer from './Buffer';
-import VertexArrayBuffer, { Indexable } from './Helpers/VertexArrayBuffer';
-declare class VertexBuffer<T extends Indexable> extends Buffer<VertexArrayBuffer<T>> {
+import { PrimitiveType } from './Helpers/Drawable';
+import VertexArrayBuffer from './Helpers/VertexArrayBuffer';
+import VertexAttribute from './Helpers/VertexAttribute';
+declare class VertexBuffer<T extends Indexable<VertexAttribute>> extends Buffer<VertexArrayBuffer<T>> {
     name: string;
     constructor(data: T[]);
     protected onBind(): void;
     protected onUnbind(): void;
-    draw(type?: GLenum): void;
+    draw(type?: PrimitiveType): void;
 }
 export default VertexBuffer;

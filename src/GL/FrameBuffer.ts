@@ -1,54 +1,60 @@
 import Null from '../Helpers/Null';
 import BindableGraphicsObject from './Helpers/BindableGraphicsObject';
-import gl from './index';
-import Texture from './Texture';
+import GL from './GL';
+import Texture, { TextureTarget } from './Texture';
 import Texture2D from './Texture2D';
 import RenderBuffer from './RenderBuffer';
+
+export enum FrameBufferAttachment {
+	Color = 36064, // GL_COLOR_ATTACHMENT0
+	Depth = 36096,//GL_DEPTH_ATTACHMENT
+	DepthStencil = 33306,//GL_DEPTH_STENCIL_ATTACHMENT
+}
 
 class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> {
 	public name: string = 'FrameBuffer';
 
-	public readonly attachments: Map<GLenum, Texture> = new Map<GLenum, Texture>();
+	public readonly attachments: Map<FrameBufferAttachment, Texture> = new Map<FrameBufferAttachment, Texture>();
 
 	public color: Null<Texture2D> = null;
 	public depth: Null<RenderBuffer> = null;
 
 	protected get identifier(): string {
-		return 'framebuffer';
+		return 'FrameBuffer';
 	}
 
 	public constructor() {
-		super(() => gl.createFramebuffer(), (handle) => gl.bindFramebuffer(gl.FRAMEBUFFER, handle), (handle) => gl.deleteFramebuffer(handle));
+		super(() => GL.createFramebuffer(), (handle) => GL.bindFramebuffer(GL.FRAMEBUFFER, handle), (handle) => GL.deleteFramebuffer(handle));
 	}
 
 	public apply(check: boolean = true): void {
 		this.bind();
 
 		if (this.depth) {
-			this.attach(this.depth.stencil ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT, this.depth);
+			this.attach(this.depth.stencil ? FrameBufferAttachment.DepthStencil : FrameBufferAttachment.Depth, this.depth);
 		}
 
 		if (this.color) {
-			this.attach(gl.COLOR_ATTACHMENT0, this.color);
+			this.attach(FrameBufferAttachment.Color, this.color);
 		}
 
-		if (check && gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
+		if (check && GL.checkFramebufferStatus(GL.FRAMEBUFFER) !== GL.FRAMEBUFFER_COMPLETE) {
 			this.dispose();
 
 			throw new Error('FrameBuffer not complete');
 		}
 	}
 
-	private attachAttachment(slot: GLenum, target: GLenum, handle: Null<WebGLObject>): void {
+	private attachAttachment(slot: FrameBufferAttachment, target: TextureTarget, handle: Null<WebGLObject>): void {
 		this.bind();
 
 		switch (target) {
-			case gl.TEXTURE_2D:
-				gl.framebufferTexture2D(gl.FRAMEBUFFER, slot, target, handle, 0);
+			case TextureTarget.Texture2D:
+				GL.framebufferTexture2D(GL.FRAMEBUFFER, slot, target, handle, 0);
 				break;
 
-			case gl.RENDERBUFFER:
-				gl.framebufferRenderbuffer(gl.FRAMEBUFFER, slot, target, handle);
+			case TextureTarget.RenderBuffer:
+				GL.framebufferRenderbuffer(GL.FRAMEBUFFER, slot, target, handle);
 				break;
 
 			default:
@@ -56,7 +62,7 @@ class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> 
 		}
 	}
 
-	private detachAttachment(slot: GLenum, target: GLenum): void {
+	private detachAttachment(slot: FrameBufferAttachment, target: TextureTarget): void {
 		this.bind();
 
 		this.attachAttachment(slot, target, null);
@@ -64,7 +70,7 @@ class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> 
 		this.attachments.delete(slot);
 	}
 
-	public attach(slot: GLenum, texture: Texture): void {
+	public attach(slot: FrameBufferAttachment, texture: Texture): void {
 		if (this.attachments.get(slot) === texture) {
 			return;
 		}
@@ -74,7 +80,7 @@ class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> 
 		this.attachments.set(slot, texture);
 	}
 
-	public detach(slot?: GLenum): void {
+	public detach(slot?: FrameBufferAttachment): void {
 		if (!slot) {
 			this.attachments.forEach((texture, slot) => this.detachAttachment(slot, texture.target));
 			this.attachments.clear();
@@ -92,9 +98,9 @@ class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> 
 		this.attachments.delete(slot);
 	}
 
-	public dispose(): void {
+	protected disposing(): void {
 		this.detach();
-		super.dispose();
+		super.disposing();
 	}
 }
 

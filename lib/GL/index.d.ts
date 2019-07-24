@@ -1,19 +1,11 @@
-import Null from '../Helpers/Null';
-import Toggle from '../Helpers/Toggle';
-declare type ToggleFn<T = void> = (cap: GLenum) => T;
-declare type ExtensionFn = <T = any>(name: string) => Null<T>;
-declare type ExtensionsFn = (...name: string[]) => void;
-interface GraphicsContext extends WebGLRenderingContext {
-    _enabled: Toggle<GLenum>;
-    enableRaw: ToggleFn;
-    disableRaw: ToggleFn;
-    getExtensionRaw: ExtensionFn;
-    getExtension: ExtensionFn;
-    getExtensions: ExtensionsFn;
-    enable: ToggleFn<boolean>;
-    disable: ToggleFn;
-    ext: WEBGL_draw_buffers;
-    depth: WEBGL_depth_texture;
-}
-declare const _default: GraphicsContext;
-export default _default;
+import GL from './GL';
+export { default as CubeMap } from './CubeMap';
+export { default as FrameBuffer } from './FrameBuffer';
+export { default as IndexBuffer } from './IndexBuffer';
+export { default as RenderBuffer } from './RenderBuffer';
+export { default as Texture2D } from './Texture2D';
+export { default as VertexBuffer } from './VertexBuffer';
+export { default as VideoTexture } from './VideoTexture';
+export { default as Shader } from './Shader';
+export { TextureFormat } from './Texture';
+export default GL;

@@ -8,7 +8,7 @@ class Vector4 extends Vector {
 	}
 
 	public clone(): Vector4 {
-		return new Vector4(this);
+		return new Vector4(this[0], this[1], this[2], this[3]);
 	}
 }
 

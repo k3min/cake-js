@@ -9,6 +9,6 @@ declare abstract class BindableGraphicsObject<T extends BindableGraphicsObject<T
     protected constructor(genFn: () => GL | null, bindFn: (handle: Null<GL>) => void, releaseFn: (handle: GL) => void);
     protected onBind(): void;
     protected onUnbind(): void;
-    dispose(): void;
+    protected disposing(): void;
 }
 export default BindableGraphicsObject;

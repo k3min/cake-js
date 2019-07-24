@@ -1,17 +1,13 @@
-import gl from '..';
+import Bindable from '../../Helpers/Bindable';
+import Indexable from '../../Helpers/Indexable';
+import gl from '../GL';
+import DataType from './DataType';
 import VertexAttribute from './VertexAttribute';
 
-export type VA = VertexAttribute<ArrayLike<number>>;
-
-export interface Indexable {
-	readonly [attribute: string]: VA;
-}
-
-class VertexArrayBuffer<T extends Indexable> extends ArrayBuffer {
-	public readonly bytesPerElement: number;
-	public readonly attributes: VA[];
-	public readonly view: DataView;
-	public readonly length: number;
+class VertexArrayBuffer<T extends Indexable<VertexAttribute>> extends ArrayBuffer implements Bindable {
+	private readonly bytesPerElement: number;
+	private readonly attributes: VertexAttribute[];
+	private readonly view: DataView;
 
 	public constructor(data: T[]) {
 		const item: T = data[0];
@@ -21,10 +17,15 @@ class VertexArrayBuffer<T extends Indexable> extends ArrayBuffer {
 
 		super(length * bytesPerElement);
 
-		this.length = length;
 		this.bytesPerElement = bytesPerElement;
-		this.attributes = VertexArrayBuffer.getAttributes(item);
 		this.view = new DataView(this);
+		this.attributes = new Array<VertexAttribute>();
+
+		for (let attribute in item) {
+			if (item.hasOwnProperty(attribute)) {
+				this.attributes.push(item[attribute]);
+			}
+		}
 
 		let byteOffset: number = 0;
 
@@ -39,65 +40,53 @@ class VertexArrayBuffer<T extends Indexable> extends ArrayBuffer {
 		}
 	}
 
-	public static getAttributes<T extends Indexable>(item: T): VA[] {
-		const attributes: VA[] = new Array<VA>();
-
-		for (let attribute in item) {
-			if (item.hasOwnProperty(attribute)) {
-				attributes.push(item[attribute] as VA);
-			}
-		}
-
-		return attributes;
-	}
-
-	public static getBytesPerElement<T extends Indexable>(item: T): number {
+	public static getBytesPerElement<T extends Indexable<VertexAttribute>>(item: T): number {
 		let size: number = 0;
 
 		for (let attribute in item) {
 			if (item.hasOwnProperty(attribute)) {
-				size += (item[attribute] as VA).byteLength;
+				size += (item[attribute] as VertexAttribute).byteLength;
 			}
 		}
 
 		return size;
 	}
 
-	public set(byteOffset: number, vertexAttribute: VA): number {
-		const type: GLenum = vertexAttribute.type;
+	public set(byteOffset: number, vertexAttribute: VertexAttribute): number {
+		const type: DataType = vertexAttribute.type;
 		const value: ArrayLike<number> = vertexAttribute.value;
-		const bytesPerElement: GLint = vertexAttribute.bytesPerElement;
+		const bytesPerElement: number = vertexAttribute.bytesPerElement;
 		const byteLength: number = vertexAttribute.byteLength;
-		const length = vertexAttribute.length;
-		const littleEndian = vertexAttribute.littleEndian;
+		const length: number = vertexAttribute.length;
+		const littleEndian: boolean = vertexAttribute.littleEndian;
 
 		for (let i = 0; i < length; i++) {
 			switch (type) {
-				case gl.UNSIGNED_INT:
+				case DataType.Uint32:
 					this.view.setUint32(byteOffset, value[i] * 0xffffffff, littleEndian);
 					break;
 
-				case gl.UNSIGNED_SHORT:
+				case DataType.Uint16:
 					this.view.setUint16(byteOffset, value[i] * 0xffff, littleEndian);
 					break;
 
-				case gl.UNSIGNED_BYTE:
+				case DataType.Uint8:
 					this.view.setUint8(byteOffset, value[i] * 0xff);
 					break;
 
-				case gl.INT:
+				case DataType.Int32:
 					this.view.setInt32(byteOffset, value[i] * 0x7fffffff, littleEndian);
 					break;
 
-				case gl.SHORT:
+				case DataType.Int16:
 					this.view.setInt16(byteOffset, value[i] * 0x7fff, littleEndian);
 					break;
 
-				case gl.BYTE:
+				case DataType.Int8:
 					this.view.setInt8(byteOffset, value[i] * 0x7f);
 					break;
 
-				case gl.FLOAT:
+				case DataType.Float32:
 					this.view.setFloat32(byteOffset, value[i], littleEndian);
 					break;
 
@@ -109,6 +98,37 @@ class VertexArrayBuffer<T extends Indexable> extends ArrayBuffer {
 		}
 
 		return byteLength;
+	}
+
+	public bind(): boolean {
+		let offset: number = 0;
+
+		for (let index = 0; index < this.attributes.length; index++) {
+			gl.enableVertexAttribArray(index);
+
+			const attribute: VertexAttribute = this.attributes[index];
+
+			gl.vertexAttribPointer(
+				index,
+				attribute.length,
+				attribute.type,
+				attribute.normalized,
+				this.bytesPerElement,
+				offset,
+			);
+
+			offset += attribute.byteLength;
+		}
+
+		return true;
+	}
+
+	public unbind(): boolean {
+		for (let index = 0; index < this.attributes.length; index++) {
+			gl.disableVertexAttribArray(index);
+		}
+
+		return true;
 	}
 }
 

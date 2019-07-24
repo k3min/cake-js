@@ -4,31 +4,46 @@ export declare enum TextureFormat {
     Alpha8 = 0,
     RGB24 = 1,
     RGBA32 = 2,
-    RGB565 = 3,
-    RGBA4444 = 4,
+    R5G6B5 = 3,
+    RGBA16 = 4,
     RGBAFloat = 5
+}
+export declare enum PixelFormat {
+    Alpha = 6406,
+    RGB = 6407,
+    RGBA = 6408
+}
+export declare enum PixelType {
+    Uint8 = 5121,
+    Float32 = 5126,
+    Uint16 = 32819,
+    Uint565 = 33635
 }
 export interface Mipmap {
     data: ArrayBufferView;
     width: number;
     height: number;
 }
-declare abstract class Texture<GL extends WebGLObject = WebGLObject> extends BindableGraphicsObject<Texture<GL>, GL> {
+export declare enum TextureTarget {
+    Texture2D = 3553,
+    CubeMap = 34067,
+    RenderBuffer = 36161
+}
+declare abstract class Texture<T extends WebGLObject = WebGLObject> extends BindableGraphicsObject<Texture<T>, T> {
     name: string;
-    readonly target: GLenum;
+    readonly target: TextureTarget;
+    private readonly parameters;
     protected data: TexImageSource | ArrayBufferView | Mipmap[] | Mipmap[][] | null;
-    protected readonly pixelInternalFormat: GLenum;
-    protected readonly pixelFormat: GLenum;
-    protected readonly pixelType: GLenum;
+    protected readonly pixelFormat: PixelFormat;
+    protected readonly pixelType: PixelType;
     readonly format: TextureFormat;
     width: number;
     height: number;
     protected readonly identifier: string;
-    protected constructor(width: number, height: number, format: TextureFormat, target: GLenum, genFn: () => Null<GL>, bindFn: (handle: Null<GL>) => void, releaseFn: (handle: GL) => void);
+    protected constructor(width: number, height: number, format: TextureFormat, target: TextureTarget, genFn: () => Null<T>, bindFn: (handle: Null<T>) => void, releaseFn: (handle: T) => void);
     set(name: GLenum, value: GLenum): void;
     abstract apply(): void;
-    static getPixelFormat(format: TextureFormat): GLenum;
-    static getPixelInternalFormat(format: TextureFormat): GLenum;
-    static getPixelType(format: TextureFormat): GLenum;
+    static getPixelFormat(format: TextureFormat): PixelFormat;
+    static getPixelType(format: TextureFormat): PixelType;
 }
 export default Texture;

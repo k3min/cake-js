@@ -1,12 +1,13 @@
-import Null from '../Helpers/Null';
 import Storage from '../Helpers/Storage';
 import BindableGraphicsObject from './Helpers/BindableGraphicsObject';
-export declare type ShaderAttribute = number | undefined;
-export declare type ShaderUniform = Null<WebGLUniformLocation>;
+export declare enum ShaderType {
+    Fragment = 35632,
+    Vertex = 35633
+}
 declare class ShaderProgram extends BindableGraphicsObject<ShaderProgram, WebGLProgram> {
     name: string;
-    attributes: Storage<ShaderAttribute>;
-    uniforms: Storage<ShaderUniform>;
+    readonly attributes: Storage<number>;
+    readonly uniforms: Storage<WebGLUniformLocation>;
     private vertex;
     private fragment;
     vertexSource: string;
@@ -14,7 +15,7 @@ declare class ShaderProgram extends BindableGraphicsObject<ShaderProgram, WebGLP
     protected readonly identifier: string;
     constructor();
     apply(): void;
-    attach(type: GLenum, sources: string[]): void;
-    dispose(): void;
+    attach(type: ShaderType, sources: string[]): boolean;
+    protected disposing(): void;
 }
 export default ShaderProgram;

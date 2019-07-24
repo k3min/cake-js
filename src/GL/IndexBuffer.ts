@@ -1,17 +1,19 @@
-import gl from './index';
-import Buffer from './Buffer';
+import Buffer, { BufferType } from './Buffer';
+import GL from './GL';
+import DataType from './Helpers/DataType';
+import { PrimitiveType } from './Helpers/Drawable';
 
 class IndexBuffer extends Buffer<Uint16Array> {
 	public name: string = 'IndexBuffer';
 
 	public constructor(data: number[]) {
-		super(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(data), data.length);
+		super(BufferType.ElementArray, new Uint16Array(data), data.length);
 	}
 
-	public draw(type?: GLenum): void {
+	public draw(type: PrimitiveType = PrimitiveType.Triangles): void {
 		this.bind();
 
-		gl.drawElements(type || gl.TRIANGLES, this.length, gl.UNSIGNED_SHORT, 0);
+		GL.drawElements(type, this.length, DataType.Uint16, 0);
 	}
 }
 

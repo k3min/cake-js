@@ -6,10 +6,11 @@ export declare enum ShaderSection {
 declare class ShaderParser {
     private readonly raw;
     private section;
+    private readonly includes;
     private readonly extensions;
     readonly keywords: string[][];
-    vertexSource: string[];
-    fragmentSource: string[];
+    readonly vertexSource: string[];
+    readonly fragmentSource: string[];
     private parse;
     load(url: string): Promise<void>;
     private apply;

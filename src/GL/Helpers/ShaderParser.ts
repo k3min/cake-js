@@ -1,7 +1,8 @@
+import Null from '../../Helpers/Null';
 import Path from '../../Helpers/Path';
 import Resource, { ResourceType } from '../../Helpers/Resource';
 import TextReader from '../../Helpers/TextReader';
-import gl from '..';
+import gl from '../GL';
 
 export enum ShaderSection {
 	Global = 'global',
@@ -15,10 +16,12 @@ const EXTENSION_PATTERN = /#extension\s+GL_(.*?)\s*:\s*enable/;
 const DEFINE_PATTERN = /defined\((.*?)\)/;
 
 interface Raw {
-	[ShaderSection.Global]: string[];
-	[ShaderSection.Vertex]: string[];
-	[ShaderSection.Fragment]: string[];
-	keywords: string[];
+	readonly [ShaderSection.Global]: string[];
+	readonly [ShaderSection.Vertex]: string[];
+	readonly [ShaderSection.Fragment]: string[];
+	readonly keywords: string[];
+
+	readonly [key: string]: string[];
 }
 
 class ShaderParser {
@@ -30,18 +33,29 @@ class ShaderParser {
 	};
 
 	private section: ShaderSection = ShaderSection.Global;
+
+	private readonly includes: string[] = [];
 	private readonly extensions: string[] = [];
 
 	public readonly keywords: string[][] = [];
 
-	public vertexSource: string[] = [];
-	public fragmentSource: string[] = [];
+	public readonly vertexSource: string[] = [];
+	public readonly fragmentSource: string[] = [];
 
 	private async parse(url: string): Promise<void> {
-		const path = Path.getDirectoryName(url);
+		const path: string = Path.getDirectoryName(url);
 		const reader: TextReader = await Resource.load<TextReader>(url, ResourceType.GLSL);
 
+		let index: number = 0;
+
 		for (let line of reader) {
+			index += 1;
+
+			const origin = location.origin;
+			const pathname = location.pathname;
+
+			const debug: string = `@${ origin }/${ Path.combine(pathname, url) }:${ index }`;
+
 			if (this.parseSection(line)) {
 				continue;
 			}
@@ -50,21 +64,25 @@ class ShaderParser {
 				continue;
 			}
 
-			if (this.parseExtension(line)) {
+			const extension = this.parseExtension(line);
+
+			if (extension === null) {
 				continue;
 			}
 
+			line += extension;
+
 			this.parseDefine(line);
 
-			this.raw[this.section].push(line);
+			this.raw[this.section].push(`/** ${ debug } */${ line }`);
 		}
 	}
 
 	public async load(url: string): Promise<void> {
 		await this.parse(url);
 
-		this.vertexSource = this.raw[ShaderSection.Global].concat(this.raw[ShaderSection.Vertex]);
-		this.fragmentSource = this.raw[ShaderSection.Global].concat(this.raw[ShaderSection.Fragment]);
+		this.vertexSource.push(...this.raw[ShaderSection.Global].concat(this.raw[ShaderSection.Vertex]));
+		this.fragmentSource.push(...this.raw[ShaderSection.Global].concat(this.raw[ShaderSection.Fragment]));
 
 		this.apply();
 	}
@@ -73,7 +91,7 @@ class ShaderParser {
 		this.raw.keywords.sort();
 
 		const count = this.raw.keywords.length;
-		const total = 1 << count;
+		const total: number = 1 << count;
 
 		for (let i = 0; i < total; i++) {
 			this.keywords[i] = [];
@@ -93,7 +111,7 @@ class ShaderParser {
 	}
 
 	private parseDefine(line: string): boolean {
-		const match = line.match(DEFINE_PATTERN);
+		const match: RegExpMatchArray = line.match(DEFINE_PATTERN) as RegExpMatchArray;
 
 		if (!match) {
 			return false;
@@ -110,44 +128,50 @@ class ShaderParser {
 		return true;
 	}
 
-	private parseExtension(line: string): boolean {
-		const match = line.match(EXTENSION_PATTERN);
+	private parseExtension(line: string): Null<string> {
+		const match: RegExpMatchArray = line.match(EXTENSION_PATTERN) as RegExpMatchArray;
 
 		if (!match) {
-			return false;
+			return '';
 		}
 
 		const [, extension] = match;
 
-		if (!this.extensions.includes(extension)) {
-			this.extensions.push(extension);
-
-			if (gl.getExtensionRaw(extension) === null) {
-				return false;
-			}
-
-			this.raw[this.section].push(`#define ${ extension }`);
+		if (this.extensions.includes(extension)) {
+			return '';
 		}
 
-		return true;
+		this.extensions.push(extension);
+
+		if (gl.getExtensionRaw(extension) === null) {
+			return null;
+		}
+
+		return `\n#define ${ extension }`;
 	}
 
 	private async parseInclude(line: string, path: string): Promise<boolean> {
-		const match = line.match(INCLUDE_PATTERN);
+		const match: RegExpMatchArray = line.match(INCLUDE_PATTERN) as RegExpMatchArray;
 
 		if (!match) {
 			return false;
 		}
 
-		const [, url] = match;
+		const [, include] = match;
 
-		await this.parse(Path.combine(path, url));
+		const url = Path.combine(path, include);
+
+		if (!this.includes.includes(url)) {
+			this.includes.push(url);
+
+			await this.parse(url);
+		}
 
 		return true;
 	}
 
 	private parseSection(line: string): boolean {
-		const match = line.match(SECTION_PATTERN);
+		const match: RegExpMatchArray = line.match(SECTION_PATTERN) as RegExpMatchArray;
 
 		if (!match) {
 			return false;

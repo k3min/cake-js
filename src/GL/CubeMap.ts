@@ -1,13 +1,13 @@
 import Path from '../Helpers/Path';
 import DirectDrawSurface, { CubeMapFlags } from './Helpers/DirectDrawSurface';
-import Texture, { Mipmap } from './Texture';
-import gl from './index';
+import Texture, { Mipmap, TextureTarget } from './Texture';
+import GL from './GL';
 
 class CubeMap extends Texture<WebGLTexture> {
 	public name: string = 'CubeMap';
 
 	public constructor(width: number, height: number, format: number) {
-		super(width, height, format, gl.TEXTURE_CUBE_MAP, () => gl.createTexture(), (handle) => gl.bindTexture(gl.TEXTURE_CUBE_MAP, handle), (handle) => gl.deleteTexture(handle));
+		super(width, height, format, TextureTarget.CubeMap, () => GL.createTexture(), (handle) => GL.bindTexture(TextureTarget.CubeMap, handle), (handle) => GL.deleteTexture(handle));
 	}
 
 	public static async load(url: string): Promise<CubeMap> {
@@ -79,10 +79,10 @@ class CubeMap extends Texture<WebGLTexture> {
 			for (let mipmap = 0; mipmap < data.length; mipmap++) {
 				let part = data[mipmap];
 
-				gl.texImage2D(
-					gl.TEXTURE_CUBE_MAP_POSITIVE_X + face,
+				GL.texImage2D(
+					GL.TEXTURE_CUBE_MAP_POSITIVE_X + face,
 					mipmap,
-					this.pixelInternalFormat,
+					this.pixelFormat,
 					part.width,
 					part.height,
 					0,

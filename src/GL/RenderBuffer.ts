@@ -1,5 +1,5 @@
-import gl from './index';
-import Texture, { TextureFormat } from './Texture';
+import GL from './GL';
+import Texture, { TextureFormat, TextureTarget } from './Texture';
 
 class RenderBuffer extends Texture<WebGLRenderbuffer> {
 	public name: string = 'RenderBuffer';
@@ -7,11 +7,11 @@ class RenderBuffer extends Texture<WebGLRenderbuffer> {
 	public readonly stencil: boolean;
 
 	protected get identifier(): string {
-		return 'renderbuffer';
+		return 'RenderBuffer';
 	}
 
 	public constructor(width: number, height: number, format: TextureFormat, stencil: boolean) {
-		super(width, height, format, gl.RENDERBUFFER, () => gl.createRenderbuffer(), (handle) => gl.bindRenderbuffer(gl.RENDERBUFFER, handle), (handle) => gl.deleteRenderbuffer(handle));
+		super(width, height, format, TextureTarget.RenderBuffer, () => GL.createRenderbuffer(), (handle) => GL.bindRenderbuffer(TextureTarget.RenderBuffer, handle), (handle) => GL.deleteRenderbuffer(handle));
 
 		this.stencil = stencil;
 	}
@@ -19,7 +19,7 @@ class RenderBuffer extends Texture<WebGLRenderbuffer> {
 	public apply(): void {
 		this.bind();
 
-		gl.renderbufferStorage(this.target, this.format, this.width, this.height);
+		GL.renderbufferStorage(this.target, this.format, this.width, this.height);
 	}
 }
 
