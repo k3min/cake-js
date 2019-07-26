@@ -21,7 +21,7 @@ const bytesPerElement = (type: DataType): number => {
 };
 
 class VertexAttribute<T extends ArrayLike<number> = ArrayLike<number>> {
-	public readonly data: T;
+	public readonly value: T;
 	public readonly type: DataType;
 	public readonly length: number;
 	public readonly bytesPerElement: number;
@@ -30,7 +30,7 @@ class VertexAttribute<T extends ArrayLike<number> = ArrayLike<number>> {
 	public readonly littleEndian: boolean;
 
 	public constructor(data: T, type: DataType = DataType.Float32, normalized: boolean = false, littleEndian: boolean = true) {
-		this.data = data;
+		this.value = data;
 		this.type = type;
 		this.normalized = normalized;
 		this.length = data.length;

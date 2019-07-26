@@ -6,10 +6,10 @@ import { Indexable } from '../Core/Helpers';
 import { Vector2 } from '../Math';
 
 class Vertex implements Indexable<VertexAttribute> {
-	public readonly vertex: VertexAttribute;
+	public readonly position: VertexAttribute;
 
-	public constructor(vertex: Vector2) {
-		this.vertex = new VertexAttribute(vertex, DataType.Float32, false);
+	public constructor(position: Vector2) {
+		this.position = new VertexAttribute(position, DataType.Float32, false);
 	}
 
 	readonly [index: string]: VertexAttribute;

@@ -92,7 +92,7 @@ const cast = <From, To>(input: From, from: Object, to: Object): To => {
 
 	const value = Object.values(to)[valueIndex];
 
-	console.info(`ShaderCapability (${ input }): ${ value }`);
+	console.debug(`ShaderCapability (${ input }): ${ value }`);
 
 	return value;
 };

@@ -1,10 +1,7 @@
-import { Resource, ResourceType } from '../Core';
-import { VertexAttribute } from '../GL/Helpers';
-import DataType from '../GL/Helpers/DataType';
+import { Resource, ResourceType, Exception } from '../Core';
+import { VertexAttribute, DataType } from '../GL/Helpers';
 import { Indexable, TextReader } from '../Core/Helpers';
-import Exception from '../Core/Exception';
-import { Vector2, Vector3 } from '../Math';
-import Vector4 from '../Math/Vector4';
+import { Vector2, Vector3, Vector4 } from '../Math';
 
 enum Token {
 	Vertex = 'v',
@@ -22,12 +19,12 @@ interface Raw {
 }
 
 export class Vertex implements Indexable<VertexAttribute> {
-	public readonly vertex: VertexAttribute<Vector3>;
+	public readonly position: VertexAttribute<Vector3>;
 	public readonly normal: VertexAttribute<Vector3>;
 	public readonly texcoord: VertexAttribute<Vector2>;
 
-	public constructor(vertex: Vector3, normal: Vector4, texcoord: Vector2) {
-		this.vertex = new VertexAttribute<Vector3>(vertex, DataType.Float32, false);
+	public constructor(position: Vector3, normal: Vector4, texcoord: Vector2) {
+		this.position = new VertexAttribute<Vector3>(position, DataType.Float32, false);
 		this.normal = new VertexAttribute<Vector4>(normal, DataType.Int8, true);
 		this.texcoord = new VertexAttribute<Vector2>(texcoord, DataType.Int16, false);
 	}
@@ -92,10 +89,16 @@ class WavefrontParser {
 			const x: number[] = face.split('/').map((v: string): number => ((+v) - 1));
 
 			// noinspection PointlessArithmeticExpressionJS
-			const vertex = new Vector3(
+			const position = new Vector3(
 				this.raw[Token.Vertex][(x[0] * 3) + 0],
 				this.raw[Token.Vertex][(x[0] * 3) + 1],
 				this.raw[Token.Vertex][(x[0] * 3) + 2],
+			);
+
+			// noinspection PointlessArithmeticExpressionJS
+			const texcoord = new Vector2(
+				this.raw[Token.Texcoord][(x[1] * 2) + 0],
+				this.raw[Token.Texcoord][(x[1] * 2) + 1],
 			);
 
 			// noinspection PointlessArithmeticExpressionJS
@@ -106,15 +109,9 @@ class WavefrontParser {
 				0,
 			);
 
-			// noinspection PointlessArithmeticExpressionJS
-			const texcoord = new Vector2(
-				this.raw[Token.Texcoord][(x[1] * 2) + 0],
-				this.raw[Token.Texcoord][(x[1] * 2) + 1],
-			);
-
 			this.hash[face] = this.index;
 
-			this.vertices.push(new Vertex(vertex, normal, texcoord));
+			this.vertices.push(new Vertex(position, normal, texcoord));
 			this.indices.push(this.index);
 
 			this.index += 1;

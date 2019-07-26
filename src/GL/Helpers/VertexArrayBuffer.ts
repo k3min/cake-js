@@ -29,7 +29,7 @@ class VertexArrayBuffer<T extends Indexable<VertexAttribute>> extends ArrayBuffe
 
 		for (let attribute in item) {
 			if (item.hasOwnProperty(attribute)) {
-				this.attributes.push(item[attribute]);
+				this.attributes.push(item[attribute] as VertexAttribute);
 			}
 		}
 
@@ -47,36 +47,36 @@ class VertexArrayBuffer<T extends Indexable<VertexAttribute>> extends ArrayBuffe
 	}
 
 	public set(byteOffset: number, vertexAttribute: VertexAttribute): number {
-		const { type, data, bytesPerElement, stride, length, littleEndian }: VertexAttribute = vertexAttribute;
+		const { type, value, bytesPerElement, stride, length, littleEndian }: VertexAttribute = vertexAttribute;
 
 		for (let i = 0; i < length; i++) {
 			switch (type) {
 				case DataType.Uint32:
-					this.view.setUint32(byteOffset, data[i] * 0xffffffff, littleEndian);
+					this.view.setUint32(byteOffset, value[i] * 0xffffffff, littleEndian);
 					break;
 
 				case DataType.Uint16:
-					this.view.setUint16(byteOffset, data[i] * 0xffff, littleEndian);
+					this.view.setUint16(byteOffset, value[i] * 0xffff, littleEndian);
 					break;
 
 				case DataType.Uint8:
-					this.view.setUint8(byteOffset, data[i] * 0xff);
+					this.view.setUint8(byteOffset, value[i] * 0xff);
 					break;
 
 				case DataType.Int32:
-					this.view.setInt32(byteOffset, data[i] * 0x7fffffff, littleEndian);
+					this.view.setInt32(byteOffset, value[i] * 0x7fffffff, littleEndian);
 					break;
 
 				case DataType.Int16:
-					this.view.setInt16(byteOffset, data[i] * 0x7fff, littleEndian);
+					this.view.setInt16(byteOffset, value[i] * 0x7fff, littleEndian);
 					break;
 
 				case DataType.Int8:
-					this.view.setInt8(byteOffset, data[i] * 0x7f);
+					this.view.setInt8(byteOffset, value[i] * 0x7f);
 					break;
 
 				case DataType.Float32:
-					this.view.setFloat32(byteOffset, data[i], littleEndian);
+					this.view.setFloat32(byteOffset, value[i], littleEndian);
 					break;
 
 				default:

@@ -1,6 +1,6 @@
 import DataType from './DataType';
 declare class VertexAttribute<T extends ArrayLike<number> = ArrayLike<number>> {
-    readonly data: T;
+    readonly value: T;
     readonly type: DataType;
     readonly length: number;
     readonly bytesPerElement: number;
