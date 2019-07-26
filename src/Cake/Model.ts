@@ -1,6 +1,7 @@
+import Mesh from '../GL/Mesh';
 import { WavefrontParser, WavefrontVertex } from '../Parsers';
-import { Mesh, IndexBuffer, VertexBuffer } from '../GL';
-import { Path } from '../Helpers';
+import { IndexBuffer, VertexBuffer } from '../GL';
+import { Path, Exception } from '../Core';
 
 class Model extends Mesh<WavefrontVertex> {
 	private readonly parser: WavefrontParser = new WavefrontParser();
@@ -10,7 +11,11 @@ class Model extends Mesh<WavefrontVertex> {
 
 		model.name = Path.getFileName(url);
 
-		await model.parser.load(url);
+		try {
+			await model.parser.load(url);
+		} catch (e) {
+			throw new Exception(`Model: failed to load '${ url }'`, e);
+		}
 
 		model.indexBuffer = new IndexBuffer(model.parser.indices);
 		model.vertexBuffer = new VertexBuffer<WavefrontVertex>(model.parser.vertices);

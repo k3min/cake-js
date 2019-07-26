@@ -1,17 +1,30 @@
 import GL from './GL';
-import { Path } from '../Helpers';
+import { Path, Exception } from '../Core';
 import { DirectDrawSurfaceParser, CubeMapFlags } from '../Parsers';
+import { pixelFormat, PixelFormat, pixelType, PixelType } from './Helpers';
 import Texture, { Mipmap, TextureTarget } from './Texture';
 
 class CubeMap extends Texture<WebGLTexture> {
 	public name: string = 'CubeMap';
 
+	private readonly pixelFormat: PixelFormat;
+	private readonly pixelType: PixelType;
+
 	public constructor(width: number, height: number, format: number) {
 		super(width, height, format, TextureTarget.CubeMap, () => GL.createTexture(), (handle) => GL.bindTexture(TextureTarget.CubeMap, handle), (handle) => GL.deleteTexture(handle));
+
+		this.pixelFormat = pixelFormat(format);
+		this.pixelType = pixelType(format);
 	}
 
 	public static async load(url: string): Promise<CubeMap> {
-		const dds: DirectDrawSurfaceParser = await DirectDrawSurfaceParser.load(url);
+		let dds: DirectDrawSurfaceParser;
+
+		try {
+			dds = await DirectDrawSurfaceParser.load(url);
+		} catch (e) {
+			throw new Exception(`CubeMap: failed to load DirectDrawSurface '${ url }'`, e);
+		}
 
 		if ((dds.ddsHeader.cubeMapFlags & CubeMapFlags.CubeMap) === 0) {
 			throw new TypeError();

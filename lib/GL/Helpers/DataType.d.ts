@@ -7,5 +7,4 @@ declare enum DataType {
     Uint32 = 5125,
     Float32 = 5126
 }
-export declare const bytesPerElement: (type: DataType) => number;
 export default DataType;

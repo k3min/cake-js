@@ -1,7 +1,10 @@
-import { Shader } from '../GL';
+import GL, { Shader } from '../GL';
 import { Matrix4x4, Vector3 } from '../Math';
 import Transform from './Transform';
 
+/**
+ * @todo Implement Bindable
+ */
 class Camera extends Transform {
 	public static main: Camera;
 
@@ -15,6 +18,7 @@ class Camera extends Transform {
 	public readonly target: Vector3 = Vector3.zero;
 
 	public readonly projection: Matrix4x4 = Matrix4x4.identity;
+	public readonly invP: Matrix4x4 = Matrix4x4.identity;
 	public readonly viewProjection: Matrix4x4 = Matrix4x4.identity;
 
 	public constructor() {
@@ -24,7 +28,9 @@ class Camera extends Transform {
 	}
 
 	public update(): void {
-		this.projection.perspective(this.fov, 1, this.near, this.far);
+		this.projection.perspective(this.fov, GL.drawingBufferWidth / GL.drawingBufferHeight, this.near, this.far);
+
+		Matrix4x4.inverse(this.projection, this.invP);
 
 		this.worldToLocal.lookAt(this.position, this.target);
 
@@ -35,6 +41,9 @@ class Camera extends Transform {
 		Shader.setMatrix4x4('MATRIX_P', this.projection);
 		Shader.setMatrix4x4('MATRIX_VP', this.viewProjection);
 		Shader.setMatrix4x4('MATRIX_V', this.worldToLocal);
+
+		Shader.setMatrix4x4('_CameraInvP', this.invP);
+		Shader.setMatrix4x4('_Camera2World', this.localToWorld);
 	}
 
 	protected disposing(): void {

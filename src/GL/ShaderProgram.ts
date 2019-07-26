@@ -1,13 +1,13 @@
-import { Null, Storage } from '../Helpers';
+import { Null, Storage } from '../Core/Helpers';
 import { BindableGraphicsObject } from './Helpers';
 import GL from './GL';
 
 const ERROR_PATTERN: RegExp = /ERROR: \d+:(\d+): '(\w+)' : (.*)/;
-const STACK_PATTERN: RegExp = /^\/\*\* @(.*) \*\//;
+const STACK_PATTERN: RegExp = /^\/\*\* (.*) \*\//;
 
 export enum ShaderType {
-	Fragment = 35632, // GL_FRAGMENT_SHADER
-	Vertex,
+	Fragment = 0x8B30, // GL_FRAGMENT_SHADER
+	Vertex = 0x8B31, // GL_VERTEX_SHADER
 }
 
 class ShaderProgram extends BindableGraphicsObject<ShaderProgram, WebGLProgram> {

@@ -1,5 +1,5 @@
-import Bindable from './Bindable';
-import Base from './Base';
+import Bindable from '../Bindable';
+import Base from '../Base';
 import Indexable from './Indexable';
 import Null from './Null';
 
@@ -27,7 +27,7 @@ abstract class BindableObject<T extends BindableObject<T>> extends Base implemen
 
 		BindableObject.map[this.identifier] = this;
 
-		this.onBind();
+		this.binding();
 
 		return true;
 	}
@@ -39,16 +39,16 @@ abstract class BindableObject<T extends BindableObject<T>> extends Base implemen
 			return false;
 		}
 
-		this.onUnbind();
+		this.unbinding();
 
 		BindableObject.map[this.identifier] = null;
 
 		return true;
 	}
 
-	protected abstract onBind(): void;
+	protected abstract binding(): void;
 
-	protected abstract onUnbind(): void;
+	protected abstract unbinding(): void;
 
 	public dispose(): boolean {
 		const disposed: boolean = super.dispose();

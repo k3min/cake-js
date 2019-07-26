@@ -1,15 +1,22 @@
-import { Path } from '../Helpers';
+import { Path } from '../Core';
 import { Vector4 } from '../Math';
 import GL from './GL';
-import Texture, { TextureFormat, TextureTarget } from './Texture';
+import { PixelFormat, PixelType, TextureFormat, pixelFormat, pixelType } from './Helpers';
+import Texture, { TextureTarget } from './Texture';
 
 class Texture2D extends Texture<WebGLTexture> {
 	public name: string = 'Texture2D';
 
 	public readonly texelSize: Vector4 = new Vector4(0, 0, 0, 0);
 
+	private readonly pixelFormat: PixelFormat;
+	private readonly pixelType: PixelType;
+
 	public constructor(width: number, height: number, format: TextureFormat) {
 		super(width, height, format, TextureTarget.Texture2D, () => GL.createTexture(), (handle) => GL.bindTexture(TextureTarget.Texture2D, handle), (handle) => GL.deleteTexture(handle));
+
+		this.pixelFormat = pixelFormat(format);
+		this.pixelType = pixelType(format);
 	}
 
 	public static async load(url: string, format: TextureFormat): Promise<Texture2D> {
@@ -34,8 +41,8 @@ class Texture2D extends Texture<WebGLTexture> {
 	public apply(): void {
 		this.bind();
 
-		this.set(GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-		this.set(GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+		this.set(GL.TEXTURE_MIN_FILTER, GL.NEAREST);
+		this.set(GL.TEXTURE_MAG_FILTER, GL.NEAREST);
 
 		this.set(GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
 		this.set(GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);

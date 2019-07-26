@@ -1,9 +1,7 @@
-import Texture from './Texture';
-import { BindableObject, Disposable, Null, Storage } from '../Helpers';
+import { Disposable } from '../Core';
+import { BindableObject, Null, Storage } from '../Core/Helpers';
 import { Matrix4x4, Vector } from '../Math';
-/**
- * @todo Implement blending, culling, etc.
- */
+import Texture from './Texture';
 declare class Shader extends BindableObject<Shader> implements Disposable {
     name: string;
     private variants;
@@ -23,19 +21,21 @@ declare class Shader extends BindableObject<Shader> implements Disposable {
     protected readonly identifier: string;
     static load(url: string): Promise<Shader>;
     apply(): void;
-    setFloat(name: string, value: GLfloat): void;
-    setInt(name: string, value: GLint): void;
-    setMatrix4x4(name: string, value: Matrix4x4): void;
-    setVector(name: string, value: Vector): void;
-    setTexture(name: string, texture: Texture): void;
+    private logUniformNotFound;
+    private getUniform;
+    setFloat(name: string, value: GLfloat, check?: boolean): void;
+    setInt(name: string, value: GLint, check?: boolean): void;
+    setMatrix4x4(name: string, value: Matrix4x4, check?: boolean): void;
+    setVector(name: string, value: Vector, check?: boolean): void;
+    setTexture(name: string, texture: Texture, check?: boolean): void;
     static setFloat(name: string, value: number): void;
     static setInt(name: string, value: number): void;
     static setVector(name: string, value: Vector): void;
     static setMatrix4x4(name: string, value: Matrix4x4): void;
     static setTexture(name: string, value: Texture): void;
-    protected onUnbind(): void;
-    protected onBind(): void;
+    private setCap;
+    protected unbinding(): void;
+    protected binding(): void;
     protected disposing(): void;
-    private uniformNotFound;
 }
 export default Shader;

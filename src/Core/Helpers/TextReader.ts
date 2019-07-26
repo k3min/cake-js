@@ -3,7 +3,7 @@ class TextReader implements IterableIterator<string> {
 	private index: number = 0;
 
 	public constructor(text: string) {
-		this.buffer.push(...text.split('\n'));
+		text.split('\n').forEach((line: string): number => this.buffer.push(line));
 	}
 
 	public next(): IteratorResult<string> {

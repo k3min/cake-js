@@ -1,6 +1,7 @@
+import { Base } from '../Core';
 import { Texture, Shader } from '../GL';
 import { Matrix4x4, Vector } from '../Math';
-import { Base, Storage, Toggle } from '../Helpers';
+import { Storage, Toggle } from '../Core/Helpers';
 
 class Material extends Base {
 	public name: string = 'Material';
@@ -11,7 +12,7 @@ class Material extends Base {
 	private readonly matrices: Storage<Matrix4x4> = new Storage<Matrix4x4>();
 	private readonly textures: Storage<Texture> = new Storage<Texture>();
 
-	private readonly keywords: Toggle = new Toggle();
+	private readonly keywords: Toggle<string> = new Toggle<string>();
 
 	public readonly shader: Shader;
 

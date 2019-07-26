@@ -1,4 +1,4 @@
-import { Storage } from '../Helpers';
+import { Storage } from '../Core/Helpers';
 import { BindableGraphicsObject } from './Helpers';
 export declare enum ShaderType {
     Fragment = 35632,

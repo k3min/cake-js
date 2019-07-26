@@ -1,31 +1,11 @@
 enum DataType {
-	Int8 = 5120, // GL_BYTE
-	Uint8,
-	Int16,
-	Uint16,
-	Int32,
-	Uint32,
-	Float32
+	Int8 = 0x1400, // GL_BYTE
+	Uint8 = 0x1401, // GL_UNSIGNED_BYTE
+	Int16 = 0x1402, // GL_SHORT
+	Uint16 = 0x1403, // GL_UNSIGNED_SHORT
+	Int32 = 0x1404, // GL_INT
+	Uint32 = 0x1405, // GL_UNSIGNED_INT
+	Float32 = 0x1406, // GL_FLOAT
 }
-
-export const bytesPerElement = (type: DataType): number => {
-	switch (type) {
-		case DataType.Int8:
-		case DataType.Uint8:
-			return 1;
-
-		case DataType.Int16:
-		case DataType.Uint16:
-			return 2;
-
-		case DataType.Int32:
-		case DataType.Uint32:
-		case DataType.Float32:
-			return 4;
-
-		default:
-			throw new RangeError();
-	}
-};
 
 export default DataType;

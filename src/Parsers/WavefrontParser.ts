@@ -1,31 +1,35 @@
-import { DataType, VertexAttribute } from '../GL/Helpers';
-import { Indexable, TextReader, Resource, ResourceType } from '../Helpers';
+import { Resource, ResourceType } from '../Core';
+import { VertexAttribute } from '../GL/Helpers';
+import DataType from '../GL/Helpers/DataType';
+import { Indexable, TextReader } from '../Core/Helpers';
+import Exception from '../Core/Exception';
 import { Vector2, Vector3 } from '../Math';
+import Vector4 from '../Math/Vector4';
 
 enum Token {
 	Vertex = 'v',
-	Texcoord = 'vt',
 	Normal = 'vn',
+	Texcoord = 'vt',
 	Face = 'f'
 }
 
 interface Raw {
 	readonly [Token.Vertex]: number[];
-	readonly [Token.Texcoord]: number[];
 	readonly [Token.Normal]: number[];
+	readonly [Token.Texcoord]: number[];
 
 	readonly [token: string]: number[];
 }
 
 export class Vertex implements Indexable<VertexAttribute> {
-	public readonly position: VertexAttribute<Vector3>;
-	public readonly texcoord: VertexAttribute<Vector2>;
+	public readonly vertex: VertexAttribute<Vector3>;
 	public readonly normal: VertexAttribute<Vector3>;
+	public readonly texcoord: VertexAttribute<Vector2>;
 
-	public constructor(position: Vector3, texcoord: Vector2, normal: Vector3) {
-		this.position = new VertexAttribute<Vector3>(position);
-		this.texcoord = new VertexAttribute<Vector2>(texcoord, DataType.Int8, true);
-		this.normal = new VertexAttribute<Vector3>(normal, DataType.Uint16, true);
+	public constructor(vertex: Vector3, normal: Vector4, texcoord: Vector2) {
+		this.vertex = new VertexAttribute<Vector3>(vertex, DataType.Float32, false);
+		this.normal = new VertexAttribute<Vector4>(normal, DataType.Int8, true);
+		this.texcoord = new VertexAttribute<Vector2>(texcoord, DataType.Int16, false);
 	}
 
 	readonly [index: string]: VertexAttribute;
@@ -34,19 +38,25 @@ export class Vertex implements Indexable<VertexAttribute> {
 class WavefrontParser {
 	private readonly raw: Raw = {
 		[Token.Vertex]: [],
-		[Token.Texcoord]: [],
 		[Token.Normal]: [],
+		[Token.Texcoord]: [],
 	};
 
 	public readonly vertices: Vertex[] = [];
 	public readonly indices: number[] = [];
 
-	private readonly hash: Indexable<number> = {};
+	private readonly hash: Indexable<number> = {}; // @todo Make this (and possibly others) `HashSet`-like
 
 	private index: number = 0;
 
 	public async load(path: string): Promise<void> {
-		const reader: TextReader = await Resource.load<TextReader>(path, ResourceType.OBJ);
+		let reader: TextReader;
+
+		try {
+			reader = await Resource.load<TextReader>(path, ResourceType.OBJ);
+		} catch (e) {
+			throw new Exception(`WavefrontParser: failed to load '${ path }'`, e);
+		}
 
 		for (let line of reader) {
 			if (line[0] === '#') {
@@ -58,8 +68,8 @@ class WavefrontParser {
 
 			switch (token) {
 				case Token.Vertex:
-				case Token.Texcoord:
 				case Token.Normal:
+				case Token.Texcoord:
 					this.raw[token].push(...parts.map((part: string): number => +part));
 					break;
 
@@ -79,31 +89,32 @@ class WavefrontParser {
 				continue;
 			}
 
-			const vertex: number[] = face.split('/').map((v: string): number => ((+v) - 1));
+			const x: number[] = face.split('/').map((v: string): number => ((+v) - 1));
 
 			// noinspection PointlessArithmeticExpressionJS
-			const position = new Vector3(
-				this.raw[Token.Vertex][(vertex[0] * 3) + 0],
-				this.raw[Token.Vertex][(vertex[0] * 3) + 1],
-				this.raw[Token.Vertex][(vertex[0] * 3) + 2],
+			const vertex = new Vector3(
+				this.raw[Token.Vertex][(x[0] * 3) + 0],
+				this.raw[Token.Vertex][(x[0] * 3) + 1],
+				this.raw[Token.Vertex][(x[0] * 3) + 2],
+			);
+
+			// noinspection PointlessArithmeticExpressionJS
+			const normal = new Vector4(
+				this.raw[Token.Normal][(x[2] * 3) + 0],
+				this.raw[Token.Normal][(x[2] * 3) + 1],
+				this.raw[Token.Normal][(x[2] * 3) + 2],
+				0,
 			);
 
 			// noinspection PointlessArithmeticExpressionJS
 			const texcoord = new Vector2(
-				this.raw[Token.Texcoord][(vertex[1] * 2) + 0],
-				this.raw[Token.Texcoord][(vertex[1] * 2) + 1],
-			);
-
-			// noinspection PointlessArithmeticExpressionJS
-			const normal = new Vector3(
-				this.raw[Token.Normal][(vertex[2] * 3) + 0],
-				this.raw[Token.Normal][(vertex[2] * 3) + 1],
-				this.raw[Token.Normal][(vertex[2] * 3) + 2],
+				this.raw[Token.Texcoord][(x[1] * 2) + 0],
+				this.raw[Token.Texcoord][(x[1] * 2) + 1],
 			);
 
 			this.hash[face] = this.index;
 
-			this.vertices.push(new Vertex(position, texcoord, normal));
+			this.vertices.push(new Vertex(vertex, normal, texcoord));
 			this.indices.push(this.index);
 
 			this.index += 1;

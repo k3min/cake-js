@@ -1,14 +1,15 @@
+import { Disposable, Path } from '../Core';
+import { Indexable, BindableObject, Null, Storage } from '../Core/Helpers';
+import Exception from '../Core/Exception';
+import { Matrix4x4, Vector, Vector2, Vector3, Vector4 } from '../Math';
+import { ShaderCapabilityValue, ShaderParser, Blend, ColorMask, ShaderCapability, StencilTest } from '../Parsers';
 import GL from './GL';
-import { ShaderParser } from '../Parsers';
+import { CompareFunction } from './Helpers';
+import Capability from './Helpers/Capability';
+import CullingMode from './Helpers/CullingMode';
 import ShaderProgram, { ShaderType } from './ShaderProgram';
 import Texture from './Texture';
 import Texture2D from './Texture2D';
-import { BindableObject, Disposable, Null, Path, Storage, Indexable } from '../Helpers';
-import { Matrix4x4, Vector, Vector2, Vector3, Vector4 } from '../Math';
-
-/**
- * @todo Implement blending, culling, etc.
- */
 
 class Shader extends BindableObject<Shader> implements Disposable {
 	public name: string = 'Shader';
@@ -64,7 +65,11 @@ class Shader extends BindableObject<Shader> implements Disposable {
 
 		shader.name = Path.getFileName(url);
 
-		await shader.parser.load(url);
+		try {
+			await shader.parser.load(url);
+		} catch (e) {
+			throw new Exception(`Shader: failed to load '${ url }'`, e);
+		}
 
 		shader.apply();
 
@@ -97,64 +102,69 @@ class Shader extends BindableObject<Shader> implements Disposable {
 		this.keywords = null;
 	}
 
-	public setFloat(name: string, value: GLfloat): void {
+	private logUniformNotFound(name: string, type: string): void {
+		const id: string = `${ name } (${ type })`;
+		const log: string = `Shader (${ this.name }): uniform ${ id } not found`;
+
+		if (id in this.log) {
+			return;
+		}
+
+		console.warn(log);
+
+		this.log[id] = log;
+	}
+
+	private getUniform(name: string, type: string, check: boolean = true): Null<WebGLUniformLocation> {
 		this.bind();
 
 		const uniform: WebGLUniformLocation = this.uniforms.get(name) as WebGLUniformLocation;
 
-		if (!uniform) {
-			if (!name.startsWith('cake')) {
-				this.uniformNotFound('float', name);
-			}
+		if (uniform) {
+			return uniform;
+		}
 
+		if (check && !name.startsWith('cake')) {
+			this.logUniformNotFound(name, type);
+		}
+
+		return null;
+	}
+
+	public setFloat(name: string, value: GLfloat, check: boolean = true): void {
+		const uniform: WebGLUniformLocation = this.getUniform(name, 'float', check) as WebGLUniformLocation;
+
+		if (!uniform) {
 			return;
 		}
 
 		GL.uniform1f(uniform, value);
 	}
 
-	public setInt(name: string, value: GLint): void {
-		this.bind();
-
-		const uniform: WebGLUniformLocation = this.uniforms.get(name) as WebGLUniformLocation;
+	public setInt(name: string, value: GLint, check: boolean = true): void {
+		const uniform: WebGLUniformLocation = this.getUniform(name, 'int', check) as WebGLUniformLocation;
 
 		if (!uniform) {
-			if (!name.startsWith('cake')) {
-				this.uniformNotFound('int', name);
-			}
-
 			return;
 		}
 
 		GL.uniform1i(uniform, value);
 	}
 
-	public setMatrix4x4(name: string, value: Matrix4x4): void {
-		this.bind();
-
-		const uniform: WebGLUniformLocation = this.uniforms.get(name) as WebGLUniformLocation;
+	public setMatrix4x4(name: string, value: Matrix4x4, check: boolean = true): void {
+		const uniform: WebGLUniformLocation = this.getUniform(name, 'Matrix4x4', check) as WebGLUniformLocation;
 
 		if (!uniform) {
-			if (!name.startsWith('cake')) {
-				this.uniformNotFound('Matrix4x4', name);
-			}
-
 			return;
 		}
 
 		GL.uniformMatrix4fv(uniform, false, value);
 	}
 
-	public setVector(name: string, value: Vector): void {
-		this.bind();
-
-		const uniform: WebGLUniformLocation = this.uniforms.get(name) as WebGLUniformLocation;
+	public setVector(name: string, value: Vector, check: boolean = true): void {
+		const uniform: WebGLUniformLocation = this.getUniform(name, `Vector${ value.length }`, check) as WebGLUniformLocation;
 
 		if (!uniform) {
-			if (!name.startsWith('cake')) {
-				this.uniformNotFound(`Vector${ value.length }`, name);
-			}
-
 			return;
 		}
 
@@ -173,27 +183,18 @@ class Shader extends BindableObject<Shader> implements Disposable {
 		}
 	}
 
-	public setTexture(name: string, texture: Texture): void {
-		this.bind();
-
-		const uniform: WebGLUniformLocation = this.uniforms.get(name) as WebGLUniformLocation;
+	public setTexture(name: string, texture: Texture, check: boolean = true): void {
+		const uniform: WebGLUniformLocation = this.getUniform(name, 'texture', check) as WebGLUniformLocation;
 
 		if (!uniform) {
-			if (!name.startsWith('cake')) {
-				this.uniformNotFound('Texture', name);
-			}
-
 			return;
 		}
 
 		if (texture instanceof Texture2D) {
-			const name2 = `${ name }_TexelSize`;
-			const value2: Vector4 = texture.texelSize;
-
-			const uniform2: WebGLUniformLocation = this.uniforms.get(name2) as WebGLUniformLocation;
+			const uniform2: WebGLUniformLocation = this.getUniform(`${ name }_TexelSize`, 'Vector4', false) as WebGLUniformLocation;
 
 			if (uniform2) {
-				GL.uniform4fv(uniform2, value2);
+				GL.uniform4fv(uniform2, texture.texelSize);
 			}
 		}
 
@@ -231,35 +232,88 @@ class Shader extends BindableObject<Shader> implements Disposable {
 		Shader.textures.set(name, value);
 	}
 
-	protected onUnbind(): void {
+	private setCap(cap: ShaderCapability): void {
+		const value: ShaderCapabilityValue = this.parser.capabilities[cap];
+
+		switch (cap) {
+			case ShaderCapability.StencilTest: {
+				if (value) {
+					const { func, ref, mask }: StencilTest = value as StencilTest;
+					GL.enable(Capability.StencilTest);
+					GL.stencilFunc(func, ref, mask);
+				} else {
+					GL.disable(Capability.StencilTest);
+				}
+
+				break;
+			}
+
+			case ShaderCapability.DepthTest: {
+				const func: CompareFunction = value as CompareFunction;
+				GL.enable(Capability.DepthTest);
+				GL.depthFunc(func);
+				break;
+			}
+
+			case ShaderCapability.Blend: {
+				if (value) {
+					const { src, dst }: Blend = value as Blend;
+					GL.enable(Capability.Blend);
+					GL.blendFunc(src, dst);
+				} else {
+					GL.disable(Capability.Blend);
+				}
+				break;
+			}
+
+			case ShaderCapability.CullFace: {
+				if (value) {
+					const mode: CullingMode = value as CullingMode;
+					GL.enable(Capability.CullFace);
+					GL.cullFace(mode);
+				} else {
+					GL.disable(Capability.CullFace);
+				}
+				break;
+			}
+
+			case ShaderCapability.DepthMask: {
+				GL.depthMask(!!value);
+				break;
+			}
+
+			case ShaderCapability.ColorMask: {
+				const { r, g, b, a }: ColorMask = value as ColorMask;
+				GL.colorMask(r, g, b, a);
+				break;
+			}
+
+			default:
+				throw new RangeError(`Shader (${ this.name }): unknown cap '${ cap }'`);
+		}
+	}
+
+	protected unbinding(): void {
 		this.variant.unbind();
 	}
 
-	protected onBind(): void {
+	protected binding(): void {
+		for (let cap of Object.values(ShaderCapability)) {
+			this.setCap(cap);
+		}
+
 		this.variant.bind();
 
-		Shader.floats.forEach((value, name) => this.setFloat(name, value));
-		Shader.ints.forEach((value, name) => this.setInt(name, value));
-		Shader.vectors.forEach((value, name) => this.setVector(name, value));
-		Shader.matrices.forEach((value, name) => this.setMatrix4x4(name, value));
-		Shader.textures.forEach((value, name) => this.setTexture(name, value));
+		Shader.floats.forEach((value, name) => this.setFloat(name, value, false));
+		Shader.ints.forEach((value, name) => this.setInt(name, value, false));
+		Shader.vectors.forEach((value, name) => this.setVector(name, value, false));
+		Shader.matrices.forEach((value, name) => this.setMatrix4x4(name, value, false));
+		Shader.textures.forEach((value, name) => this.setTexture(name, value, false));
 	}
 
 	protected disposing(): void {
 		this.variants.forEach((variant: ShaderProgram) => variant.dispose());
 		this.variants.clear();
-	}
-
-	private uniformNotFound(type: string, name: string): void {
-		const log: string = `Shader (${ this.name }): uniform (${ type }) ${ name } not found!`;
-
-		if (this.log[log]) {
-			return;
-		}
-
-		console.warn(log);
-
-		this.log[log] = log;
 	}
 }
 

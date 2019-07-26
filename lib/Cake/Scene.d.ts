@@ -1,5 +1,6 @@
-import Drawable from '../GL/Helpers/Drawable';
-import { Base, Storage, Updatable } from '../Helpers';
+import { Drawable } from '../GL/Helpers';
+import { Storage } from '../Core/Helpers';
+import { Base, Updatable } from '../Core';
 import Camera from './Camera';
 import Renderer from './Renderer';
 declare class Scene extends Base implements Updatable, Drawable {

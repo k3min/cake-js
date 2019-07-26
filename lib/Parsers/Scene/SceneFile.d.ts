@@ -5,6 +5,7 @@ export declare enum SceneObjectType {
 export interface SceneObject {
     readonly type: SceneObjectType;
     readonly position: number[];
+    readonly scale: number[];
 }
 export interface SceneCamera extends SceneObject {
     readonly fov: number;
@@ -25,7 +26,7 @@ export declare enum SceneMaterialPropertyType {
     Float = "float",
     Int = "int",
     Vector = "vector",
-    Texture2D = "texture2D"
+    Texture = "texture"
 }
 export interface SceneMaterialProperty {
     readonly name: string;

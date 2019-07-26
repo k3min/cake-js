@@ -5,6 +5,7 @@ export {
 	Texture2D,
 	RenderBuffer,
 	TextureFormat,
+	RenderBufferFormat,
 	VideoTexture,
 	Shader,
 } from './GL';
@@ -14,6 +15,9 @@ export {
 	Model,
 	Quad,
 	Graphics,
+	Camera,
+	Renderer,
+	Scene,
 } from './Cake';
 
 export {

@@ -2,8 +2,8 @@ import GL from './GL';
 import { PrimitiveType, Drawable, BindableGraphicsObject } from './Helpers';
 
 export enum BufferType {
-	Array = 34962, // GL_ARRAY_BUFFER
-	ElementArray = 34963
+	Array = 0x8892, // GL_ARRAY_BUFFER
+	ElementArray = 0x8893, // GL_ELEMENT_ARRAY_BUFFER
 }
 
 abstract class Buffer<T extends ArrayBuffer> extends BindableGraphicsObject<Buffer<T>, WebGLBuffer> implements Drawable {

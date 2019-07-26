@@ -1,5 +1,7 @@
-import Drawable from '../GL/Helpers/Drawable';
-import { Base, Path, Indexable, Storage, Updatable } from '../Helpers';
+import { Drawable } from '../GL/Helpers';
+import { Indexable, Storage } from '../Core/Helpers';
+import { Base, Path, Updatable } from '../Core';
+import Exception from '../Core/Exception';
 import { SceneParser } from '../Parsers';
 import Camera from './Camera';
 import Renderer from './Renderer';
@@ -17,7 +19,11 @@ class Scene extends Base implements Updatable, Drawable {
 	public static async load(url: string): Promise<Scene> {
 		const scene = new Scene();
 
-		await scene.parser.parse(url);
+		try {
+			await scene.parser.parse(url);
+		} catch (e) {
+			throw new Exception(`Scene: failed to parse '${ url }'`, e);
+		}
 
 		scene.name = Path.getFileName(url);
 		scene.camera = scene.parser.camera;

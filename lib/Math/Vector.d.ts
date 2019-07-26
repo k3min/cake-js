@@ -27,7 +27,6 @@ declare abstract class Vector extends Float32Array {
     '*='(x: X, y?: number, z?: number, w?: number): Vector;
     '+='(x: X, y?: number, z?: number, w?: number): Vector;
     set(x: X, y?: number, z?: number, w?: number): Vector;
-    static parse(value: number[]): Vector;
     abstract clone(): Vector;
 }
 export default Vector;

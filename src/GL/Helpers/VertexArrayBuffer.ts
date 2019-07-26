@@ -1,10 +1,11 @@
-import { Bindable, Indexable } from '../../Helpers';
-import gl from '../GL';
+import { Bindable } from '../../Core';
+import { Indexable } from '../../Core/Helpers';
+import GL from '../GL';
 import DataType from './DataType';
 import VertexAttribute from './VertexAttribute';
 
 class VertexArrayBuffer<T extends Indexable<VertexAttribute>> extends ArrayBuffer implements Bindable {
-	private readonly bytesPerElement: number;
+	private readonly stride: number;
 	private readonly attributes: VertexAttribute[];
 	private readonly view: DataView;
 
@@ -12,17 +13,17 @@ class VertexArrayBuffer<T extends Indexable<VertexAttribute>> extends ArrayBuffe
 		const length: number = data.length;
 		const item: T = data[0];
 
-		let bytesPerElement: number = 0;
+		let stride: number = 0;
 
 		for (let attribute in item) {
 			if (item.hasOwnProperty(attribute)) {
-				bytesPerElement += (item[attribute] as VertexAttribute).byteLength;
+				stride += (item[attribute] as VertexAttribute).stride;
 			}
 		}
 
-		super(length * bytesPerElement);
+		super(length * stride);
 
-		this.bytesPerElement = bytesPerElement;
+		this.stride = stride;
 		this.view = new DataView(this);
 		this.attributes = new Array<VertexAttribute>();
 
@@ -46,41 +47,36 @@ class VertexArrayBuffer<T extends Indexable<VertexAttribute>> extends ArrayBuffe
 	}
 
 	public set(byteOffset: number, vertexAttribute: VertexAttribute): number {
-		const type: DataType = vertexAttribute.type;
-		const value: ArrayLike<number> = vertexAttribute.value;
-		const bytesPerElement: number = vertexAttribute.bytesPerElement;
-		const byteLength: number = vertexAttribute.byteLength;
-		const length: number = vertexAttribute.length;
-		const littleEndian: boolean = vertexAttribute.littleEndian;
+		const { type, data, bytesPerElement, stride, length, littleEndian }: VertexAttribute = vertexAttribute;
 
 		for (let i = 0; i < length; i++) {
 			switch (type) {
 				case DataType.Uint32:
-					this.view.setUint32(byteOffset, value[i] * 0xffffffff, littleEndian);
+					this.view.setUint32(byteOffset, data[i] * 0xffffffff, littleEndian);
 					break;
 
 				case DataType.Uint16:
-					this.view.setUint16(byteOffset, value[i] * 0xffff, littleEndian);
+					this.view.setUint16(byteOffset, data[i] * 0xffff, littleEndian);
 					break;
 
 				case DataType.Uint8:
-					this.view.setUint8(byteOffset, value[i] * 0xff);
+					this.view.setUint8(byteOffset, data[i] * 0xff);
 					break;
 
 				case DataType.Int32:
-					this.view.setInt32(byteOffset, value[i] * 0x7fffffff, littleEndian);
+					this.view.setInt32(byteOffset, data[i] * 0x7fffffff, littleEndian);
 					break;
 
 				case DataType.Int16:
-					this.view.setInt16(byteOffset, value[i] * 0x7fff, littleEndian);
+					this.view.setInt16(byteOffset, data[i] * 0x7fff, littleEndian);
 					break;
 
 				case DataType.Int8:
-					this.view.setInt8(byteOffset, value[i] * 0x7f);
+					this.view.setInt8(byteOffset, data[i] * 0x7f);
 					break;
 
 				case DataType.Float32:
-					this.view.setFloat32(byteOffset, value[i], littleEndian);
+					this.view.setFloat32(byteOffset, data[i], littleEndian);
 					break;
 
 				default:
@@ -90,27 +86,27 @@ class VertexArrayBuffer<T extends Indexable<VertexAttribute>> extends ArrayBuffe
 			byteOffset += bytesPerElement;
 		}
 
-		return byteLength;
+		return stride;
 	}
 
 	public bind(): boolean {
 		let offset: number = 0;
 
 		for (let index = 0; index < this.attributes.length; index++) {
-			gl.enableVertexAttribArray(index);
+			GL.enableVertexAttribArray(index);
 
 			const attribute: VertexAttribute = this.attributes[index];
 
-			gl.vertexAttribPointer(
+			GL.vertexAttribPointer(
 				index,
 				attribute.length,
 				attribute.type,
 				attribute.normalized,
-				this.bytesPerElement,
+				this.stride,
 				offset,
 			);
 
-			offset += attribute.byteLength;
+			offset += attribute.stride;
 		}
 
 		return true;
@@ -118,7 +114,7 @@ class VertexArrayBuffer<T extends Indexable<VertexAttribute>> extends ArrayBuffe
 
 	public unbind(): boolean {
 		for (let index = 0; index < this.attributes.length; index++) {
-			gl.disableVertexAttribArray(index);
+			GL.disableVertexAttribArray(index);
 		}
 
 		return true;

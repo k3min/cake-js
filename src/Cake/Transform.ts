@@ -1,4 +1,4 @@
-import { Base, Updatable } from '../Helpers';
+import { Base, Updatable } from '../Core';
 import { Matrix4x4, Vector3 } from '../Math';
 
 abstract class Transform extends Base implements Updatable {

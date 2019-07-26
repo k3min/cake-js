@@ -1,12 +1,9 @@
 import Math from './Math';
-import Vector2 from './Vector2';
-import Vector3 from './Vector3';
-import Vector4 from './Vector4';
 
 const bOrA = (a: number, b?: number): number => ((b !== undefined) ? b : a);
 
 const isArrayLike = (array: any): array is ArrayLike<number> => {
-	return array.length !== undefined;
+	return (array !== undefined && array.length !== undefined);
 };
 
 export type X = ArrayLike<number> | number;
@@ -56,10 +53,10 @@ abstract class Vector extends Float32Array {
 		return this.clone().normalize();
 	}
 
-	protected constructor(components: number, x?: X, y?: number, z?: number, w?: number) {
+	protected constructor(components: number, x?: X, y: number = 0, z: number = 0, w: number = 0) {
 		if (isArrayLike(x)) {
 			super(x);
-		} else if (x !== undefined && y !== undefined && z !== undefined && w !== undefined) {
+		} else if (x !== undefined) {
 			super([x, y, z, w].slice(0, components));
 		} else {
 			super(components);
@@ -152,19 +149,6 @@ abstract class Vector extends Float32Array {
 
 	public set(x: X, y?: number, z?: number, w?: number): Vector {
 		return this.op((_, b) => b, x, y, z, w);
-	}
-
-	public static parse(value: number[]): Vector {
-		switch (value.length) {
-			case Vector2.LENGTH:
-				return new Vector2(value);
-			case Vector3.LENGTH:
-				return new Vector3(value);
-			case Vector4.LENGTH:
-				return new Vector4(value);
-			default:
-				throw new RangeError();
-		}
 	}
 
 	public abstract clone(): Vector;

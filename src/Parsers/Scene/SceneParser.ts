@@ -1,7 +1,7 @@
 import { Camera, Material, Model, Renderer } from '../../Cake';
 import { Shader, Texture2D, TextureFormat } from '../../GL';
-import { Resource, ResourceType } from '../../Helpers';
-import { Vector } from '../../Math';
+import { Exception, Resource, ResourceType } from '../../Core';
+import { Vector, Vector2, Vector3, Vector4 } from '../../Math';
 
 import {
 	SceneObject,
@@ -12,6 +12,22 @@ import {
 	SceneMaterialPropertyType,
 } from './SceneFile';
 
+const vector = (vector: number[]): Vector => {
+	switch (vector.length) {
+		case Vector2.LENGTH:
+			return new Vector2(vector);
+
+		case Vector3.LENGTH:
+			return new Vector3(vector);
+
+		case Vector4.LENGTH:
+			return new Vector4(vector);
+
+		default:
+			throw new RangeError();
+	}
+};
+
 class SceneParser {
 	public readonly camera: Camera = new Camera();
 	public readonly renderers: Renderer[] = [];
@@ -21,29 +37,45 @@ class SceneParser {
 			name,
 			model,
 			position,
+			scale,
 			material: { shader, properties },
 		}: SceneRenderer = object;
 
 		const renderer = new Renderer();
 
-		renderer.name = name || 'Transform';
+		renderer.name = name || 'Renderer';
 
-		renderer.model = await Model.load(model);
+		try {
+			renderer.model = await Model.load(model);
+		} catch (e) {
+			throw new Exception(`SceneParser: failed to load model '${ model }'`, e);
+		}
 
 		renderer.position.set(position);
+		renderer.scale.set(scale);
 
-		renderer.material = new Material(await Shader.load(shader));
+		try {
+			renderer.material = new Material(await Shader.load(shader));
+		} catch (e) {
+			throw new Exception(`SceneParser: failed to load shader '${ shader }'`, e);
+		}
 
 		for (let i = 0; i < properties.length; i++) {
 			const { type, name, value }: SceneMaterialProperty = properties[i];
 
 			switch (type) {
-				case SceneMaterialPropertyType.Texture2D:
-					renderer.material.setTexture(name, await Texture2D.load(value as string, TextureFormat.RGBA32));
+				case SceneMaterialPropertyType.Texture: {
+					try {
+						renderer.material.setTexture(name, await Texture2D.load(value as string, TextureFormat.RGBA32));
+					} catch (e) {
+						throw new Exception(`SceneParser: failed to load texture '${ value }'`, e);
+					}
+
 					break;
+				}
 
 				case SceneMaterialPropertyType.Vector:
-					renderer.material.setVector(name, Vector.parse(value as number[]));
+					renderer.material.setVector(name, vector(value as number[]));
 					break;
 
 				case SceneMaterialPropertyType.Int:
@@ -55,7 +87,7 @@ class SceneParser {
 					break;
 
 				default:
-					throw new RangeError();
+					throw new RangeError(`SceneParser: unknown SceneMaterialPropertyType '${ type }'`);
 			}
 		}
 
@@ -63,15 +95,29 @@ class SceneParser {
 	}
 
 	public async parse(url: string): Promise<void> {
-		const data: SceneObject[] = await Resource.load<SceneObject[]>(url, ResourceType.JSON);
+		let data: SceneObject[];
+
+		try {
+			data = await Resource.load<SceneObject[]>(url, ResourceType.JSON);
+		} catch (e) {
+			throw new Exception(`SceneParser: failed to load '${ url }'`, e);
+		}
 
 		for (let i = 0; i < data.length; i++) {
 			const object: SceneObject = data[i];
 
-			switch (object.type) {
-				case SceneObjectType.Renderer:
-					await this.add(object as SceneRenderer);
+			const { type }: SceneObject = object;
+
+			switch (type) {
+				case SceneObjectType.Renderer: {
+					try {
+						await this.add(object as SceneRenderer);
+					} catch (e) {
+						throw new Exception(`SceneParser: failed to add '${ JSON.stringify(object) }'`, e);
+					}
+
 					break;
+				}
 
 				case SceneObjectType.Camera:
 					const camera: SceneCamera = object as SceneCamera;
@@ -86,7 +132,7 @@ class SceneParser {
 					break;
 
 				default:
-					throw new RangeError();
+					throw new RangeError(`SceneParser: unknown SceneObjectType '${ type }'`);
 			}
 		}
 	}

@@ -1,7 +1,8 @@
+import { Disposable } from '../Core';
 import { Drawable, PrimitiveType, VertexAttribute } from './Helpers';
 import IndexBuffer from './IndexBuffer';
 import VertexBuffer from './VertexBuffer';
-import { BindableObject, Disposable, Indexable, Null } from '../Helpers';
+import { BindableObject, Indexable, Null } from '../Core/Helpers';
 
 class Mesh<T extends Indexable<VertexAttribute>> extends BindableObject<Mesh<T>> implements Drawable, Disposable {
 	public name: string = 'Mesh';
@@ -13,7 +14,7 @@ class Mesh<T extends Indexable<VertexAttribute>> extends BindableObject<Mesh<T>>
 		return 'Mesh';
 	}
 
-	protected onBind(): void {
+	protected binding(): void {
 		if (!this.vertexBuffer) {
 			return;
 		}
@@ -25,7 +26,7 @@ class Mesh<T extends Indexable<VertexAttribute>> extends BindableObject<Mesh<T>>
 		}
 	}
 
-	protected onUnbind(): void {
+	protected unbinding(): void {
 		if (this.vertexBuffer) {
 			this.vertexBuffer.unbind();
 

@@ -1,4 +1,4 @@
-import { BinaryReader } from '../../Helpers';
+import { BinaryReader } from '../../Core/Helpers';
 import { TextureFormat } from '../../GL';
 import { DirectDrawSurfaceHeader, DX10Header } from './Headers';
 export declare const MAGIC = 542327876;

@@ -1,5 +1,5 @@
 import GL from './GL';
-import { Indexable } from '../Helpers';
+import { Indexable } from '../Core/Helpers';
 import Buffer, { BufferType } from './Buffer';
 import { PrimitiveType, VertexArrayBuffer, VertexAttribute } from './Helpers';
 
@@ -10,16 +10,16 @@ class VertexBuffer<T extends Indexable<VertexAttribute>> extends Buffer<VertexAr
 		super(BufferType.Array, new VertexArrayBuffer<T>(data), data.length);
 	}
 
-	protected onBind(): void {
-		super.onBind();
+	protected binding(): void {
+		super.binding();
 
 		this.data.bind();
 	}
 
-	protected onUnbind(): void {
+	protected unbinding(): void {
 		this.data.unbind();
 
-		super.onUnbind();
+		super.unbinding();
 	}
 
 	public draw(type: PrimitiveType = PrimitiveType.Triangles): void {

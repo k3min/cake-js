@@ -1,5 +1,7 @@
-import { BinaryReader, Resource, ResourceType } from '../../Helpers';
+import { Resource, ResourceType } from '../../Core';
+import { BinaryReader } from '../../Core/Helpers';
 import { TextureFormat } from '../../GL';
+import Exception from '../../Core/Exception';
 import DXGIFormat from './DXGIFormat';
 import { CubeMapFlags, HeaderFlags, PixelFormatFlags, SurfaceFlags } from './Flags';
 import { DirectDrawSurfaceHeader, DX10Header, PixelFormatHeader } from './Headers';
@@ -149,7 +151,13 @@ class DirectDrawSurfaceParser {
 	}
 
 	public static async load(url: string): Promise<DirectDrawSurfaceParser> {
-		const reader: BinaryReader = await Resource.load<BinaryReader>(url, ResourceType.DDS);
+		let reader: BinaryReader;
+
+		try {
+			reader = await Resource.load<BinaryReader>(url, ResourceType.DDS);
+		} catch (e) {
+			throw new Exception(`DirectDrawSurfaceParser: failed to load '${ url }'`, e);
+		}
 
 		return new DirectDrawSurfaceParser(reader);
 	}

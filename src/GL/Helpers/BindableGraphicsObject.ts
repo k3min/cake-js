@@ -1,4 +1,5 @@
-import { Null, Disposable, BindableObject } from '../../Helpers';
+import { Disposable } from '../../Core';
+import { Null, BindableObject } from '../../Core/Helpers';
 
 abstract class BindableGraphicsObject<T extends BindableGraphicsObject<T, GL>, GL extends WebGLObject> extends BindableObject<T> implements Disposable {
 	public name: string = 'BindableGraphicsObject';
@@ -17,11 +18,11 @@ abstract class BindableGraphicsObject<T extends BindableGraphicsObject<T, GL>, G
 		this.deleteFn = releaseFn;
 	}
 
-	protected onBind(): void {
+	protected binding(): void {
 		this.bindFn(this.handle);
 	}
 
-	protected onUnbind(): void {
+	protected unbinding(): void {
 		this.bindFn(null);
 	}
 

@@ -1,5 +1,5 @@
-import { Path } from '../Helpers';
-import { TextureFormat } from './Texture';
+import { Path } from '../Core';
+import { TextureFormat } from './Helpers';
 import Texture2D from './Texture2D';
 
 class VideoTexture extends Texture2D {

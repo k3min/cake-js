@@ -1,5 +1,5 @@
 enum PrimitiveType {
-	Points = 0, // GL_POINTS
+	Points = 0x0000, // GL_POINTS
 	Lines,
 	LineLoop,
 	LineStrip,

@@ -138,14 +138,17 @@ class Matrix4x4 extends Float32Array {
 		result[1] = 0;
 		result[2] = 0;
 		result[3] = 0;
+
 		result[4] = 0;
 		result[5] = 1;
 		result[6] = 0;
 		result[7] = 0;
+
 		result[8] = 0;
 		result[9] = 0;
 		result[10] = 1;
 		result[11] = 0;
+
 		result[12] = 0;
 		result[13] = 0;
 		result[14] = 0;
@@ -161,14 +164,17 @@ class Matrix4x4 extends Float32Array {
 		result[1] = this[4];
 		result[2] = this[8];
 		result[3] = this[12];
+
 		result[4] = this[1];
 		result[5] = this[5];
 		result[6] = this[9];
 		result[7] = this[13];
+
 		result[8] = this[2];
 		result[9] = this[6];
 		result[10] = this[10];
 		result[11] = this[14];
+
 		result[12] = this[3];
 		result[13] = this[7];
 		result[14] = this[11];
@@ -206,14 +212,17 @@ class Matrix4x4 extends Float32Array {
 		result[1] = ((a02 * b10) - (a01 * b11) - (a03 * b09)) * det;
 		result[2] = ((a31 * b05) - (a32 * b04) + (a33 * b03)) * det;
 		result[3] = ((a22 * b04) - (a21 * b05) - (a23 * b03)) * det;
+
 		result[4] = ((a12 * b08) - (a10 * b11) - (a13 * b07)) * det;
 		result[5] = ((a00 * b11) - (a02 * b08) + (a03 * b07)) * det;
 		result[6] = ((a32 * b02) - (a30 * b05) - (a33 * b01)) * det;
 		result[7] = ((a20 * b05) - (a22 * b02) + (a23 * b01)) * det;
+
 		result[8] = ((a10 * b10) - (a11 * b08) + (a13 * b06)) * det;
 		result[9] = ((a01 * b08) - (a00 * b10) - (a03 * b06)) * det;
 		result[10] = ((a30 * b04) - (a31 * b02) + (a33 * b00)) * det;
 		result[11] = ((a21 * b02) - (a20 * b04) - (a23 * b00)) * det;
+
 		result[12] = ((a11 * b07) - (a10 * b09) - (a12 * b06)) * det;
 		result[13] = ((a00 * b09) - (a01 * b07) + (a02 * b06)) * det;
 		result[14] = ((a31 * b01) - (a30 * b03) - (a32 * b00)) * det;
@@ -369,14 +378,17 @@ class Matrix4x4 extends Float32Array {
 		this[1] = y0;
 		this[2] = z0;
 		this[3] = 0;
+
 		this[4] = x1;
 		this[5] = y1;
 		this[6] = z1;
 		this[7] = 0;
+
 		this[8] = x2;
 		this[9] = y2;
 		this[10] = z2;
 		this[11] = 0;
+
 		this[12] = x3;
 		this[13] = y3;
 		this[14] = z3;
