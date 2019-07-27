@@ -258,12 +258,12 @@ class Shader extends BindableObject<Shader> implements Disposable {
 
 		switch (cap) {
 			case ShaderCapability.StencilTest: {
-				if (value) {
+				if (value === false) {
+					Context.disable(Capability.StencilTest);
+				} else {
 					const { func, ref, mask }: StencilTest = value as StencilTest;
 					Context.enable(Capability.StencilTest);
 					Context.stencilFunc(func, ref, mask);
-				} else {
-					Context.disable(Capability.StencilTest);
 				}
 
 				break;
@@ -283,29 +283,32 @@ class Shader extends BindableObject<Shader> implements Disposable {
 			}
 
 			case ShaderCapability.Blend: {
-				if (value) {
-					const { src, dst }: Blend = value as Blend;
-					Context.enable(Capability.Blend);
-					Context.blendFunc(src, dst);
-				} else {
+				if (value === false) {
 					Context.disable(Capability.Blend);
+				} else {
+					const { srcRGB, dstRGB, srcA, dstA }: Blend = value as Blend;
+					if (srcA !== false && dstA !== false) {
+						Context.blendFuncSeparate(srcRGB, dstRGB, srcA, dstA);
+					} else {
+						Context.blendFunc(srcRGB, dstRGB);
+					}
 				}
 				break;
 			}
 
 			case ShaderCapability.CullFace: {
-				if (value) {
+				if (value === false) {
+					Context.disable(Capability.CullFace);
+				} else {
 					const mode: CullingMode = value as CullingMode;
 					Context.enable(Capability.CullFace);
 					Context.cullFace(mode);
-				} else {
-					Context.disable(Capability.CullFace);
 				}
 				break;
 			}
 
 			case ShaderCapability.DepthMask: {
-				Context.depthMask(!!value);
+				Context.depthMask(value as boolean);
 				break;
 			}
 

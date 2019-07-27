@@ -61,8 +61,10 @@ export declare enum ShaderStencilFunction {
     Invert = "invert"
 }
 export interface Blend {
-    src: BlendFunction;
-    dst: BlendFunction;
+    srcRGB: BlendFunction;
+    dstRGB: BlendFunction;
+    srcA: BlendFunction | false;
+    dstA: BlendFunction | false;
 }
 export interface StencilOp {
     fail: StencilFunction;
@@ -84,13 +86,13 @@ export interface ColorMask {
 export declare const blendFunction: (func: ShaderBlendFunction) => BlendFunction;
 export declare const compareFunction: (func: ShaderCompareFunction) => CompareFunction;
 export declare const stencilFunction: (func: ShaderStencilFunction) => StencilFunction;
-export declare const cullingMode: (mode?: ShaderCullingMode | undefined) => boolean | CullingMode;
+export declare const cullingMode: (mode?: ShaderCullingMode | undefined) => false | CullingMode;
 export declare type ShaderCapabilityValue = Blend | CullingMode | CompareFunction | StencilTest | ColorMask | StencilOp | boolean;
 interface ShaderCapabilities {
-    [ShaderCapability.Blend]: Blend | boolean;
-    [ShaderCapability.CullFace]: CullingMode | boolean;
+    [ShaderCapability.Blend]: Blend | false;
+    [ShaderCapability.CullFace]: CullingMode | false;
     [ShaderCapability.DepthTest]: CompareFunction;
-    [ShaderCapability.StencilTest]: StencilTest | boolean;
+    [ShaderCapability.StencilTest]: StencilTest | false;
     [ShaderCapability.DepthMask]: boolean;
     [ShaderCapability.ColorMask]: ColorMask;
     [ShaderCapability.StencilOp]: StencilOp;

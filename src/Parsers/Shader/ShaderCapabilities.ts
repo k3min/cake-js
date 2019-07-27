@@ -69,8 +69,10 @@ export enum ShaderStencilFunction {
 }
 
 export interface Blend {
-	src: BlendFunction;
-	dst: BlendFunction;
+	srcRGB: BlendFunction;
+	dstRGB: BlendFunction;
+	srcA: BlendFunction | false;
+	dstA: BlendFunction | false;
 }
 
 export interface StencilOp {
@@ -128,7 +130,7 @@ export const stencilFunction = (func: ShaderStencilFunction): StencilFunction =>
 	return cast(func, ShaderStencilFunction, StencilFunction);
 };
 
-export const cullingMode = (mode?: ShaderCullingMode): CullingMode | boolean => {
+export const cullingMode = (mode?: ShaderCullingMode): CullingMode | false => {
 	switch (mode) {
 		case ShaderCullingMode.Back:
 			return CullingMode.Back;
@@ -144,10 +146,10 @@ export const cullingMode = (mode?: ShaderCullingMode): CullingMode | boolean => 
 export type ShaderCapabilityValue = Blend | CullingMode | CompareFunction | StencilTest | ColorMask | StencilOp | boolean;
 
 interface ShaderCapabilities {
-	[ShaderCapability.Blend]: Blend | boolean;
-	[ShaderCapability.CullFace]: CullingMode | boolean;
+	[ShaderCapability.Blend]: Blend | false;
+	[ShaderCapability.CullFace]: CullingMode | false;
 	[ShaderCapability.DepthTest]: CompareFunction;
-	[ShaderCapability.StencilTest]: StencilTest | boolean;
+	[ShaderCapability.StencilTest]: StencilTest | false;
 	[ShaderCapability.DepthMask]: boolean;
 	[ShaderCapability.ColorMask]: ColorMask;
 	[ShaderCapability.StencilOp]: StencilOp;

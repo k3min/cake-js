@@ -223,14 +223,16 @@ class ShaderParser {
 
 		switch (cap as ShaderCapability) {
 			case ShaderCapability.Blend: {
-				const [dst, src]: string[] = params;
+				const [srcRGB, dstRGB, srcA, dstA]: string[] = params;
 
-				if (dst === ShaderBlendFunction.Off) {
+				if (srcRGB === ShaderBlendFunction.Off) {
 					this.capabilities[ShaderCapability.Blend] = false;
 				} else {
 					this.capabilities[ShaderCapability.Blend] = {
-						src: blendFunction(src as ShaderBlendFunction),
-						dst: blendFunction(dst as ShaderBlendFunction),
+						srcRGB: blendFunction(srcRGB as ShaderBlendFunction),
+						dstRGB: blendFunction(dstRGB as ShaderBlendFunction),
+						srcA: srcA ? blendFunction(srcA as ShaderBlendFunction) : false,
+						dstA: dstA ? blendFunction(dstA as ShaderBlendFunction) : false,
 					};
 				}
 

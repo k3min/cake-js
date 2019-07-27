@@ -54,7 +54,7 @@ class Texture2D extends Texture<WebGLTexture> {
 				resolve(result);
 			});
 
-			image.src = Resource.url(uri);
+			image.srcRGB = Resource.url(uri);
 		});
 	}
 
