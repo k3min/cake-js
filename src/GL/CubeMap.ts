@@ -1,38 +1,37 @@
-import GL from './GL';
+import Context from './Context';
 import { Path, Exception } from '../Core';
 import { DirectDrawSurfaceParser, CubeMapFlags } from '../Parsers';
-import { pixelFormat, PixelFormat, pixelType, PixelType } from './Helpers';
-import Texture, { Mipmap, TextureTarget } from './Texture';
+import Texture, { CubeMapFace, Mipmap, TextureFormat, TextureTarget } from './Texture';
 
+/**
+ * @todo Set appropriate filter / wrap
+ */
 class CubeMap extends Texture<WebGLTexture> {
 	public name: string = 'CubeMap';
 
-	private readonly pixelFormat: PixelFormat;
-	private readonly pixelType: PixelType;
-
-	public constructor(width: number, height: number, format: number) {
-		super(width, height, format, TextureTarget.CubeMap, () => GL.createTexture(), (handle) => GL.bindTexture(TextureTarget.CubeMap, handle), (handle) => GL.deleteTexture(handle));
-
-		this.pixelFormat = pixelFormat(format);
-		this.pixelType = pixelType(format);
+	public constructor(width: number, height: number, format: TextureFormat) {
+		super(width, height, format, TextureTarget.CubeMap, () => Context.createTexture(), (handle) => Context.bindTexture(TextureTarget.CubeMap, handle), (handle) => Context.deleteTexture(handle));
 	}
 
 	public static async load(url: string): Promise<CubeMap> {
+		const name: string = Path.getFileName(url);
+
 		let dds: DirectDrawSurfaceParser;
 
 		try {
 			dds = await DirectDrawSurfaceParser.load(url);
 		} catch (e) {
-			throw new Exception(`CubeMap: failed to load DirectDrawSurface '${ url }'`, e);
+			throw new Exception(`CubeMap (${ name }): failed to load DirectDrawSurface '${ url }'`, e);
 		}
 
 		if ((dds.ddsHeader.cubeMapFlags & CubeMapFlags.CubeMap) === 0) {
-			throw new TypeError();
+			throw new TypeError(`CubeMap (${ name }): loaded DirectDrawSurface is missing CubeMap flag`);
 		}
 
 		const result: CubeMap = new CubeMap(dds.width, dds.height, dds.textureFormat);
 
-		result.name = Path.getFileName(url);
+		result.name = name;
+		result.mipmapCount = dds.mipmapCount;
 
 		result.parse(dds);
 
@@ -48,19 +47,19 @@ class CubeMap extends Texture<WebGLTexture> {
 			offset += 20;
 		}
 
-		this.data = new Array<Mipmap[]>(6);
+		this.data = new Array<CubeMapFace>(6);
 
-		for (let face = 0; face < this.data.length; face++) {
+		for (let face = 0; face < 6; face++) {
 			let width: number = dds.width;
 			let height: number = dds.height;
 
-			this.data[face] = new Array<Mipmap>(dds.mipMapCount);
+			this.data[face] = new Array<Mipmap>(this.mipmapCount);
 
-			for (let mipmap = 0; mipmap < this.data[face].length; mipmap++) {
+			for (let level = 0; level < this.mipmapCount; level++) {
 				const length: number = width * height * 4;
 				const data: Float32Array = new Float32Array(dds.reader.buffer, offset, length);
 
-				this.data[face][mipmap] = { data, width, height };
+				this.data[face][level] = { data, width, height };
 
 				offset += length * Float32Array.BYTES_PER_ELEMENT;
 
@@ -69,39 +68,28 @@ class CubeMap extends Texture<WebGLTexture> {
 			}
 		}
 
-		if (dds.mipMapCount) {
-			//this.mipmap = true;
-			//this.filter = TextureFilter.trilinear;
-		}
-
 		this.apply();
 	}
 
 	public apply(): void {
-		if (!this.data) {
-			return;
-		}
+		super.apply();
 
-		this.bind();
+		for (let face = 0; face < 6; face++) {
+			const data: CubeMapFace = (this.data as CubeMapFace[])[face];
 
-		const datas: Mipmap[][] = this.data as Mipmap[][];
+			for (let level = 0; level < this.mipmapCount; level++) {
+				const mipmap: Mipmap = data[level];
 
-		for (let face = 0; face < datas.length; face++) {
-			const data = datas[face] as Mipmap[];
-
-			for (let mipmap = 0; mipmap < data.length; mipmap++) {
-				let part = data[mipmap];
-
-				GL.texImage2D(
-					GL.TEXTURE_CUBE_MAP_POSITIVE_X + face,
-					mipmap,
+				Context.texImage2D(
+					Context.TEXTURE_CUBE_MAP_POSITIVE_X + face,
+					level,
 					this.pixelFormat,
-					part.width,
-					part.height,
+					mipmap.width,
+					mipmap.height,
 					0,
 					this.pixelFormat,
 					this.pixelType,
-					part.data,
+					mipmap.data,
 				);
 			}
 		}

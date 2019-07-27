@@ -157,32 +157,6 @@ class Matrix4x4 extends Float32Array {
 		return result;
 	}
 
-	public get transpose(): Matrix4x4 {
-		const result = new Matrix4x4();
-
-		result[0] = this[0];
-		result[1] = this[4];
-		result[2] = this[8];
-		result[3] = this[12];
-
-		result[4] = this[1];
-		result[5] = this[5];
-		result[6] = this[9];
-		result[7] = this[13];
-
-		result[8] = this[2];
-		result[9] = this[6];
-		result[10] = this[10];
-		result[11] = this[14];
-
-		result[12] = this[3];
-		result[13] = this[7];
-		result[14] = this[11];
-		result[15] = this[15];
-
-		return result;
-	}
-
 	public constructor() {
 		super(16);
 	}
@@ -278,32 +252,36 @@ class Matrix4x4 extends Float32Array {
 		result[15] = (b0 * a03) + (b1 * a13) + (b2 * a23) + (b3 * a33);
 	}
 
-	public static perspective(fov: number, aspect: number, near: number, far: number): Matrix4x4 {
-		return (new Matrix4x4()).perspective(fov, aspect, near, far);
-	}
-
-	public perspective(fov: number, aspect: number, near: number, far: number): Matrix4x4 {
+	public static perspective(fov: number, aspect: number, near: number, far: number, result: Matrix4x4): Matrix4x4 {
 		const top = near * Math.tan(fov * Math.deg2Rad * 0.5);
 		const right = top * aspect;
 		const left = -right;
 		const bottom = -top;
 
-		this[0] = (2 * near) / (right - left);
-		this[5] = (2 * near) / (top - bottom);
-		this[8] = (right + left) / (right - left);
-		this[9] = (top + bottom) / (top - bottom);
-		this[10] = -(far + near) / (far - near);
-		this[11] = -1;
-		this[14] = -(2 * far * near) / (far - near);
+		result[0] = (2 * near) / (right - left);
+		result[1] = 0;
+		result[2] = 0;
+		result[3] = 0;
 
-		return this;
+		result[4] = 0;
+		result[5] = (2 * near) / (top - bottom);
+		result[6] = 0;
+		result[7] = 0;
+
+		result[8] = (right + left) / (right - left);
+		result[9] = (top + bottom) / (top - bottom);
+		result[10] = -(far + near) / (far - near);
+		result[11] = -1;
+
+		result[12] = 0;
+		result[13] = 0;
+		result[14] = -(2 * far * near) / (far - near);
+		result[15] = 0;
+
+		return result;
 	}
 
-	public static lookAt(position: Vector3, target: Vector3): Matrix4x4 {
-		return (new Matrix4x4()).lookAt(position, target);
-	}
-
-	public lookAt(position: Vector3, target: Vector3): Matrix4x4 {
+	public static lookAt(position: Vector3, target: Vector3, result: Matrix4x4): Matrix4x4 {
 		const xPos = position[0];
 		const yPos = position[1];
 		const zPos = position[2];
@@ -327,7 +305,7 @@ class Matrix4x4 extends Float32Array {
 			z1 = 0;
 			z2 = 0;
 		} else {
-			len = 1 / Math.sqrt(len);
+			len = Math.rsqrt(len);
 
 			z0 *= len;
 			z1 *= len;
@@ -345,7 +323,7 @@ class Matrix4x4 extends Float32Array {
 			x1 = 0;
 			x2 = 0;
 		} else {
-			len = 1 / Math.sqrt(len);
+			len = Math.rsqrt(len);
 
 			x0 *= len;
 			x1 *= len;
@@ -363,7 +341,7 @@ class Matrix4x4 extends Float32Array {
 			y1 = 0;
 			y2 = 0;
 		} else {
-			len = 1 / Math.sqrt(len);
+			len = Math.rsqrt(len);
 
 			y0 *= len;
 			y1 *= len;
@@ -374,27 +352,27 @@ class Matrix4x4 extends Float32Array {
 		let y3 = -((y0 * xPos) + (y1 * yPos) + (y2 * zPos));
 		let z3 = -((z0 * xPos) + (z1 * yPos) + (z2 * zPos));
 
-		this[0] = x0;
-		this[1] = y0;
-		this[2] = z0;
-		this[3] = 0;
+		result[0] = x0;
+		result[1] = y0;
+		result[2] = z0;
+		result[3] = 0;
 
-		this[4] = x1;
-		this[5] = y1;
-		this[6] = z1;
-		this[7] = 0;
+		result[4] = x1;
+		result[5] = y1;
+		result[6] = z1;
+		result[7] = 0;
 
-		this[8] = x2;
-		this[9] = y2;
-		this[10] = z2;
-		this[11] = 0;
+		result[8] = x2;
+		result[9] = y2;
+		result[10] = z2;
+		result[11] = 0;
 
-		this[12] = x3;
-		this[13] = y3;
-		this[14] = z3;
-		this[15] = 1;
+		result[12] = x3;
+		result[13] = y3;
+		result[14] = z3;
+		result[15] = 1;
 
-		return this;
+		return result;
 	}
 
 	setRow(i: number, v: Vector4) {

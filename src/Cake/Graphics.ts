@@ -1,7 +1,7 @@
 import { Disposable } from '../Core';
-import GL, { Texture } from '../GL';
+import Context, { Texture } from '../GL';
 import FrameBuffer from '../GL/FrameBuffer';
-import { Null } from '../Core/Helpers';
+import { isArrayLike, Null } from '../Core/Helpers';
 import Material from './Material';
 import Quad from './Quad';
 
@@ -24,39 +24,39 @@ class Graphics implements Disposable {
 	}
 
 	public setRenderTarget(color: Null<Texture | Texture[]> = null, depth: Null<Texture> = null): void {
-		if (!color) {
+		if (color === null) {
 			this.framebuffer.unbind();
 			return;
 		}
 
 		this.framebuffer.bind();
 
-		if (color instanceof Array) {
-			GL.viewport(0, 0, (color as Texture[])[0].width, (color as Texture[])[0].height);
+		if (isArrayLike(color)) {
+			const buffers: Texture[] = color as Texture[];
+			Context.viewport(0, 0, buffers[0].width, buffers[0].height);
 		} else {
-			GL.viewport(0, 0, (color as Texture).width, (color as Texture).height);
+			const buffer: Texture = color as Texture;
+			Context.viewport(0, 0, buffer.width, buffer.height);
 		}
 
-		if (this.framebuffer.color !== color || this.framebuffer.depth !== depth) {
-			this.framebuffer.attachments.forEach((_, slot) => {
-				this.framebuffer.detach(slot);
-			});
-
-			this.framebuffer.color = color;
-			this.framebuffer.depth = depth;
-
-			this.framebuffer.apply(false);
+		if (this.framebuffer.color === color && this.framebuffer.depth === depth) {
+			return;
 		}
+
+		this.framebuffer.color = color;
+		this.framebuffer.depth = depth;
+
+		this.framebuffer.apply(false);
 	}
 
-	public blit(a: Null<Texture>, b: Null<Texture | Texture[]>, material: Material): void {
+	public blit(a: Null<Texture>, b: Null<Texture>, material: Material): void {
 		this.setRenderTarget(b);
 
-		if (!b) {
-			GL.viewport(0, 0, GL.canvas.width, GL.canvas.height);
+		if (b === null) {
+			Context.viewport(0, 0, Context.canvas.width, Context.canvas.height);
 		}
 
-		if (a) {
+		if (a !== null) {
 			material.setTexture('_MainTex', a);
 		}
 

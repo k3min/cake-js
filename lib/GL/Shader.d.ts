@@ -2,6 +2,9 @@ import { Disposable } from '../Core';
 import { BindableObject, Null, Storage } from '../Core/Helpers';
 import { Matrix4x4, Vector } from '../Math';
 import Texture from './Texture';
+/**
+ * @todo Unset uniforms without (valid) value
+ */
 declare class Shader extends BindableObject<Shader> implements Disposable {
     name: string;
     private variants;
@@ -15,6 +18,7 @@ declare class Shader extends BindableObject<Shader> implements Disposable {
     static matrices: Storage<Matrix4x4>;
     static textures: Storage<Texture>;
     private readonly log;
+    static bound: Null<Shader>;
     readonly attributes: Storage<number>;
     readonly uniforms: Storage<WebGLUniformLocation>;
     keywords: Null<string[]>;

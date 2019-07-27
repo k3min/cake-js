@@ -1,9 +1,8 @@
-import { Disposable, Path } from '../Core';
+import { Disposable, Path, Exception } from '../Core';
 import { Indexable, BindableObject, Null, Storage } from '../Core/Helpers';
-import Exception from '../Core/Exception';
 import { Matrix4x4, Vector, Vector2, Vector3, Vector4 } from '../Math';
 import { ShaderCapabilityValue, ShaderParser, Blend, ColorMask, ShaderCapability, StencilTest } from '../Parsers';
-import GL from './GL';
+import Context from './Context';
 import { CompareFunction } from './Helpers';
 import Capability from './Helpers/Capability';
 import CullingMode from './Helpers/CullingMode';
@@ -11,6 +10,9 @@ import ShaderProgram, { ShaderType } from './ShaderProgram';
 import Texture from './Texture';
 import Texture2D from './Texture2D';
 
+/**
+ * @todo Unset uniforms without (valid) value
+ */
 class Shader extends BindableObject<Shader> implements Disposable {
 	public name: string = 'Shader';
 
@@ -32,6 +34,8 @@ class Shader extends BindableObject<Shader> implements Disposable {
 
 	private readonly log: Indexable<string> = {};
 
+	public static bound: Null<Shader> = null;
+
 	public get attributes(): Storage<number> {
 		return this.variant.attributes;
 	}
@@ -44,7 +48,7 @@ class Shader extends BindableObject<Shader> implements Disposable {
 		let id = '';
 
 		if (value && value.length > 0) {
-			id = value.sort().join('');
+			id = value.sort().join(',');
 		}
 
 		const variant: ShaderProgram = this.variants.get(id) as ShaderProgram;
@@ -96,7 +100,7 @@ class Shader extends BindableObject<Shader> implements Disposable {
 
 			attachment.apply();
 
-			this.variants.set(keywords.join(''), attachment);
+			this.variants.set(keywords.join(','), attachment);
 		});
 
 		this.keywords = null;
@@ -138,7 +142,7 @@ class Shader extends BindableObject<Shader> implements Disposable {
 			return;
 		}
 
-		GL.uniform1f(uniform, value);
+		Context.uniform1f(uniform, value);
 	}
 
 	public setInt(name: string, value: GLint, check: boolean = true): void {
@@ -148,7 +152,7 @@ class Shader extends BindableObject<Shader> implements Disposable {
 			return;
 		}
 
-		GL.uniform1i(uniform, value);
+		Context.uniform1i(uniform, value);
 	}
 
 	public setMatrix4x4(name: string, value: Matrix4x4, check: boolean = true): void {
@@ -158,7 +162,7 @@ class Shader extends BindableObject<Shader> implements Disposable {
 			return;
 		}
 
-		GL.uniformMatrix4fv(uniform, false, value);
+		Context.uniformMatrix4fv(uniform, false, value);
 	}
 
 	public setVector(name: string, value: Vector, check: boolean = true): void {
@@ -170,15 +174,15 @@ class Shader extends BindableObject<Shader> implements Disposable {
 
 		switch (value.length) {
 			case Vector2.LENGTH:
-				GL.uniform2fv(uniform, value);
+				Context.uniform2fv(uniform, value);
 				break;
 
 			case Vector3.LENGTH:
-				GL.uniform3fv(uniform, value);
+				Context.uniform3fv(uniform, value);
 				break;
 
 			case Vector4.LENGTH:
-				GL.uniform4fv(uniform, value);
+				Context.uniform4fv(uniform, value);
 				break;
 		}
 	}
@@ -194,7 +198,7 @@ class Shader extends BindableObject<Shader> implements Disposable {
 			const uniform2: WebGLUniformLocation = this.getUniform(`${ name }_TexelSize`, 'Vector4', false) as WebGLUniformLocation;
 
 			if (uniform2) {
-				GL.uniform4fv(uniform2, texture.texelSize);
+				Context.uniform4fv(uniform2, texture.texelSize);
 			}
 		}
 
@@ -205,11 +209,11 @@ class Shader extends BindableObject<Shader> implements Disposable {
 			this.textureIndices[index] = name;
 		}
 
-		GL.activeTexture(GL.TEXTURE0 + index);
+		Context.activeTexture(Context.TEXTURE0 + index);
 
 		texture.bind();
 
-		GL.uniform1i(uniform, index);
+		Context.uniform1i(uniform, index);
 	}
 
 	public static setFloat(name: string, value: number): void {
@@ -239,10 +243,10 @@ class Shader extends BindableObject<Shader> implements Disposable {
 			case ShaderCapability.StencilTest: {
 				if (value) {
 					const { func, ref, mask }: StencilTest = value as StencilTest;
-					GL.enable(Capability.StencilTest);
-					GL.stencilFunc(func, ref, mask);
+					Context.enable(Capability.StencilTest);
+					Context.stencilFunc(func, ref, mask);
 				} else {
-					GL.disable(Capability.StencilTest);
+					Context.disable(Capability.StencilTest);
 				}
 
 				break;
@@ -250,18 +254,18 @@ class Shader extends BindableObject<Shader> implements Disposable {
 
 			case ShaderCapability.DepthTest: {
 				const func: CompareFunction = value as CompareFunction;
-				GL.enable(Capability.DepthTest);
-				GL.depthFunc(func);
+				Context.enable(Capability.DepthTest);
+				Context.depthFunc(func);
 				break;
 			}
 
 			case ShaderCapability.Blend: {
 				if (value) {
 					const { src, dst }: Blend = value as Blend;
-					GL.enable(Capability.Blend);
-					GL.blendFunc(src, dst);
+					Context.enable(Capability.Blend);
+					Context.blendFunc(src, dst);
 				} else {
-					GL.disable(Capability.Blend);
+					Context.disable(Capability.Blend);
 				}
 				break;
 			}
@@ -269,22 +273,22 @@ class Shader extends BindableObject<Shader> implements Disposable {
 			case ShaderCapability.CullFace: {
 				if (value) {
 					const mode: CullingMode = value as CullingMode;
-					GL.enable(Capability.CullFace);
-					GL.cullFace(mode);
+					Context.enable(Capability.CullFace);
+					Context.cullFace(mode);
 				} else {
-					GL.disable(Capability.CullFace);
+					Context.disable(Capability.CullFace);
 				}
 				break;
 			}
 
 			case ShaderCapability.DepthMask: {
-				GL.depthMask(!!value);
+				Context.depthMask(!!value);
 				break;
 			}
 
 			case ShaderCapability.ColorMask: {
 				const { r, g, b, a }: ColorMask = value as ColorMask;
-				GL.colorMask(r, g, b, a);
+				Context.colorMask(r, g, b, a);
 				break;
 			}
 
@@ -298,6 +302,8 @@ class Shader extends BindableObject<Shader> implements Disposable {
 	}
 
 	protected binding(): void {
+		Shader.bound = this;
+
 		for (let cap of Object.values(ShaderCapability)) {
 			this.setCap(cap);
 		}

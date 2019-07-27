@@ -1,4 +1,4 @@
-import GL from './GL';
+import Context from './Context';
 import { PrimitiveType, Drawable, BindableGraphicsObject } from './Helpers';
 
 export enum BufferType {
@@ -18,7 +18,7 @@ abstract class Buffer<T extends ArrayBuffer> extends BindableGraphicsObject<Buff
 	}
 
 	protected constructor(target: BufferType, data: T, length: number) {
-		super(() => GL.createBuffer(), (handle) => GL.bindBuffer(target, handle), (handle) => GL.deleteBuffer(handle));
+		super(() => Context.createBuffer(), (handle) => Context.bindBuffer(target, handle), (handle) => Context.deleteBuffer(handle));
 
 		this.target = target;
 		this.data = data;
@@ -30,7 +30,7 @@ abstract class Buffer<T extends ArrayBuffer> extends BindableGraphicsObject<Buff
 	public apply(): void {
 		this.bind();
 
-		GL.bufferData(this.target, this.data, GL.STATIC_DRAW);
+		Context.bufferData(this.target, this.data, Context.STATIC_DRAW);
 	}
 
 	public abstract draw(type: PrimitiveType): void;

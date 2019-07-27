@@ -10,5 +10,6 @@ declare class Vertex implements Indexable<VertexAttribute> {
 declare class Quad extends Mesh<Vertex> {
     name: string;
     constructor();
+    draw(): void;
 }
 export default Quad;

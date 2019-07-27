@@ -39,7 +39,7 @@ class DirectDrawSurfaceStruct implements DirectDrawSurfaceHeader {
 	public readonly width: number;
 	public readonly pitchOrLinearSize: number;
 	public readonly depth: number;
-	public readonly mipMapCount: number;
+	public readonly mipmapCount: number;
 	public readonly reserved1: number[] = new Array<number>(11);
 	public readonly pixelFormat: PixelFormatHeader;
 	public readonly surfaceFlags: SurfaceFlags;
@@ -55,7 +55,7 @@ class DirectDrawSurfaceStruct implements DirectDrawSurfaceHeader {
 		this.width = br.readUint32();
 		this.pitchOrLinearSize = br.readUint32();
 		this.depth = br.readUint32();
-		this.mipMapCount = br.readUint32();
+		this.mipmapCount = br.readUint32();
 
 		for (let i = 0; i < this.reserved1.length; i++) {
 			this.reserved1[i] = br.readUint32();
@@ -99,8 +99,8 @@ class DirectDrawSurfaceParser {
 		        (pf.fourCC === DirectDrawSurfaceParser.fourCC('DX10')));
 	}
 
-	public get mipMapCount(): number {
-		return this.ddsHeader.mipMapCount;
+	public get mipmapCount(): number {
+		return this.ddsHeader.mipmapCount;
 	}
 
 	public get width(): number {

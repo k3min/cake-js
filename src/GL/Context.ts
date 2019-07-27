@@ -3,7 +3,7 @@ import Storage from '../Core/Helpers/Storage';
 import Vector4 from '../Math/Vector4';
 import { Capability } from './Helpers';
 
-interface GraphicsContext extends Omit<WebGLRenderingContext, 'clear' | 'enable' | 'disable' | 'getExtension'> {
+interface Context extends Omit<WebGLRenderingContext, 'clear' | 'enable' | 'disable' | 'getExtension'> {
 	_enabled: Toggle<Capability>;
 	_extensions: Storage<any>;
 
@@ -22,7 +22,7 @@ interface GraphicsContext extends Omit<WebGLRenderingContext, 'clear' | 'enable'
 
 	requireExtension<T = any>(name: string): T;
 
-	getExtensions(...name: string[]): void;
+	getExtensions(names: string[]): void;
 
 	enable(cap: Capability): boolean;
 
@@ -51,7 +51,7 @@ if (!('gl' in window)) {
 
 		getExtension: {
 			value: function <T>(name: string): Null<T> {
-				const _this: GraphicsContext = this as GraphicsContext;
+				const _this: Context = this as Context;
 				const _cache: Null<T> = _this._extensions.get(name);
 
 				if (_cache) {
@@ -72,7 +72,7 @@ if (!('gl' in window)) {
 
 		requireExtension: {
 			value: function <T>(name: string): T {
-				const _this: GraphicsContext = this as GraphicsContext;
+				const _this: Context = this as Context;
 				const _ext: Null<T> = _this.getExtension<T>(name);
 
 				if (!_ext) {
@@ -84,24 +84,24 @@ if (!('gl' in window)) {
 		},
 
 		getExtensions: {
-			value: function (...name: string[]): void {
-				const _this: GraphicsContext = this as GraphicsContext;
+			value: function (names: string[]): void {
+				const _this: Context = this as Context;
 
-				for (let i = 0; i < name.length; i++) {
-					_this.getExtension(name[i]);
+				for (let i = 0; i < names.length; i++) {
+					_this.getExtension(names[i]);
 				}
 			},
 		},
 
 		drawBuffers: {
 			value: function (buffers: GLenum[]): void {
-				(this as GraphicsContext).ext.drawBuffersWEBGL(buffers);
+				(this as Context).ext.drawBuffersWEBGL(buffers);
 			},
 		},
 
 		enable: {
 			value: function (cap: Capability): boolean {
-				const _this: GraphicsContext = this as GraphicsContext;
+				const _this: Context = this as Context;
 				const _enable: boolean = _this._enabled.set(cap, true);
 
 				if (_enable) {
@@ -114,7 +114,7 @@ if (!('gl' in window)) {
 
 		disable: {
 			value: function (cap: Capability): void {
-				const _this: GraphicsContext = this as GraphicsContext;
+				const _this: Context = this as Context;
 
 				if (_this._enabled.set(cap, false)) {
 					_this.disableRaw(cap);
@@ -124,14 +124,16 @@ if (!('gl' in window)) {
 
 		clear: {
 			value: function (color: Vector4 | boolean = false, depth: GLclampf | boolean = false, stencil: GLint | boolean = false): void {
-				const _this: GraphicsContext = this as GraphicsContext;
+				const _this: Context = this as Context;
 
 				let mask: GLbitfield = 0;
 
 				if (color !== false) {
 					mask |= _this.COLOR_BUFFER_BIT;
 
-					if (color !== true) {
+					if (color === true) {
+						_this.clearColor(0, 0, 0, 0);
+					} else {
 						const [r, g, b, a]: Vector4 = color as Vector4;
 						_this.clearColor(r, g, b, a);
 					}
@@ -140,16 +142,20 @@ if (!('gl' in window)) {
 				if (depth !== false) {
 					mask |= _this.DEPTH_BUFFER_BIT;
 
-					if (depth !== true) {
-						_this.clearDepth(depth as GLclampf);
+					if (depth === true) {
+						_this.clearDepth(1);
+					} else {
+						_this.clearDepth(depth);
 					}
 				}
 
 				if (stencil !== false) {
 					mask |= _this.STENCIL_BUFFER_BIT;
 
-					if (stencil !== true) {
-						_this.clearStencil(stencil as GLint);
+					if (stencil === true) {
+						_this.clearStencil(0);
+					} else {
+						_this.clearStencil(stencil);
 					}
 				}
 
@@ -161,9 +167,11 @@ if (!('gl' in window)) {
 	});
 
 	Object.defineProperties((window as any).gl, {
-		ext: { value: ((window as any).gl as GraphicsContext).requireExtension<WEBGL_draw_buffers>('WEBGL_draw_buffers') },
-		depth: { value: ((window as any).gl as GraphicsContext).requireExtension<WEBGL_depth_texture>('WEBGL_depth_texture') },
+		ext: { value: ((window as any).gl as Context).requireExtension<WEBGL_draw_buffers>('WEBGL_draw_buffers') },
+		depth: { value: ((window as any).gl as Context).requireExtension<WEBGL_depth_texture>('WEBGL_depth_texture') },
 	});
+
+	console.debug('Context: created');
 }
 
-export default (window as any).gl as GraphicsContext;
+export default (window as any).gl as Context;

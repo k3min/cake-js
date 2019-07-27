@@ -1,4 +1,4 @@
-import GL from './GL';
+import Context from './Context';
 import { Indexable } from '../Core/Helpers';
 import Buffer, { BufferType } from './Buffer';
 import { PrimitiveType, VertexArrayBuffer, VertexAttribute } from './Helpers';
@@ -25,7 +25,7 @@ class VertexBuffer<T extends Indexable<VertexAttribute>> extends Buffer<VertexAr
 	public draw(type: PrimitiveType = PrimitiveType.Triangles): void {
 		this.bind();
 
-		GL.drawArrays(type, 0, this.length);
+		Context.drawArrays(type, 0, this.length);
 	}
 }
 

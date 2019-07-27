@@ -7,7 +7,7 @@ declare class DirectDrawSurfaceParser {
     readonly ddsHeader: DirectDrawSurfaceHeader;
     readonly dx10Header?: DX10Header;
     readonly isDX10: boolean;
-    readonly mipMapCount: number;
+    readonly mipmapCount: number;
     readonly width: number;
     readonly height: number;
     readonly textureFormat: TextureFormat;

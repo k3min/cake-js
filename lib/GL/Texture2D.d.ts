@@ -1,13 +1,13 @@
 import { Vector4 } from '../Math';
-import { TextureFormat } from './Helpers';
-import Texture from './Texture';
+import Texture, { TextureFormat } from './Texture';
+/**
+ * @todo Customizable filter / wrap
+ */
 declare class Texture2D extends Texture<WebGLTexture> {
     name: string;
     readonly texelSize: Vector4;
-    private readonly pixelFormat;
-    private readonly pixelType;
     constructor(width: number, height: number, format: TextureFormat);
-    static load(url: string, format: TextureFormat): Promise<Texture2D>;
-    apply(): void;
+    static load(url: string, format: TextureFormat, mipChain?: boolean): Promise<Texture2D>;
+    apply(updateMipmaps?: boolean): void;
 }
 export default Texture2D;

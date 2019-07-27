@@ -20,7 +20,7 @@ export interface DirectDrawSurfaceHeader {
 	readonly width: number;
 	readonly pitchOrLinearSize: number;
 	readonly depth: number;
-	readonly mipMapCount: number;
+	readonly mipmapCount: number;
 	readonly reserved1: number[];
 	readonly pixelFormat: PixelFormatHeader;
 	readonly surfaceFlags: SurfaceFlags;

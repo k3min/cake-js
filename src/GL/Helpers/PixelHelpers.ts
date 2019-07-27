@@ -1,15 +1,4 @@
-enum TextureFormat {
-	Alpha8,
-	RGB24,
-	RGBA32,
-	R5G6B5,
-	R5G5B5A1,
-	RGBA16,
-	RGBAFloat,
-	Depth16,
-	Depth32,
-	DepthStencil
-}
+import { TextureFormat } from '../Texture';
 
 export enum PixelFormat {
 	Depth = 0x1902, // GL_DEPTH_COMPONENT
@@ -51,7 +40,7 @@ export const pixelFormat = (format: TextureFormat): PixelFormat => {
 
 		case TextureFormat.DepthStencil:
 			return PixelFormat.DepthStencil;
-
+			
 		default:
 			throw new RangeError();
 	}

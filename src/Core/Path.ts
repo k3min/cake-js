@@ -1,51 +1,50 @@
-const DIRECTORY_SEPARATOR = '/';
+class Path {
+	public static readonly DIRECTORY_SEPARATOR: string = '/';
 
-const substr = (path: string, char: string): string => {
-	let index: number = path.lastIndexOf(char);
-
-	if (index !== -1) {
-		return path.substr(index + 1, path.length - index);
-	}
-
-	return '';
-};
-
-const getFileName = (path: string, extension: boolean = false): string => {
-	path = substr(path, DIRECTORY_SEPARATOR) || path;
-
-	if (!extension) {
-		let index: number = path.lastIndexOf('.');
+	private static substr(path: string, char: string): string {
+		let index: number = path.lastIndexOf(char);
 
 		if (index !== -1) {
-			path = path.substr(0, index);
+			return path.substr(index + 1, path.length - index);
 		}
+
+		return '';
 	}
 
-	return path;
-};
+	public static getFileName(path: string, extension: boolean = false): string {
+		path = Path.substr(path, Path.DIRECTORY_SEPARATOR) || path;
 
-const getExtension = (path: string): string => {
-	return substr(path, '.');
-};
+		if (!extension) {
+			let index: number = path.lastIndexOf('.');
 
-const getDirectoryName = (path: string): string => {
-	let index: number = path.lastIndexOf(DIRECTORY_SEPARATOR);
+			if (index !== -1) {
+				path = path.substr(0, index);
+			}
+		}
 
-	if (index !== -1) {
-		return path.substr(0, index);
+		return path;
 	}
 
-	return path;
-};
+	public static getExtension(path: string): string {
+		return Path.substr(path, '.');
+	}
 
-const combine = (...paths: string[]) => paths.join(DIRECTORY_SEPARATOR)
-                                             .split(DIRECTORY_SEPARATOR)
-                                             .filter((part: string): boolean => !!part)
-                                             .join(DIRECTORY_SEPARATOR);
+	public static getDirectoryName(path: string): string {
+		let index: number = path.lastIndexOf(Path.DIRECTORY_SEPARATOR);
 
-export default {
-	getFileName,
-	getExtension,
-	getDirectoryName,
-	combine,
-};
+		if (index !== -1) {
+			return path.substr(0, index);
+		}
+
+		return path;
+	}
+
+	public static combine(...paths: string[]): string {
+		return paths.join(Path.DIRECTORY_SEPARATOR)
+		            .split(Path.DIRECTORY_SEPARATOR)
+		            .filter((part: string): boolean => !!part)
+		            .join(Path.DIRECTORY_SEPARATOR);
+	}
+}
+
+export default Path;

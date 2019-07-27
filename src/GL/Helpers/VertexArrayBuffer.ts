@@ -1,13 +1,16 @@
 import { Bindable } from '../../Core';
 import { Indexable } from '../../Core/Helpers';
-import GL from '../GL';
+import Storage from '../../Core/Helpers/Storage';
+import Context from '../Context';
+import Shader from '../Shader';
 import DataType from './DataType';
 import VertexAttribute from './VertexAttribute';
 
 class VertexArrayBuffer<T extends Indexable<VertexAttribute>> extends ArrayBuffer implements Bindable {
 	private readonly stride: number;
-	private readonly attributes: VertexAttribute[];
+	private readonly attributes: Storage<VertexAttribute>;
 	private readonly view: DataView;
+	private readonly indices: Storage<number>;
 
 	public constructor(data: T[]) {
 		const length: number = data.length;
@@ -25,11 +28,12 @@ class VertexArrayBuffer<T extends Indexable<VertexAttribute>> extends ArrayBuffe
 
 		this.stride = stride;
 		this.view = new DataView(this);
-		this.attributes = new Array<VertexAttribute>();
+		this.attributes = new Storage<VertexAttribute>();
+		this.indices = new Storage<number>();
 
 		for (let attribute in item) {
 			if (item.hasOwnProperty(attribute)) {
-				this.attributes.push(item[attribute] as VertexAttribute);
+				this.attributes.set(attribute, item[attribute] as VertexAttribute);
 			}
 		}
 
@@ -90,21 +94,33 @@ class VertexArrayBuffer<T extends Indexable<VertexAttribute>> extends ArrayBuffe
 	}
 
 	public bind(): boolean {
+		const shader: Shader = Shader.bound as Shader;
+
+		if (!shader) {
+			return false;
+		}
+
 		let offset: number = 0;
 
-		for (let index = 0; index < this.attributes.length; index++) {
-			GL.enableVertexAttribArray(index);
+		for (let [name, attribute] of this.attributes) {
+			const index: number = shader.attributes.get(name) as number;
 
-			const attribute: VertexAttribute = this.attributes[index];
+			if (index === undefined) {
+				console.warn(`VertexArrayBuffer: vertex attribute '${ name }' not found`);
+			} else {
+				this.indices.set(name, index);
 
-			GL.vertexAttribPointer(
-				index,
-				attribute.length,
-				attribute.type,
-				attribute.normalized,
-				this.stride,
-				offset,
-			);
+				Context.enableVertexAttribArray(index);
+
+				Context.vertexAttribPointer(
+					index,
+					attribute.length,
+					attribute.type,
+					attribute.normalized,
+					this.stride,
+					offset,
+				);
+			}
 
 			offset += attribute.stride;
 		}
@@ -113,9 +129,8 @@ class VertexArrayBuffer<T extends Indexable<VertexAttribute>> extends ArrayBuffe
 	}
 
 	public unbind(): boolean {
-		for (let index = 0; index < this.attributes.length; index++) {
-			GL.disableVertexAttribArray(index);
-		}
+		this.indices.forEach((index) => Context.disableVertexAttribArray(index));
+		this.indices.clear();
 
 		return true;
 	}

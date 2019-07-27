@@ -5,6 +5,7 @@ declare class VertexArrayBuffer<T extends Indexable<VertexAttribute>> extends Ar
     private readonly stride;
     private readonly attributes;
     private readonly view;
+    private readonly indices;
     constructor(data: T[]);
     set(byteOffset: number, vertexAttribute: VertexAttribute): number;
     bind(): boolean;

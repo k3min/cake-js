@@ -3,6 +3,20 @@ import { VertexAttribute, DataType } from '../GL/Helpers';
 import { Indexable, TextReader } from '../Core/Helpers';
 import { Vector2, Vector3, Vector4 } from '../Math';
 
+export class Vertex implements Indexable<VertexAttribute> {
+	public readonly position: VertexAttribute<Vector3>;
+	public readonly normal: VertexAttribute<Vector3>;
+	public readonly texcoord: VertexAttribute<Vector2>;
+
+	public constructor(position: Vector3, normal: Vector4, texcoord: Vector2) {
+		this.position = new VertexAttribute<Vector3>(position, DataType.Float32, false);
+		this.normal = new VertexAttribute<Vector4>(normal, DataType.Int8, true);
+		this.texcoord = new VertexAttribute<Vector2>(texcoord, DataType.Int16, false);
+	}
+
+	readonly [index: string]: VertexAttribute;
+}
+
 enum Token {
 	Vertex = 'v',
 	Normal = 'vn',
@@ -16,20 +30,6 @@ interface Raw {
 	readonly [Token.Texcoord]: number[];
 
 	readonly [token: string]: number[];
-}
-
-export class Vertex implements Indexable<VertexAttribute> {
-	public readonly position: VertexAttribute<Vector3>;
-	public readonly normal: VertexAttribute<Vector3>;
-	public readonly texcoord: VertexAttribute<Vector2>;
-
-	public constructor(position: Vector3, normal: Vector4, texcoord: Vector2) {
-		this.position = new VertexAttribute<Vector3>(position, DataType.Float32, false);
-		this.normal = new VertexAttribute<Vector4>(normal, DataType.Int8, true);
-		this.texcoord = new VertexAttribute<Vector2>(texcoord, DataType.Int16, false);
-	}
-
-	readonly [index: string]: VertexAttribute;
 }
 
 class WavefrontParser {
@@ -86,26 +86,26 @@ class WavefrontParser {
 				continue;
 			}
 
-			const x: number[] = face.split('/').map((v: string): number => ((+v) - 1));
+			const vertex: number[] = face.split('/').map((v: string): number => ((+v) - 1));
 
 			// noinspection PointlessArithmeticExpressionJS
 			const position = new Vector3(
-				this.raw[Token.Vertex][(x[0] * 3) + 0],
-				this.raw[Token.Vertex][(x[0] * 3) + 1],
-				this.raw[Token.Vertex][(x[0] * 3) + 2],
+				this.raw[Token.Vertex][(vertex[0] * 3) + 0],
+				this.raw[Token.Vertex][(vertex[0] * 3) + 1],
+				this.raw[Token.Vertex][(vertex[0] * 3) + 2],
 			);
 
 			// noinspection PointlessArithmeticExpressionJS
 			const texcoord = new Vector2(
-				this.raw[Token.Texcoord][(x[1] * 2) + 0],
-				this.raw[Token.Texcoord][(x[1] * 2) + 1],
+				this.raw[Token.Texcoord][(vertex[1] * 2) + 0],
+				this.raw[Token.Texcoord][(vertex[1] * 2) + 1],
 			);
 
 			// noinspection PointlessArithmeticExpressionJS
 			const normal = new Vector4(
-				this.raw[Token.Normal][(x[2] * 3) + 0],
-				this.raw[Token.Normal][(x[2] * 3) + 1],
-				this.raw[Token.Normal][(x[2] * 3) + 2],
+				this.raw[Token.Normal][(vertex[2] * 3) + 0],
+				this.raw[Token.Normal][(vertex[2] * 3) + 1],
+				this.raw[Token.Normal][(vertex[2] * 3) + 2],
 				0,
 			);
 

@@ -1,11 +1,12 @@
 export {
-	default as GL,
+	default as Context,
 	CubeMap,
 	FrameBuffer,
 	Texture2D,
 	RenderBuffer,
 	TextureFormat,
-	RenderBufferFormat,
+	TextureFilterMode,
+	TextureWrapMode,
 	VideoTexture,
 	Shader,
 } from './GL';

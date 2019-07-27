@@ -1,10 +1,7 @@
+import { isArrayLike } from '../Core/Helpers';
 import Math from './Math';
 
 const bOrA = (a: number, b?: number): number => ((b !== undefined) ? b : a);
-
-const isArrayLike = (array: any): array is ArrayLike<number> => {
-	return (array !== undefined && array.length !== undefined);
-};
 
 export type X = ArrayLike<number> | number;
 
@@ -54,12 +51,14 @@ abstract class Vector extends Float32Array {
 	}
 
 	protected constructor(components: number, x?: X, y: number = 0, z: number = 0, w: number = 0) {
-		if (isArrayLike(x)) {
-			super(x);
-		} else if (x !== undefined) {
-			super([x, y, z, w].slice(0, components));
-		} else {
+		if (x === undefined) {
 			super(components);
+		} else {
+			if (isArrayLike(x)) {
+				super(x);
+			} else {
+				super([x, y, z, w].slice(0, components));
+			}
 		}
 	}
 

@@ -1,4 +1,4 @@
-import { VertexAttribute, DataType } from '../GL/Helpers';
+import { VertexAttribute, DataType, PrimitiveType } from '../GL/Helpers';
 import IndexBuffer from '../GL/IndexBuffer';
 import VertexBuffer from '../GL/VertexBuffer';
 import Mesh from '../GL/Mesh';
@@ -29,6 +29,10 @@ class Quad extends Mesh<Vertex> {
 			new Vertex(new Vector2(+1.0, -1.0)),
 			new Vertex(new Vector2(+1.0, +1.0)),
 		]);
+	}
+
+	public draw(): void {
+		super.draw(PrimitiveType.Triangles);
 	}
 }
 

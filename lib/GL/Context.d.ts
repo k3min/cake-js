@@ -2,7 +2,7 @@ import { Null, Toggle, Omit } from '../Core/Helpers';
 import Storage from '../Core/Helpers/Storage';
 import Vector4 from '../Math/Vector4';
 import { Capability } from './Helpers';
-interface GraphicsContext extends Omit<WebGLRenderingContext, 'clear' | 'enable' | 'disable' | 'getExtension'> {
+interface Context extends Omit<WebGLRenderingContext, 'clear' | 'enable' | 'disable' | 'getExtension'> {
     _enabled: Toggle<Capability>;
     _extensions: Storage<any>;
     ext: WEBGL_draw_buffers;
@@ -13,11 +13,11 @@ interface GraphicsContext extends Omit<WebGLRenderingContext, 'clear' | 'enable'
     getExtensionRaw<T = any>(name: string): Null<T>;
     getExtension<T = any>(name: string): Null<T>;
     requireExtension<T = any>(name: string): T;
-    getExtensions(...name: string[]): void;
+    getExtensions(names: string[]): void;
     enable(cap: Capability): boolean;
     disable(cap: Capability): void;
     clear(color?: Vector4 | boolean, depth?: GLclampf | boolean, stencil?: GLint | boolean): void;
     drawBuffers(buffers: GLenum[]): void;
 }
-declare const _default: GraphicsContext;
+declare const _default: Context;
 export default _default;

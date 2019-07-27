@@ -1,4 +1,4 @@
-import gl from '../../GL';
+import Context from '../../GL';
 import { CompareFunction, CullingMode } from '../../GL/Helpers';
 import { TextReader } from '../../Core/Helpers';
 import { Path, Resource, ResourceType, Exception } from '../../Core';
@@ -174,7 +174,7 @@ class ShaderParser {
 
 		this.extensions.push(extension);
 
-		if (gl.getExtension(extension) !== null) {
+		if (Context.getExtension(extension) !== null) {
 			line += `\n#define ${ extension }`;
 		}
 

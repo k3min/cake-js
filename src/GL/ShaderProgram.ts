@@ -1,6 +1,6 @@
 import { Null, Storage } from '../Core/Helpers';
 import { BindableGraphicsObject } from './Helpers';
-import GL from './GL';
+import Context from './Context';
 
 const ERROR_PATTERN: RegExp = /ERROR: \d+:(\d+): '(\w+)' : (.*)/;
 const STACK_PATTERN: RegExp = /^\/\*\* (.*) \*\//;
@@ -27,35 +27,35 @@ class ShaderProgram extends BindableGraphicsObject<ShaderProgram, WebGLProgram> 
 	}
 
 	public constructor() {
-		super(() => GL.createProgram(), (handle) => GL.useProgram(handle), (handle) => GL.deleteProgram(handle));
+		super(() => Context.createProgram(), (handle) => Context.useProgram(handle), (handle) => Context.deleteProgram(handle));
 	}
 
 	public apply() {
-		GL.linkProgram(this.handle);
+		Context.linkProgram(this.handle);
 
-		if (GL.getProgramParameter(this.handle, GL.LINK_STATUS) <= 0) {
-			const log = GL.getProgramInfoLog(this.handle) as string;
+		if (Context.getProgramParameter(this.handle, Context.LINK_STATUS) <= 0) {
+			const log = Context.getProgramInfoLog(this.handle) as string;
 
 			this.dispose();
 
 			throw new Error(log);
 		}
 
-		for (let index = 0; index < GL.getProgramParameter(this.handle, GL.ACTIVE_ATTRIBUTES); index++) {
-			const info: WebGLActiveInfo = GL.getActiveAttrib(this.handle, index) as WebGLActiveInfo;
+		for (let index = 0; index < Context.getProgramParameter(this.handle, Context.ACTIVE_ATTRIBUTES); index++) {
+			const info: WebGLActiveInfo = Context.getActiveAttrib(this.handle, index) as WebGLActiveInfo;
 
 			this.attributes.set(info.name, index);
 		}
 
-		for (let index = 0; index < GL.getProgramParameter(this.handle, GL.ACTIVE_UNIFORMS); index++) {
-			const info: WebGLActiveInfo = GL.getActiveUniform(this.handle, index) as WebGLActiveInfo;
+		for (let index = 0; index < Context.getProgramParameter(this.handle, Context.ACTIVE_UNIFORMS); index++) {
+			const info: WebGLActiveInfo = Context.getActiveUniform(this.handle, index) as WebGLActiveInfo;
 
-			this.uniforms.set(info.name, GL.getUniformLocation(this.handle, info.name) as WebGLUniformLocation);
+			this.uniforms.set(info.name, Context.getUniformLocation(this.handle, info.name) as WebGLUniformLocation);
 		}
 	}
 
 	public attach(type: ShaderType, sources: string[]): boolean {
-		const shader: WebGLShader = GL.createShader(type) as WebGLShader;
+		const shader: WebGLShader = Context.createShader(type) as WebGLShader;
 		const source = sources.join('\n');
 
 		switch (type) {
@@ -73,16 +73,16 @@ class ShaderProgram extends BindableGraphicsObject<ShaderProgram, WebGLProgram> 
 				throw new RangeError();
 		}
 
-		GL.shaderSource(shader, source);
+		Context.shaderSource(shader, source);
 
-		GL.compileShader(shader);
+		Context.compileShader(shader);
 
-		if (GL.getShaderParameter(shader, GL.COMPILE_STATUS) > 0) {
-			GL.attachShader(this.handle, shader);
+		if (Context.getShaderParameter(shader, Context.COMPILE_STATUS) > 0) {
+			Context.attachShader(this.handle, shader);
 			return true;
 		}
 
-		const log = GL.getShaderInfoLog(shader) as string;
+		const log = Context.getShaderInfoLog(shader) as string;
 
 		this.dispose();
 
@@ -119,11 +119,11 @@ class ShaderProgram extends BindableGraphicsObject<ShaderProgram, WebGLProgram> 
 
 	protected disposing(): void {
 		if (this.vertex) {
-			GL.deleteShader(this.vertex);
+			Context.deleteShader(this.vertex);
 		}
 
 		if (this.fragment) {
-			GL.deleteShader(this.fragment);
+			Context.deleteShader(this.fragment);
 		}
 
 		super.disposing();

@@ -1,15 +1,4 @@
-declare enum TextureFormat {
-    Alpha8 = 0,
-    RGB24 = 1,
-    RGBA32 = 2,
-    R5G6B5 = 3,
-    R5G5B5A1 = 4,
-    RGBA16 = 5,
-    RGBAFloat = 6,
-    Depth16 = 7,
-    Depth32 = 8,
-    DepthStencil = 9
-}
+import { TextureFormat } from '../Texture';
 export declare enum PixelFormat {
     Depth = 6402,
     Alpha = 6406,

@@ -10,7 +10,7 @@ declare class Graphics implements Disposable {
     readonly quad: Quad;
     dispose(): boolean;
     setRenderTarget(color?: Null<Texture | Texture[]>, depth?: Null<Texture>): void;
-    blit(a: Null<Texture>, b: Null<Texture | Texture[]>, material: Material): void;
+    blit(a: Null<Texture>, b: Null<Texture>, material: Material): void;
 }
 declare const graphics: Graphics;
 export default graphics;

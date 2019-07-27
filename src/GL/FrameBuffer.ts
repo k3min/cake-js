@@ -1,21 +1,19 @@
-import { Null } from '../Core/Helpers';
-import { BindableGraphicsObject, TextureFormat } from './Helpers';
-import GL from './GL';
-import Texture, { TextureTarget } from './Texture';
-import { RenderBufferFormat } from './RenderBuffer';
+import { isArrayLike, Null } from '../Core/Helpers';
+import { BindableGraphicsObject } from './Helpers';
+import Context from './Context';
+import Texture, { TextureFormat, TextureTarget } from './Texture';
 
 export enum FrameBufferAttachment {
-	Color = 0x8CE0, // GL_COLOR_ATTACHMENT0
+	Color = 0x8CE0, // GL_COLOR_ATTACHMENT0 / EXT_COLOR_ATTACHMENT0_WEBGL
 	Depth = 0x8D00, // GL_DEPTH_ATTACHMENT
 	Stencil = 0x8D20, // GL_STENCIL_ATTACHMENT
 	DepthStencil = 0x821A, // GL_DEPTH_STENCIL_ATTACHMENT
-	Buffer = 0x8CE0 // EXT_COLOR_ATTACHMENT0_WEBGL
 }
 
 class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> {
 	public name: string = 'FrameBuffer';
 
-	public readonly attachments: Map<FrameBufferAttachment, Null<Texture>> = new Map<FrameBufferAttachment, Null<Texture>>();
+	public readonly attachments: Map<FrameBufferAttachment, Texture> = new Map<FrameBufferAttachment, Texture>();
 
 	public color: Null<Texture | Texture[]> = null;
 	public depth: Null<Texture> = null;
@@ -25,12 +23,12 @@ class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> 
 	}
 
 	public constructor(color: Null<Texture | Texture[]> = null, depth: Null<Texture> = null) {
-		super(() => GL.createFramebuffer(), (handle) => GL.bindFramebuffer(GL.FRAMEBUFFER, handle), (handle) => GL.deleteFramebuffer(handle));
+		super(() => Context.createFramebuffer(), (handle) => Context.bindFramebuffer(Context.FRAMEBUFFER, handle), (handle) => Context.deleteFramebuffer(handle));
 
 		this.color = color;
 		this.depth = depth;
 
-		if (this.color || this.depth) {
+		if (this.color !== null || this.depth !== null) {
 			this.apply();
 		}
 	}
@@ -38,47 +36,81 @@ class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> 
 	public apply(check: boolean = true): void {
 		this.bind();
 
-		if (this.depth) {
+		this.detach();
+
+		if (this.depth === null) {
+			this.detach(FrameBufferAttachment.Depth);
+			this.detach(FrameBufferAttachment.Stencil);
+			this.detach(FrameBufferAttachment.DepthStencil);
+		} else {
 			switch (this.depth.format) {
 				case TextureFormat.Depth16:
 				case TextureFormat.Depth32:
-				case RenderBufferFormat.Depth:
+				case TextureFormat.Depth:
 					this.attach(FrameBufferAttachment.Depth, this.depth);
+					this.detach(FrameBufferAttachment.Stencil);
+					this.detach(FrameBufferAttachment.DepthStencil);
 					break;
 
-				case RenderBufferFormat.Stencil:
+				case TextureFormat.Stencil:
+					this.detach(FrameBufferAttachment.Depth);
 					this.attach(FrameBufferAttachment.Stencil, this.depth);
+					this.detach(FrameBufferAttachment.DepthStencil);
 					break;
 
 				case TextureFormat.DepthStencil:
-				case RenderBufferFormat.DepthStencil:
+					this.detach(FrameBufferAttachment.Depth);
+					this.detach(FrameBufferAttachment.Stencil);
 					this.attach(FrameBufferAttachment.DepthStencil, this.depth);
 					break;
 			}
 		}
 
-		if (this.color) {
-			if (this.color instanceof Array) {
-				const buffers: FrameBufferAttachment[] = [];
+		if (this.color !== null) {
+			if (isArrayLike(this.color)) {
+				const textures: Texture[] = this.color as Texture[];
 
-				for (let i = 0; i < this.color.length; i++) {
-					buffers.push(FrameBufferAttachment.Buffer + i);
-				}
+				Context.drawBuffers(textures.map((_, index: number): FrameBufferAttachment => {
+					return FrameBufferAttachment.Color + index;
+				}));
 
-				GL.drawBuffers(buffers);
-
-				for (let i = 0; i < this.color.length; i++) {
-					this.attach(buffers[i], this.color[i]);
-				}
+				textures.forEach((texture: Texture, index: number): void => {
+					this.attach(FrameBufferAttachment.Color + index, texture);
+				});
 			} else {
-				this.attach(FrameBufferAttachment.Color, this.color);
+				const texture: Texture = this.color as Texture;
+
+				Context.drawBuffers([FrameBufferAttachment.Color]);
+
+				this.attach(FrameBufferAttachment.Color, texture);
 			}
 		}
 
-		if (check && GL.checkFramebufferStatus(GL.FRAMEBUFFER) !== GL.FRAMEBUFFER_COMPLETE) {
-			this.dispose();
+		if (check) {
+			try {
+				this.check();
+			} catch (e) {
+				this.dispose();
+				throw e;
+			}
+		}
+	}
 
-			throw new Error('FrameBuffer: not complete');
+	public check(): void {
+		this.bind();
+
+		switch (Context.checkFramebufferStatus(Context.FRAMEBUFFER)) {
+			case Context.FRAMEBUFFER_UNSUPPORTED:
+				throw new Error('FrameBuffer: unsupported');
+
+			case Context.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+				throw new Error('FrameBuffer: incomplete attachment');
+
+			case Context.FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
+				throw new Error('FrameBuffer: incomplete dimensions');
+
+			case Context.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+				throw new Error('FrameBuffer: incomplete missing attachment');
 		}
 	}
 
@@ -87,11 +119,11 @@ class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> 
 
 		switch (target) {
 			case TextureTarget.Texture2D:
-				GL.framebufferTexture2D(GL.FRAMEBUFFER, slot, TextureTarget.Texture2D, handle, 0);
+				Context.framebufferTexture2D(Context.FRAMEBUFFER, slot, TextureTarget.Texture2D, handle, 0);
 				break;
 
 			case TextureTarget.RenderBuffer:
-				GL.framebufferRenderbuffer(GL.FRAMEBUFFER, slot, TextureTarget.RenderBuffer, handle);
+				Context.framebufferRenderbuffer(Context.FRAMEBUFFER, slot, TextureTarget.RenderBuffer, handle);
 				break;
 
 			default:
@@ -113,7 +145,7 @@ class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> 
 
 	public detach(slot?: FrameBufferAttachment): void {
 		if (!slot) {
-			this.attachments.forEach((_, slot) => this.detach(slot));
+			this.attachments.forEach((_, slot: FrameBufferAttachment): void => this.detach(slot));
 			return;
 		}
 
@@ -125,12 +157,7 @@ class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> 
 
 		this.setAttachment(slot, texture.target, null);
 
-		this.attachments.set(slot, null);
-	}
-
-	protected disposing(): void {
-		this.detach();
-		super.disposing();
+		this.attachments.delete(slot);
 	}
 }
 

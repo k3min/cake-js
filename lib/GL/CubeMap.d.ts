@@ -1,9 +1,10 @@
-import Texture from './Texture';
+import Texture, { TextureFormat } from './Texture';
+/**
+ * @todo Set appropriate filter / wrap
+ */
 declare class CubeMap extends Texture<WebGLTexture> {
     name: string;
-    private readonly pixelFormat;
-    private readonly pixelType;
-    constructor(width: number, height: number, format: number);
+    constructor(width: number, height: number, format: TextureFormat);
     static load(url: string): Promise<CubeMap>;
     private parse;
     apply(): void;

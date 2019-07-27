@@ -1,4 +1,4 @@
-import GL, { Shader } from '../GL';
+import Context, { Shader } from '../GL';
 import { Matrix4x4, Vector3 } from '../Math';
 import Transform from './Transform';
 
@@ -28,15 +28,12 @@ class Camera extends Transform {
 	}
 
 	public update(): void {
-		this.projection.perspective(this.fov, GL.drawingBufferWidth / GL.drawingBufferHeight, this.near, this.far);
-
-		Matrix4x4.inverse(this.projection, this.invP);
-
-		this.worldToLocal.lookAt(this.position, this.target);
-
+		Matrix4x4.lookAt(this.position, this.target, this.worldToLocal);
 		Matrix4x4.inverse(this.worldToLocal, this.localToWorld);
 
+		Matrix4x4.perspective(this.fov, Context.drawingBufferWidth / Context.drawingBufferHeight, this.near, this.far, this.projection);
 		Matrix4x4.multiply(this.projection, this.worldToLocal, this.viewProjection);
+		Matrix4x4.inverse(this.projection, this.invP);
 
 		Shader.setMatrix4x4('MATRIX_P', this.projection);
 		Shader.setMatrix4x4('MATRIX_VP', this.viewProjection);

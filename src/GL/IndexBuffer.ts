@@ -1,5 +1,5 @@
 import Buffer, { BufferType } from './Buffer';
-import GL from './GL';
+import Context from './Context';
 import { DataType, PrimitiveType } from './Helpers';
 
 class IndexBuffer extends Buffer<Uint16Array> {
@@ -12,7 +12,7 @@ class IndexBuffer extends Buffer<Uint16Array> {
 	public draw(type: PrimitiveType = PrimitiveType.Triangles): void {
 		this.bind();
 
-		GL.drawElements(type, this.length, DataType.Uint16, 0);
+		Context.drawElements(type, this.length, DataType.Uint16, 0);
 	}
 }
 
