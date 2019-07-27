@@ -32,6 +32,7 @@ export enum SceneMaterialPropertyType {
 	Int = 'int',
 	Vector = 'vector',
 	Texture = 'texture',
+	Color = 'color',
 }
 
 export interface SceneMaterialProperty {

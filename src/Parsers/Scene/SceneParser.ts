@@ -2,6 +2,7 @@ import { Camera, Material, Model, Renderer } from '../../Cake';
 import { Shader, Texture2D, TextureFormat } from '../../GL';
 import { Exception, Resource, ResourceType } from '../../Core';
 import { Vector, Vector2, Vector3, Vector4 } from '../../Math';
+import Color from '../../Math/Color';
 
 import {
 	SceneObject,
@@ -86,6 +87,11 @@ class SceneParser {
 					renderer.material.setFloat(name, value as number);
 					break;
 
+				case SceneMaterialPropertyType.Color:
+					const [r, g, b, a] = value as number[];
+					renderer.material.setColor(name, new Color(r, g, b, a));
+					break;
+
 				default:
 					throw new RangeError(`SceneParser: unknown SceneMaterialPropertyType '${ type }'`);
 			}
@@ -94,13 +100,13 @@ class SceneParser {
 		this.renderers.push(renderer);
 	}
 
-	public async parse(url: string): Promise<void> {
+	public async parse(uri: string): Promise<void> {
 		let data: SceneObject[];
 
 		try {
-			data = await Resource.load<SceneObject[]>(url, ResourceType.JSON);
+			data = await Resource.load<SceneObject[]>(uri, ResourceType.JSON);
 		} catch (e) {
-			throw new Exception(`SceneParser: failed to load '${ url }'`, e);
+			throw new Exception(`SceneParser: failed to load '${ uri }'`, e);
 		}
 
 		for (let i = 0; i < data.length; i++) {

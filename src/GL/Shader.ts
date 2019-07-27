@@ -1,7 +1,8 @@
-import { Disposable, Path, Exception } from '../Core';
-import { Indexable, BindableObject, Null, Storage } from '../Core/Helpers';
-import { Matrix4x4, Vector, Vector2, Vector3, Vector4 } from '../Math';
-import { ShaderCapabilityValue, ShaderParser, Blend, ColorMask, ShaderCapability, StencilTest } from '../Parsers';
+import { Disposable, Exception, Path } from '../Core';
+import { BindableObject, Indexable, Null, Storage } from '../Core/Helpers';
+import { Color, Matrix4x4, Vector, Vector2, Vector3, Vector4 } from '../Math';
+import { Blend, ColorMask, ShaderCapability, ShaderCapabilityValue, ShaderParser, StencilTest } from '../Parsers';
+import { StencilOp } from '../Parsers/Shader';
 import Context from './Context';
 import { CompareFunction } from './Helpers';
 import Capability from './Helpers/Capability';
@@ -12,6 +13,7 @@ import Texture2D from './Texture2D';
 
 /**
  * @todo Unset uniforms without (valid) value
+ * @todo Warn about wrong attribute type
  */
 class Shader extends BindableObject<Shader> implements Disposable {
 	public name: string = 'Shader';
@@ -31,6 +33,7 @@ class Shader extends BindableObject<Shader> implements Disposable {
 	public static vectors: Storage<Vector> = new Storage<Vector>();
 	public static matrices: Storage<Matrix4x4> = new Storage<Matrix4x4>();
 	public static textures: Storage<Texture> = new Storage<Texture>();
+	public static colors: Storage<Color> = new Storage<Color>();
 
 	private readonly log: Indexable<string> = {};
 
@@ -64,15 +67,15 @@ class Shader extends BindableObject<Shader> implements Disposable {
 		return 'Shader';
 	}
 
-	public static async load(url: string): Promise<Shader> {
+	public static async load(uri: string): Promise<Shader> {
 		const shader: Shader = new Shader();
 
-		shader.name = Path.getFileName(url);
+		shader.name = Path.getFileName(uri);
 
 		try {
-			await shader.parser.load(url);
+			await shader.parser.load(uri);
 		} catch (e) {
-			throw new Exception(`Shader: failed to load '${ url }'`, e);
+			throw new Exception(`Shader: failed to load '${ uri }'`, e);
 		}
 
 		shader.apply();
@@ -133,6 +136,16 @@ class Shader extends BindableObject<Shader> implements Disposable {
 		}
 
 		return null;
+	}
+
+	public setColor(name: string, value: Color, check: boolean = true): void {
+		const uniform: WebGLUniformLocation = this.getUniform(name, 'Color', check) as WebGLUniformLocation;
+
+		if (!uniform) {
+			return;
+		}
+
+		Context.uniform4fv(uniform, value.linear);
 	}
 
 	public setFloat(name: string, value: GLfloat, check: boolean = true): void {
@@ -236,6 +249,10 @@ class Shader extends BindableObject<Shader> implements Disposable {
 		Shader.textures.set(name, value);
 	}
 
+	public static setColor(name: string, value: Color): void {
+		Shader.colors.set(name, value);
+	}
+
 	private setCap(cap: ShaderCapability): void {
 		const value: ShaderCapabilityValue = this.parser.capabilities[cap];
 
@@ -249,6 +266,12 @@ class Shader extends BindableObject<Shader> implements Disposable {
 					Context.disable(Capability.StencilTest);
 				}
 
+				break;
+			}
+
+			case ShaderCapability.StencilOp: {
+				const { fail, zFail, zPass }: StencilOp = value as StencilOp;
+				Context.stencilOp(fail, zFail, zPass);
 				break;
 			}
 
@@ -315,6 +338,7 @@ class Shader extends BindableObject<Shader> implements Disposable {
 		Shader.vectors.forEach((value, name) => this.setVector(name, value));
 		Shader.matrices.forEach((value, name) => this.setMatrix4x4(name, value));
 		Shader.textures.forEach((value, name) => this.setTexture(name, value));
+		Shader.colors.forEach((value, name) => this.setColor(name, value));
 	}
 
 	protected disposing(): void {

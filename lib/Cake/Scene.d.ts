@@ -8,7 +8,7 @@ declare class Scene extends Base implements Updatable, Drawable {
     camera: Camera;
     readonly renderers: Storage<Renderer>;
     private readonly parser;
-    static load(url: string): Promise<Scene>;
+    static load(uri: string): Promise<Scene>;
     private apply;
     update(): void;
     draw(): void;

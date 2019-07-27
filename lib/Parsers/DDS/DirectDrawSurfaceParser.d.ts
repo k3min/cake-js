@@ -12,7 +12,7 @@ declare class DirectDrawSurfaceParser {
     readonly height: number;
     readonly textureFormat: TextureFormat;
     private constructor();
-    static load(url: string): Promise<DirectDrawSurfaceParser>;
+    static load(uri: string): Promise<DirectDrawSurfaceParser>;
     private validate;
     static fourCC(value: string): number;
 }

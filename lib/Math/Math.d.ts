@@ -8,6 +8,8 @@ interface MathEx extends Math {
     bytesPerElement(type: DataType): number;
     nextByteBoundary(x: number, align?: number): number;
     rsqrt(x: number): number;
+    linear(x: number): number;
+    gamma(x: number): number;
 }
 declare const _default: MathEx;
 export default _default;

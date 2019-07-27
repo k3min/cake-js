@@ -26,7 +26,8 @@ export declare enum SceneMaterialPropertyType {
     Float = "float",
     Int = "int",
     Vector = "vector",
-    Texture = "texture"
+    Texture = "texture",
+    Color = "color"
 }
 export interface SceneMaterialProperty {
     readonly name: string;

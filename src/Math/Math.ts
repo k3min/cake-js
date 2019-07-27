@@ -15,6 +15,10 @@ interface MathEx extends Math {
 	nextByteBoundary(x: number, align?: number): number;
 
 	rsqrt(x: number): number;
+
+	linear(x: number): number;
+
+	gamma(x: number): number;
 }
 
 Object.defineProperties(Math, {
@@ -79,6 +83,18 @@ Object.defineProperties(Math, {
 	rsqrt: {
 		value: (x: number): number => {
 			return 1 / Math.sqrt(x);
+		},
+	},
+
+	linear: {
+		value: (x: number): number => {
+			return x * (x * ((x * 0.305306011) + 0.682171111) + 0.012522878);
+		},
+	},
+
+	gamma: {
+		value: (x: number): number => {
+			return Math.max((Math.pow(Math.max(x, 0), 0.416666667) * 1.055) - 0.055, 0);
 		},
 	},
 });

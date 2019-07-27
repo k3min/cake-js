@@ -1,5 +1,5 @@
 import Context from '../../GL';
-import { CompareFunction, CullingMode } from '../../GL/Helpers';
+import { CompareFunction, CullingMode, StencilFunction } from '../../GL/Helpers';
 import { TextReader } from '../../Core/Helpers';
 import { Path, Resource, ResourceType, Exception } from '../../Core';
 
@@ -11,7 +11,7 @@ import ShaderCapabilities, {
 	ShaderCapability,
 	ShaderCompareFunction,
 	ShaderCullingMode,
-	ShaderDepthMask,
+	ShaderDepthMask, ShaderStencilFunction, stencilFunction,
 } from './ShaderCapabilities';
 
 enum ShaderSection {
@@ -58,20 +58,25 @@ class ShaderParser {
 		[ShaderCapability.DepthMask]: true,
 		[ShaderCapability.StencilTest]: false,
 		[ShaderCapability.ColorMask]: { r: true, g: true, b: true, a: true },
+		[ShaderCapability.StencilOp]: {
+			fail: StencilFunction.Keep,
+			zFail: StencilFunction.Keep,
+			zPass: StencilFunction.Keep,
+		},
 	};
 
 	public readonly vertexSource: string[] = [];
 	public readonly fragmentSource: string[] = [];
 
-	private async parse(url: string): Promise<void> {
-		const path: string = Path.getDirectoryName(url);
+	private async parse(uri: string): Promise<void> {
+		const path: string = Path.getDirectoryName(uri);
 
 		let reader: TextReader;
 
 		try {
-			reader = await Resource.load<TextReader>(url, ResourceType.GLSL);
+			reader = await Resource.load<TextReader>(uri, ResourceType.GLSL);
 		} catch (e) {
-			throw new Exception(`ShaderParser: failed to load '${ url }'`, e);
+			throw new Exception(`ShaderParser: failed to load '${ uri }'`, e);
 		}
 
 		let index: number = 0;
@@ -82,7 +87,7 @@ class ShaderParser {
 			const origin = location.origin;
 			const pathname = location.pathname;
 
-			const debug: string = `${ origin }/${ Path.combine(pathname, url) }:${ index }`;
+			const debug: string = `${ origin }/${ Path.combine(pathname, uri) }:${ index }`;
 
 			if (this.parseSection(line)) {
 				continue;
@@ -109,11 +114,11 @@ class ShaderParser {
 		}
 	}
 
-	public async load(url: string): Promise<void> {
+	public async load(uri: string): Promise<void> {
 		try {
-			await this.parse(url);
+			await this.parse(uri);
 		} catch (e) {
-			throw new Exception(`ShaderParser: failed to parse '${ url }'`, e);
+			throw new Exception(`ShaderParser: failed to parse '${ uri }'`, e);
 		}
 
 		this.vertexSource.push(...this.raw[ShaderSection.Global].concat(this.raw[ShaderSection.Vertex]));
@@ -190,15 +195,15 @@ class ShaderParser {
 
 		const [, include] = match;
 
-		const url = Path.combine(path, include);
+		const uri = Path.combine(path, include);
 
-		if (!this.includes.includes(url)) {
-			this.includes.push(url);
+		if (!this.includes.includes(uri)) {
+			this.includes.push(uri);
 
 			try {
-				await this.parse(url);
+				await this.parse(uri);
 			} catch (e) {
-				throw new Exception(`ShaderParser: failed to parse '${ url }'`, e);
+				throw new Exception(`ShaderParser: failed to parse '${ uri }'`, e);
 			}
 		}
 
@@ -255,6 +260,18 @@ class ShaderParser {
 					func: compareFunction(func as ShaderCompareFunction),
 					ref: +ref,
 					mask: +mask,
+				};
+
+				break;
+			}
+
+			case ShaderCapability.StencilOp: {
+				const [fail, zFail, zPass]: string[] = params;
+
+				this.capabilities[ShaderCapability.StencilOp] = {
+					fail: stencilFunction(fail as ShaderStencilFunction),
+					zFail: stencilFunction(zFail as ShaderStencilFunction),
+					zPass: stencilFunction(zPass as ShaderStencilFunction),
 				};
 
 				break;

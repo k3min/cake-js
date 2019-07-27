@@ -1,5 +1,6 @@
 import { BinaryReader, Indexable, TextReader } from './Helpers';
 import Exception from './Exception';
+import { Path } from './index';
 
 type Resourceable = BinaryReader | TextReader | Indexable<any> | ArrayLike<any>;
 
@@ -11,23 +12,35 @@ export enum ResourceType {
 }
 
 class Resource {
-	public static async load<T extends Resourceable>(url: string, type: ResourceType): Promise<T> {
+	public static async load<T extends Resourceable>(uri: string, type: ResourceType): Promise<T> {
 		let response: Response;
 
-		console.debug(`Resource: loading '${ url }'`);
+		console.debug(`Resource: loading '${ uri }'`);
 
 		try {
-			response = await fetch(url, {
+
+			response = await fetch(Resource.url(uri), {
 				method: 'GET',
 				headers: {
 					'accept': type,
 				},
 			});
 		} catch (e) {
-			throw new Exception(`Resource: failed to load '${ url }'`, e);
+			throw new Exception(`Resource: failed to load '${ uri }'`, e);
 		}
 
 		return await Resource.parse<T>(response, type);
+	}
+
+	public static url(uri: string): string {
+		const origin = location.origin;
+		const pathname = location.pathname;
+
+		const url: URL = new URL(`${ origin }/${ Path.combine(pathname, uri) }`);
+
+		url.searchParams.append('timestamp', Date.now().toString());
+
+		return url.toString();
 	}
 
 	private static async parse<T extends Resourceable>(response: Response, type: ResourceType): Promise<T> {

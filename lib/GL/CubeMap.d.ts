@@ -5,7 +5,7 @@ import Texture, { TextureFormat } from './Texture';
 declare class CubeMap extends Texture<WebGLTexture> {
     name: string;
     constructor(width: number, height: number, format: TextureFormat);
-    static load(url: string): Promise<CubeMap>;
+    static load(uri: string): Promise<CubeMap>;
     private parse;
     apply(): void;
 }

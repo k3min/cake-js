@@ -14,7 +14,10 @@ export {
 	blendFunction,
 	compareFunction,
 	cullingMode,
+	stencilFunction,
 	ShaderCapabilityValue,
+	StencilOp,
+	ShaderStencilFunction,
 } from './ShaderCapabilities';
 
 export default ShaderParser;

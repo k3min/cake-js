@@ -17,8 +17,8 @@ class Renderer extends Transform implements Drawable {
 
 	public readonly scale: Vector3 = Vector3.one;
 
-	private readonly mv: Matrix4x4 = Matrix4x4.identity;
-	private readonly mvp: Matrix4x4 = Matrix4x4.identity;
+	protected readonly modelView: Matrix4x4 = Matrix4x4.identity;
+	protected readonly modelViewProjection: Matrix4x4 = Matrix4x4.identity;
 
 	public update(): void {
 		this.localToWorld[0] = this.scale[0];
@@ -31,14 +31,14 @@ class Renderer extends Transform implements Drawable {
 
 		Matrix4x4.inverse(this.localToWorld, this.worldToLocal);
 
-		Matrix4x4.multiply(Camera.main.worldToLocal, this.localToWorld, this.mv);
-		Matrix4x4.multiply(Camera.main.viewProjection, this.localToWorld, this.mvp);
+		Matrix4x4.multiply(Camera.main.worldToLocal, this.localToWorld, this.modelView);
+		Matrix4x4.multiply(Camera.main.viewProjection, this.localToWorld, this.modelViewProjection);
 
 		this.material.setMatrix4x4('_Object2World', this.localToWorld);
 		this.material.setMatrix4x4('_World2Object', this.worldToLocal);
 
-		this.material.setMatrix4x4('MATRIX_MV', this.mv);
-		this.material.setMatrix4x4('MATRIX_MVP', this.mvp);
+		this.material.setMatrix4x4('MATRIX_MV', this.modelView);
+		this.material.setMatrix4x4('MATRIX_MVP', this.modelViewProjection);
 	}
 
 	public draw(): void {

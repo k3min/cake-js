@@ -1,6 +1,6 @@
 import { Base } from '../Core';
 import { Texture, Shader } from '../GL';
-import { Matrix4x4, Vector } from '../Math';
+import { Matrix4x4, Vector, Color } from '../Math';
 import { Storage, Toggle } from '../Core/Helpers';
 
 class Material extends Base {
@@ -11,6 +11,7 @@ class Material extends Base {
 	private readonly vectors: Storage<Vector> = new Storage<Vector>();
 	private readonly matrices: Storage<Matrix4x4> = new Storage<Matrix4x4>();
 	private readonly textures: Storage<Texture> = new Storage<Texture>();
+	private readonly colors: Storage<Color> = new Storage<Color>();
 
 	private readonly keywords: Toggle<string> = new Toggle<string>();
 
@@ -33,6 +34,7 @@ class Material extends Base {
 		this.vectors.forEach((value, name) => this.shader.setVector(name, value));
 		this.textures.forEach((value, name) => this.shader.setTexture(name, value));
 		this.matrices.forEach((value, name) => this.shader.setMatrix4x4(name, value));
+		this.colors.forEach((value, name) => this.shader.setColor(name, value));
 	}
 
 	public setKeyword(name: string, value: boolean): void {
@@ -57,6 +59,10 @@ class Material extends Base {
 
 	public setFloat(name: string, value: GLfloat): void {
 		this.floats.set(name, value);
+	}
+
+	public setColor(name: string, value: Color): void {
+		this.colors.set(name, value);
 	}
 
 	protected disposing(): void {

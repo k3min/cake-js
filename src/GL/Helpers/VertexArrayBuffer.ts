@@ -12,6 +12,8 @@ class VertexArrayBuffer<T extends Indexable<VertexAttribute>> extends ArrayBuffe
 	private readonly view: DataView;
 	private readonly indices: Storage<number>;
 
+	private readonly log: Indexable<string>;
+
 	public constructor(data: T[]) {
 		const length: number = data.length;
 		const item: T = data[0];
@@ -30,6 +32,7 @@ class VertexArrayBuffer<T extends Indexable<VertexAttribute>> extends ArrayBuffe
 		this.view = new DataView(this);
 		this.attributes = new Storage<VertexAttribute>();
 		this.indices = new Storage<number>();
+		this.log = {};
 
 		for (let attribute in item) {
 			if (item.hasOwnProperty(attribute)) {
@@ -106,7 +109,7 @@ class VertexArrayBuffer<T extends Indexable<VertexAttribute>> extends ArrayBuffe
 			const index: number = shader.attributes.get(name) as number;
 
 			if (index === undefined) {
-				console.warn(`VertexArrayBuffer: vertex attribute '${ name }' not found`);
+				this.logAttributeNotFound(name);
 			} else {
 				this.indices.set(name, index);
 
@@ -126,6 +129,18 @@ class VertexArrayBuffer<T extends Indexable<VertexAttribute>> extends ArrayBuffe
 		}
 
 		return true;
+	}
+
+	private logAttributeNotFound(name: string): void {
+		if (name in this.log) {
+			return;
+		}
+
+		const log: string = `VertexArrayBuffer: attribute ${ name } not found`;
+
+		console.warn(log);
+
+		this.log[name] = log;
 	}
 
 	public unbind(): boolean {

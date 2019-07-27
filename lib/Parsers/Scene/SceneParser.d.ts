@@ -4,6 +4,6 @@ declare class SceneParser {
     readonly camera: Camera;
     readonly renderers: Renderer[];
     add(object: SceneRenderer): Promise<void>;
-    parse(url: string): Promise<void>;
+    parse(uri: string): Promise<void>;
 }
 export default SceneParser;

@@ -1,11 +1,13 @@
 import BlendFunction from '../../GL/Helpers/BlendFunction';
 import CompareFunction from '../../GL/Helpers/CompareFunction';
 import CullingMode from '../../GL/Helpers/CullingMode';
+import StencilFunction from '../../GL/Helpers/StencilFunction';
 export declare enum ShaderCapability {
     Blend = "blend",
     CullFace = "cull",
     DepthTest = "zTest",
     StencilTest = "stencil",
+    StencilOp = "stencilOp",
     DepthMask = "zWrite",
     ColorMask = "colorMask"
 }
@@ -48,9 +50,24 @@ export declare enum ShaderColorMask {
     B = "b",
     A = "a"
 }
+export declare enum ShaderStencilFunction {
+    Keep = "keep",
+    Zero = "zero",
+    Replace = "replace",
+    Increment = "increment",
+    IncrementWrap = "incrementWrap",
+    Decrement = "decrement",
+    DecrementWrap = "decrementWrap",
+    Invert = "invert"
+}
 export interface Blend {
     src: BlendFunction;
     dst: BlendFunction;
+}
+export interface StencilOp {
+    fail: StencilFunction;
+    zFail: StencilFunction;
+    zPass: StencilFunction;
 }
 export interface StencilTest {
     func: CompareFunction;
@@ -66,8 +83,9 @@ export interface ColorMask {
 }
 export declare const blendFunction: (func: ShaderBlendFunction) => BlendFunction;
 export declare const compareFunction: (func: ShaderCompareFunction) => CompareFunction;
+export declare const stencilFunction: (func: ShaderStencilFunction) => StencilFunction;
 export declare const cullingMode: (mode?: ShaderCullingMode | undefined) => boolean | CullingMode;
-export declare type ShaderCapabilityValue = Blend | CullingMode | CompareFunction | StencilTest | ColorMask | boolean;
+export declare type ShaderCapabilityValue = Blend | CullingMode | CompareFunction | StencilTest | ColorMask | StencilOp | boolean;
 interface ShaderCapabilities {
     [ShaderCapability.Blend]: Blend | boolean;
     [ShaderCapability.CullFace]: CullingMode | boolean;
@@ -75,6 +93,7 @@ interface ShaderCapabilities {
     [ShaderCapability.StencilTest]: StencilTest | boolean;
     [ShaderCapability.DepthMask]: boolean;
     [ShaderCapability.ColorMask]: ColorMask;
+    [ShaderCapability.StencilOp]: StencilOp;
     [key: string]: ShaderCapabilityValue;
 }
 export default ShaderCapabilities;

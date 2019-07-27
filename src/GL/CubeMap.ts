@@ -13,15 +13,15 @@ class CubeMap extends Texture<WebGLTexture> {
 		super(width, height, format, TextureTarget.CubeMap, () => Context.createTexture(), (handle) => Context.bindTexture(TextureTarget.CubeMap, handle), (handle) => Context.deleteTexture(handle));
 	}
 
-	public static async load(url: string): Promise<CubeMap> {
-		const name: string = Path.getFileName(url);
+	public static async load(uri: string): Promise<CubeMap> {
+		const name: string = Path.getFileName(uri);
 
 		let dds: DirectDrawSurfaceParser;
 
 		try {
-			dds = await DirectDrawSurfaceParser.load(url);
+			dds = await DirectDrawSurfaceParser.load(uri);
 		} catch (e) {
-			throw new Exception(`CubeMap (${ name }): failed to load DirectDrawSurface '${ url }'`, e);
+			throw new Exception(`CubeMap (${ name }): failed to load DirectDrawSurface '${ uri }'`, e);
 		}
 
 		if ((dds.ddsHeader.cubeMapFlags & CubeMapFlags.CubeMap) === 0) {

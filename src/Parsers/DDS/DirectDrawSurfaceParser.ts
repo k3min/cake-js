@@ -150,13 +150,13 @@ class DirectDrawSurfaceParser {
 		this.validate();
 	}
 
-	public static async load(url: string): Promise<DirectDrawSurfaceParser> {
+	public static async load(uri: string): Promise<DirectDrawSurfaceParser> {
 		let reader: BinaryReader;
 
 		try {
-			reader = await Resource.load<BinaryReader>(url, ResourceType.DDS);
+			reader = await Resource.load<BinaryReader>(uri, ResourceType.DDS);
 		} catch (e) {
-			throw new Exception(`DirectDrawSurfaceParser: failed to load '${ url }'`, e);
+			throw new Exception(`DirectDrawSurfaceParser: failed to load '${ uri }'`, e);
 		}
 
 		return new DirectDrawSurfaceParser(reader);

@@ -1,6 +1,7 @@
-import { Path } from '../Core';
+import { Exception, Path, Resource } from '../Core';
 import { isArrayLike } from '../Core/Helpers';
 import Math, { Vector4 } from '../Math';
+import { DirectDrawSurfaceParser } from '../Parsers';
 import Context from './Context';
 import Texture, { Mipmap, TextureFormat, TextureTarget } from './Texture';
 
@@ -16,14 +17,36 @@ class Texture2D extends Texture<WebGLTexture> {
 		super(width, height, format, TextureTarget.Texture2D, () => Context.createTexture(), (handle) => Context.bindTexture(TextureTarget.Texture2D, handle), (handle) => Context.deleteTexture(handle));
 	}
 
-	public static async load(url: string, format: TextureFormat, mipChain: boolean = true): Promise<Texture2D> {
+	/**
+	 * @todo Make this more generic
+	 */
+	public static async loadRaw(uri: string): Promise<Texture2D> {
+		const name: string = Path.getFileName(uri);
+
+		let raw: DirectDrawSurfaceParser;
+
+		try {
+			raw = await DirectDrawSurfaceParser.load(uri);
+		} catch (e) {
+			throw new Exception(`Texture2D (${ name }): failed to load DirectDrawSurface '${ uri }'`, e);
+		}
+
+		const result: Texture2D = new Texture2D(raw.width, raw.height, raw.textureFormat);
+
+		result.data = new Float32Array(raw.reader.buffer, 4 + raw.ddsHeader.size, raw.width * raw.height * 4);
+		result.apply(false);
+
+		return result;
+	}
+
+	public static async load(uri: string, format: TextureFormat, mipChain: boolean = true): Promise<Texture2D> {
 		return new Promise<Texture2D>((resolve) => {
 			const image = new Image();
 
 			image.addEventListener('load', () => {
 				const result = new Texture2D(image.width, image.height, format);
 
-				result.name = Path.getFileName(url);
+				result.name = Path.getFileName(uri);
 				result.data = image;
 
 				result.apply(mipChain);
@@ -31,7 +54,7 @@ class Texture2D extends Texture<WebGLTexture> {
 				resolve(result);
 			});
 
-			image.src = url;
+			image.src = Resource.url(uri);
 		});
 	}
 
@@ -56,20 +79,7 @@ class Texture2D extends Texture<WebGLTexture> {
 				null,
 			);
 		} else {
-			if (this.data as TexImageSource) {
-				Context.pixelStorei(Context.UNPACK_FLIP_Y_WEBGL, true);
-
-				Context.texImage2D(
-					this.target,
-					0,
-					this.pixelFormat,
-					this.pixelFormat,
-					this.pixelType,
-					this.data as TexImageSource,
-				);
-
-				Context.pixelStorei(Context.UNPACK_FLIP_Y_WEBGL, false);
-			} else if (ArrayBuffer.isView(this.data)) {
+			if (ArrayBuffer.isView(this.data)) {
 				Context.texImage2D(
 					this.target,
 					0,
@@ -97,6 +107,15 @@ class Texture2D extends Texture<WebGLTexture> {
 						mipmap.data,
 					);
 				}
+			} else {
+				Context.texImage2D(
+					this.target,
+					0,
+					this.pixelFormat,
+					this.pixelFormat,
+					this.pixelType,
+					this.data as TexImageSource,
+				);
 			}
 		}
 

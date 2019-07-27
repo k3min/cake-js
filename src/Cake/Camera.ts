@@ -41,6 +41,8 @@ class Camera extends Transform {
 
 		Shader.setMatrix4x4('_CameraInvP', this.invP);
 		Shader.setMatrix4x4('_Camera2World', this.localToWorld);
+
+		Shader.setVector('_WorldSpaceCameraPos', this.position);
 	}
 
 	protected disposing(): void {

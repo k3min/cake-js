@@ -1,12 +1,14 @@
 import BlendFunction from '../../GL/Helpers/BlendFunction';
 import CompareFunction from '../../GL/Helpers/CompareFunction';
 import CullingMode from '../../GL/Helpers/CullingMode';
+import StencilFunction from '../../GL/Helpers/StencilFunction';
 
 export enum ShaderCapability {
 	Blend = 'blend',
 	CullFace = 'cull',
 	DepthTest = 'zTest',
 	StencilTest = 'stencil',
+	StencilOp = 'stencilOp',
 	DepthMask = 'zWrite',
 	ColorMask = 'colorMask'
 }
@@ -55,9 +57,26 @@ export enum ShaderColorMask {
 	A = 'a',
 }
 
+export enum ShaderStencilFunction {
+	Keep = 'keep',
+	Zero = 'zero',
+	Replace = 'replace',
+	Increment = 'increment',
+	IncrementWrap = 'incrementWrap',
+	Decrement = 'decrement',
+	DecrementWrap = 'decrementWrap',
+	Invert = 'invert',
+}
+
 export interface Blend {
 	src: BlendFunction;
 	dst: BlendFunction;
+}
+
+export interface StencilOp {
+	fail: StencilFunction;
+	zFail: StencilFunction;
+	zPass: StencilFunction;
 }
 
 export interface StencilTest {
@@ -105,6 +124,10 @@ export const compareFunction = (func: ShaderCompareFunction): CompareFunction =>
 	return cast(func, ShaderCompareFunction, CompareFunction);
 };
 
+export const stencilFunction = (func: ShaderStencilFunction): StencilFunction => {
+	return cast(func, ShaderStencilFunction, StencilFunction);
+};
+
 export const cullingMode = (mode?: ShaderCullingMode): CullingMode | boolean => {
 	switch (mode) {
 		case ShaderCullingMode.Back:
@@ -118,7 +141,7 @@ export const cullingMode = (mode?: ShaderCullingMode): CullingMode | boolean => 
 	}
 };
 
-export type ShaderCapabilityValue = Blend | CullingMode | CompareFunction | StencilTest | ColorMask | boolean;
+export type ShaderCapabilityValue = Blend | CullingMode | CompareFunction | StencilTest | ColorMask | StencilOp | boolean;
 
 interface ShaderCapabilities {
 	[ShaderCapability.Blend]: Blend | boolean;
@@ -127,6 +150,7 @@ interface ShaderCapabilities {
 	[ShaderCapability.StencilTest]: StencilTest | boolean;
 	[ShaderCapability.DepthMask]: boolean;
 	[ShaderCapability.ColorMask]: ColorMask;
+	[ShaderCapability.StencilOp]: StencilOp;
 
 	[key: string]: ShaderCapabilityValue;
 }

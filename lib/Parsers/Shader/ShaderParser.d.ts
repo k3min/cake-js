@@ -9,7 +9,7 @@ declare class ShaderParser {
     readonly vertexSource: string[];
     readonly fragmentSource: string[];
     private parse;
-    load(url: string): Promise<void>;
+    load(uri: string): Promise<void>;
     private apply;
     private parseDefine;
     private parseExtension;

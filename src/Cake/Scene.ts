@@ -16,15 +16,15 @@ class Scene extends Base implements Updatable, Drawable {
 
 	private readonly parser: SceneParser = new SceneParser();
 
-	public static async load(url: string): Promise<Scene> {
+	public static async load(uri: string): Promise<Scene> {
 		const scene = new Scene();
 
-		scene.name = Path.getFileName(url);
+		scene.name = Path.getFileName(uri);
 
 		try {
-			await scene.parser.parse(url);
+			await scene.parser.parse(uri);
 		} catch (e) {
-			throw new Exception(`Scene: failed to parse '${ url }'`, e);
+			throw new Exception(`Scene: failed to parse '${ uri }'`, e);
 		}
 
 		scene.camera = scene.parser.camera;
