@@ -304,6 +304,7 @@ class Shader extends Base implements Bindable {
 				if (value === false) {
 					Context.disable(Capability.Blend);
 				} else {
+					Context.enable(Capability.Blend);
 					const { srcRGB, dstRGB, srcA, dstA }: Blend = value as Blend;
 					if (srcA !== false && dstA !== false) {
 						Context.blendFuncSeparate(srcRGB, dstRGB, srcA, dstA);
