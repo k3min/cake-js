@@ -143,7 +143,8 @@ class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> 
 	public attach(slot: FrameBufferAttachment, texture: Texture): void {
 		const attached: Texture = this.attachments.get(slot) as Texture;
 
-		if (attached && attached === texture) {
+		// @todo Check if disposed?
+		if (attached !== undefined && attached === texture) {
 			return;
 		}
 
@@ -153,14 +154,14 @@ class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> 
 	}
 
 	public detach(slot?: FrameBufferAttachment): void {
-		if (!slot) {
+		if (slot === undefined) {
 			this.attachments.forEach((_, slot: FrameBufferAttachment): void => this.detach(slot));
 			return;
 		}
 
 		const texture: Texture = this.attachments.get(slot) as Texture;
 
-		if (!texture) {
+		if (texture === undefined || texture.disposed) {
 			return;
 		}
 

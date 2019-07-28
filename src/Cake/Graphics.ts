@@ -10,17 +10,15 @@ class Graphics implements Disposable {
 	public readonly framebuffer: FrameBuffer = new FrameBuffer();
 	public readonly quad: Quad = new Quad();
 
-	public dispose(): boolean {
+	public dispose(): void {
 		if (this.disposed) {
-			return false;
+			throw new ReferenceError(`Graphics: already disposed`);
 		}
 
 		this.framebuffer.dispose();
 		this.quad.dispose();
 
 		this.disposed = true;
-
-		return true;
 	}
 
 	public setRenderTarget(color: Null<Texture | ArrayLike<Texture>> = null, depth: Null<Texture> = null): void {
@@ -31,12 +29,16 @@ class Graphics implements Disposable {
 
 		this.framebuffer.bind();
 
-		if (isArrayLike(color)) {
-			const buffers: ArrayLike<Texture> = color as ArrayLike<Texture>;
-			Context.viewport(0, 0, buffers[0].width, buffers[0].height);
+		if (depth === null) {
+			if (isArrayLike(color)) {
+				const buffers: ArrayLike<Texture> = color as ArrayLike<Texture>;
+				Context.viewport(0, 0, buffers[0].width, buffers[0].height);
+			} else {
+				const buffer: Texture = color as Texture;
+				Context.viewport(0, 0, buffer.width, buffer.height);
+			}
 		} else {
-			const buffer: Texture = color as Texture;
-			Context.viewport(0, 0, buffer.width, buffer.height);
+			Context.viewport(0, 0, depth.width, depth.height);
 		}
 
 		if (this.framebuffer.color === color && this.framebuffer.depth === depth) {

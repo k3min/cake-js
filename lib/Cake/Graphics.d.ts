@@ -8,7 +8,7 @@ declare class Graphics implements Disposable {
     private disposed;
     readonly framebuffer: FrameBuffer;
     readonly quad: Quad;
-    dispose(): boolean;
+    dispose(): void;
     setRenderTarget(color?: Null<Texture | ArrayLike<Texture>>, depth?: Null<Texture>): void;
     blit(a: Null<Texture>, b: Null<Texture>, material: Material): void;
 }

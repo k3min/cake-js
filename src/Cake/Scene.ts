@@ -64,7 +64,7 @@ class Scene extends Base implements Updatable, Drawable {
 	protected disposing(): void {
 		this.camera.dispose();
 
-		this.renderers.forEach((renderer: Renderer): boolean => renderer.dispose());
+		this.renderers.forEach((renderer: Renderer): void => renderer.dispose());
 		this.renderers.clear();
 	}
 }

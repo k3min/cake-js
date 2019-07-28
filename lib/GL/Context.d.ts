@@ -29,7 +29,6 @@ interface Context extends Omit<WebGLRenderingContext, 'clear' | 'enable' | 'disa
     drawBuffers(buffers: GLenum[]): void;
     enumToString(value: GLenum): string[];
     getError(): ContextError;
-    readonly [key: string]: any;
 }
 declare const _default: Context;
 export default _default;

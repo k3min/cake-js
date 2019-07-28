@@ -22,12 +22,18 @@ class ShaderProgram extends BindableGraphicsObject<ShaderProgram, WebGLProgram> 
 	public vertexSource: string = '';
 	public fragmentSource: string = '';
 
+	public readonly id: string;
+	public readonly keywords: string[];
+
 	protected get identifier(): string {
 		return 'ShaderProgram';
 	}
 
-	public constructor() {
+	public constructor(keywords: string[]) {
 		super(() => Context.createProgram(), (handle) => Context.useProgram(handle), (handle) => Context.deleteProgram(handle));
+
+		this.keywords = keywords;
+		this.id = keywords.sort().toString() || 'default';
 	}
 
 	public apply() {
@@ -68,27 +74,32 @@ class ShaderProgram extends BindableGraphicsObject<ShaderProgram, WebGLProgram> 
 				this.fragment = shader;
 				this.fragmentSource = source;
 				break;
-
-			default:
-				throw new RangeError();
 		}
 
 		Context.shaderSource(shader, source);
 
 		Context.compileShader(shader);
 
-		if (Context.getShaderParameter(shader, Context.COMPILE_STATUS) > 0) {
-			Context.attachShader(this.handle, shader);
-			return true;
+		if (Context.getShaderParameter(shader, Context.COMPILE_STATUS) <= 0) {
+			const log = Context.getShaderInfoLog(shader) as string;
+
+			this.dispose();
+
+			this.logCompileStatus(log, source);
+
+			return false;
 		}
 
-		const log = Context.getShaderInfoLog(shader) as string;
+		Context.attachShader(this.handle, shader);
 
-		this.dispose();
+		return true;
+	}
 
-		let errors: string[] = log.split('\n');
+	private logCompileStatus(log: string, source: string): void {
+		const logs: string[] = log.split('\n');
+		const sources: string[] = source.split('\n');
 
-		errors = errors.map((line: string): string => {
+		const errors: string[] = logs.map((line: string): string => {
 			const match: RegExpMatchArray = line.match(ERROR_PATTERN) as RegExpMatchArray;
 
 			if (!match) {
@@ -110,20 +121,20 @@ class ShaderProgram extends BindableGraphicsObject<ShaderProgram, WebGLProgram> 
 			return `${ error[0].toUpperCase() + error.slice(1) } (${ fn }@${ stack })`;
 		});
 
-		errors = errors.filter((error: string): boolean => !!error);
+		const error: string = errors.filter((error: string): boolean => !!error).join('\n');
 
-		console.error(`ShaderProgram (${ this.name }): SyntaxError\n${ errors.join('\n') }\n`);
-
-		return false;
+		console.error(`ShaderProgram (${ this.name }): SyntaxError\n${ error }\n`);
 	}
 
 	protected disposing(): void {
-		if (this.vertex) {
+		if (this.vertex !== null) {
 			Context.deleteShader(this.vertex);
+			this.vertex = null;
 		}
 
-		if (this.fragment) {
+		if (this.fragment !== null) {
 			Context.deleteShader(this.fragment);
+			this.fragment = null;
 		}
 
 		super.disposing();

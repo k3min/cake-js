@@ -10,6 +10,7 @@ interface MathEx extends Math {
     rsqrt(x: number): number;
     linear(x: number): number;
     gamma(x: number): number;
+    exp2(x: number): number;
 }
 declare const _default: MathEx;
 export default _default;

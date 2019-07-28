@@ -34,7 +34,7 @@ class CubeMap extends Texture<WebGLTexture> {
 		result.name = name;
 		result.mipmapCount = dds.mipmapCount;
 
-		if (result.mipmapCount) {
+		if (result.mipmapCount > 0) {
 			result.filterMode = TextureFilterMode.Trilinear;
 		}
 

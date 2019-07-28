@@ -46,8 +46,6 @@ interface Context extends Omit<WebGLRenderingContext, 'clear' | 'enable' | 'disa
 	enumToString(value: GLenum): string[];
 
 	getError(): ContextError;
-
-	readonly [key: string]: any;
 }
 
 if (!('gl' in window)) {
@@ -73,7 +71,7 @@ if (!('gl' in window)) {
 				const _result: string[] = [];
 
 				for (let key in _this) {
-					if (typeof _this[key] === 'number' && _this[key] === value) {
+					if (typeof (_this as any)[key] === 'number' && (_this as any)[key] === value) {
 						_result.push(`gl.${ key }`);
 					}
 				}
@@ -93,13 +91,13 @@ if (!('gl' in window)) {
 				const _this: Context = this as Context;
 				const _cache: Null<T> = _this._extensions.get(name);
 
-				if (_cache) {
+				if (_cache !== undefined) {
 					return _cache;
 				}
 
 				const _ext: Null<T> = _this.getExtensionRaw<T>(name);
 
-				if (!_ext) {
+				if (_ext === null) {
 					return null;
 				}
 
@@ -114,7 +112,7 @@ if (!('gl' in window)) {
 				const _this: Context = this as Context;
 				const _ext: Null<T> = _this.getExtension<T>(name);
 
-				if (!_ext) {
+				if (_ext === null) {
 					throw new ReferenceError(`'${ name }' not supported!`);
 				}
 

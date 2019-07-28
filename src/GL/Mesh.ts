@@ -15,47 +15,49 @@ class Mesh<T extends Indexable<VertexAttribute>> extends BindableObject<Mesh<T>>
 	}
 
 	protected binding(): void {
-		if (!this.vertexBuffer) {
-			return;
+		if (this.vertexBuffer === null) {
+			throw new ReferenceError(`Mesh (${ this.name }): invalid vertex buffer`);
 		}
 
 		this.vertexBuffer.bind();
 
-		if (this.indexBuffer) {
+		if (this.indexBuffer !== null) {
 			this.indexBuffer.bind();
 		}
 	}
 
 	protected unbinding(): void {
-		if (this.vertexBuffer) {
-			this.vertexBuffer.unbind();
+		if (this.vertexBuffer === null) {
+			return;
+		}
 
-			if (this.indexBuffer) {
-				this.indexBuffer.unbind();
-			}
+		this.vertexBuffer.unbind();
+
+		if (this.indexBuffer !== null) {
+			this.indexBuffer.unbind();
 		}
 	}
 
 	public draw(type: PrimitiveType = PrimitiveType.Triangles): void {
 		this.bind();
 
-		if (this.indexBuffer) {
-			this.indexBuffer.draw(type);
-		} else {
-			if (!this.vertexBuffer) {
+		if (this.indexBuffer === null) {
+			if (this.vertexBuffer === null) {
 				throw new ReferenceError(`Model (${ this.name }): no vertices`);
 			}
 
 			this.vertexBuffer.draw(type);
+		} else {
+			this.indexBuffer.draw(type);
 		}
 	}
 
 	protected disposing(): void {
-		if (this.vertexBuffer) {
+		if (this.vertexBuffer !== null) {
 			this.vertexBuffer.dispose();
 		}
 
-		if (this.indexBuffer) {
+		if (this.indexBuffer !== null) {
 			this.indexBuffer.dispose();
 		}
 	}

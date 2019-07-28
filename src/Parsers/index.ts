@@ -21,4 +21,7 @@ export {
 	ShaderColorMask,
 	ColorMask,
 	ShaderCapabilityValue,
+	StencilOp,
+	ShaderStencilFunction,
+	ShaderCapabilities,
 } from './Shader';

@@ -5,7 +5,7 @@ import { Vector, Vector2, Vector3, Vector4 } from '../../Math';
 import Color from '../../Math/Color';
 
 import {
-	SceneObject,
+	SceneBase,
 	SceneObjectType,
 	SceneCamera,
 	SceneRenderer,
@@ -101,18 +101,18 @@ class SceneParser {
 	}
 
 	public async parse(uri: string): Promise<void> {
-		let data: SceneObject[];
+		let data: SceneBase[];
 
 		try {
-			data = await Resource.load<SceneObject[]>(uri, ResourceType.JSON);
+			data = await Resource.load<SceneBase[]>(uri, ResourceType.JSON);
 		} catch (e) {
 			throw new Exception(`SceneParser: failed to load '${ uri }'`, e);
 		}
 
 		for (let i = 0; i < data.length; i++) {
-			const object: SceneObject = data[i];
+			const object: SceneBase = data[i];
 
-			const { type }: SceneObject = object;
+			const { type }: SceneBase = object;
 
 			switch (type) {
 				case SceneObjectType.Renderer: {

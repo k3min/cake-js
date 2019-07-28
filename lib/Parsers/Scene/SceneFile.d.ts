@@ -2,18 +2,18 @@ export declare enum SceneObjectType {
     Camera = "camera",
     Renderer = "renderer"
 }
-export interface SceneObject {
+export interface SceneBase {
     readonly type: SceneObjectType;
     readonly position: number[];
     readonly scale: number[];
 }
-export interface SceneCamera extends SceneObject {
+export interface SceneCamera extends SceneBase {
     readonly fov: number;
     readonly near: number;
     readonly far: number;
     readonly target: number[];
 }
-export interface SceneRenderer extends SceneObject {
+export interface SceneRenderer extends SceneBase {
     readonly name: string;
     readonly model: string;
     readonly material: SceneMaterial;

@@ -1,7 +1,7 @@
 import { Base } from '../Core';
 import { Texture, Shader } from '../GL';
 import { Matrix4x4, Vector, Color } from '../Math';
-import { Storage, Toggle } from '../Core/Helpers';
+import { Storage } from '../Core/Helpers';
 
 class Material extends Base {
 	public name: string = 'Material';
@@ -13,7 +13,7 @@ class Material extends Base {
 	private readonly textures: Storage<Texture> = new Storage<Texture>();
 	private readonly colors: Storage<Color> = new Storage<Color>();
 
-	private readonly keywords: Toggle<string> = new Toggle<string>();
+	private readonly keywords: string[] = [];
 
 	public readonly shader: Shader;
 
@@ -25,7 +25,7 @@ class Material extends Base {
 	}
 
 	public use(): void {
-		this.shader.keywords = this.keywords.toArray();
+		this.shader.keywords = this.keywords;
 
 		this.shader.bind();
 
@@ -37,8 +37,20 @@ class Material extends Base {
 		this.colors.forEach((value, name) => this.shader.setColor(name, value));
 	}
 
-	public setKeyword(name: string, value: boolean): void {
-		this.keywords.set(name, value);
+	public enableKeyword(name: string): void {
+		if (!this.keywords.includes(name)) {
+			this.keywords.push(name);
+		}
+	}
+
+	public disableKeyword(name: string): void {
+		const index: number = this.keywords.indexOf(name);
+
+		if (index === -1) {
+			return;
+		}
+
+		this.keywords.splice(index, 1);
 	}
 
 	public setTexture(name: string, value: Texture): void {

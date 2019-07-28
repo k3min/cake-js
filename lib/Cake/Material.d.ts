@@ -13,7 +13,8 @@ declare class Material extends Base {
     readonly shader: Shader;
     constructor(shader: Shader);
     use(): void;
-    setKeyword(name: string, value: boolean): void;
+    enableKeyword(name: string): void;
+    disableKeyword(name: string): void;
     setTexture(name: string, value: Texture): void;
     setVector(name: string, value: Vector): void;
     setMatrix4x4(name: string, value: Matrix4x4): void;

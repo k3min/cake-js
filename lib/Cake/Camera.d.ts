@@ -16,7 +16,7 @@ declare class Camera extends Transform {
     readonly viewProjection: Matrix4x4;
     readonly prevViewProjection: Matrix4x4;
     constructor();
-    update(): void;
+    updating(): void;
     protected disposing(): void;
 }
 export default Camera;

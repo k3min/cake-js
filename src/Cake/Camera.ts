@@ -29,7 +29,7 @@ class Camera extends Transform {
 		Camera.main = this;
 	}
 
-	public update(): void {
+	public updating(): void {
 		this.viewProjection.copyTo(this.prevViewProjection);
 
 		Matrix4x4.lookAt(this.position, this.target, this.worldToLocal);

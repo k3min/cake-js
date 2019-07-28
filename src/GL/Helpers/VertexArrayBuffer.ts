@@ -106,7 +106,7 @@ class VertexArrayBuffer<T extends Indexable<VertexAttribute>> extends ArrayBuffe
 		let offset: number = 0;
 
 		for (let [name, attribute] of this.attributes) {
-			const index: number = shader.attributes.get(name) as number;
+			const index: number = shader.variant.attributes.get(name) as number;
 
 			if (index === undefined) {
 				this.logAttributeNotFound(name);

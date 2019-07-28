@@ -1,12 +1,19 @@
-import { Disposable, Exception, Path } from '../Core';
-import { BindableObject, Indexable, Null, Storage } from '../Core/Helpers';
+import { Exception, Path, Base, Bindable } from '../Core';
+import { Null, Storage } from '../Core/Helpers';
 import { Color, Matrix4x4, Vector, Vector2, Vector3, Vector4 } from '../Math';
-import { Blend, ColorMask, ShaderCapability, ShaderCapabilityValue, ShaderParser, StencilTest } from '../Parsers';
-import { StencilOp } from '../Parsers/Shader';
+
+import {
+	Blend,
+	ColorMask,
+	ShaderCapability,
+	ShaderCapabilityValue,
+	ShaderParser,
+	StencilTest,
+	StencilOp,
+} from '../Parsers';
+
 import Context from './Context';
-import { CompareFunction } from './Helpers';
-import Capability from './Helpers/Capability';
-import CullingMode from './Helpers/CullingMode';
+import { CompareFunction, Capability, CullingMode } from './Helpers';
 import ShaderProgram, { ShaderType } from './ShaderProgram';
 import Texture from './Texture';
 import Texture2D from './Texture2D';
@@ -15,18 +22,19 @@ import Texture2D from './Texture2D';
  * @todo Unset uniforms without (valid) value
  * @todo Warn about wrong attribute type
  */
-class Shader extends BindableObject<Shader> implements Disposable {
+class Shader extends Base implements Bindable {
 	public name: string = 'Shader';
+
+	private static _bound: Null<Shader> = null;
 
 	private variants: Storage<ShaderProgram> = new Storage<ShaderProgram>();
 
 	private readonly parser: ShaderParser = new ShaderParser();
 
 	private textureIndices: string[] = [];
-	private textureIndex: number = 0;
 
 	// @ts-ignore
-	private variant: ShaderProgram;
+	private _variant: ShaderProgram;
 
 	public static floats: Storage<GLfloat> = new Storage<GLfloat>();
 	public static ints: Storage<GLint> = new Storage<GLint>();
@@ -35,36 +43,42 @@ class Shader extends BindableObject<Shader> implements Disposable {
 	public static textures: Storage<Texture> = new Storage<Texture>();
 	public static colors: Storage<Color> = new Storage<Color>();
 
-	private readonly log: Indexable<string> = {};
+	private readonly log: string[] = [];
 
-	public static bound: Null<Shader> = null;
+	public static get bound(): Null<Shader> {
+		return Shader._bound;
+	}
 
 	public get attributes(): Storage<number> {
-		return this.variant.attributes;
+		return this._variant.attributes;
 	}
 
 	public get uniforms(): Storage<WebGLUniformLocation> {
-		return this.variant.uniforms;
+		return this._variant.uniforms;
+	}
+
+	public get variant(): ShaderProgram {
+		return this._variant;
+	}
+
+	public get keywords(): Null<string[]> {
+		return this._variant.keywords;
 	}
 
 	public set keywords(value: Null<string[]>) {
-		let id: string = '';
+		let id: string = 'default';
 
 		if (value && value.length > 0) {
-			id = value.sort().join(',');
+			id = value.sort().toString();
 		}
 
 		const variant: ShaderProgram = this.variants.get(id) as ShaderProgram;
 
 		if (!variant) {
-			throw new ReferenceError(`Shader (${ this.name }): variant '${ id || 'default' }' not found`);
+			throw new ReferenceError(`Shader (${ this.name }): variant '${ id }' not found`);
 		}
 
-		this.variant = variant;
-	}
-
-	protected get identifier(): string {
-		return 'Shader';
+		this._variant = variant;
 	}
 
 	public static async load(uri: string): Promise<Shader> {
@@ -85,13 +99,12 @@ class Shader extends BindableObject<Shader> implements Disposable {
 
 	public apply(): void {
 		this.parser.keywords.forEach((keywords: string[]) => {
-			const defines: string[] = [];
+			const defines: string[] = keywords.map((keyword: string): string => `#define ${ keyword }`);
+			const id: string = keywords.sort().toString() || 'default';
 
-			keywords.forEach((keyword: string) => defines.push(`#define ${ keyword }`));
+			const attachment: ShaderProgram = new ShaderProgram(keywords);
 
-			const attachment: ShaderProgram = new ShaderProgram();
-
-			attachment.name = this.name;
+			attachment.name = `${ this.name } (${ id })`;
 
 			if (!attachment.attach(ShaderType.Vertex, defines.concat(this.parser.vertexSource))) {
 				return;
@@ -103,31 +116,33 @@ class Shader extends BindableObject<Shader> implements Disposable {
 
 			attachment.apply();
 
-			this.variants.set(keywords.join(','), attachment);
+			this.variants.set(id, attachment);
 		});
 
 		this.keywords = null;
 	}
 
 	private logUniformNotFound(name: string, type: string): void {
-		const id: string = `${ name } (${ type })`;
-		const log: string = `Shader (${ this.name }): uniform ${ id } not found`;
+		const uniform: string = `'${ name }' (${ type })`;
+		const variant: string = this._variant.id;
 
-		if (id in this.log) {
+		const log: string = `Shader (${ this.name }): uniform ${ uniform } not found (variant '${ variant }')`;
+
+		if (this.log.includes(log)) {
 			return;
 		}
 
 		console.warn(log);
 
-		this.log[id] = log;
+		this.log.push(log);
 	}
 
 	private getUniform(name: string, type: string, check: boolean = true): Null<WebGLUniformLocation> {
 		this.bind();
 
-		const uniform: WebGLUniformLocation = this.variant.uniforms.get(name) as WebGLUniformLocation;
+		const uniform: WebGLUniformLocation = this._variant.uniforms.get(name) as WebGLUniformLocation;
 
-		if (uniform) {
+		if (uniform !== undefined) {
 			return uniform;
 		}
 
@@ -138,74 +153,50 @@ class Shader extends BindableObject<Shader> implements Disposable {
 		return null;
 	}
 
-	private check() {
-		const error = Context.getError();
-
-		if (error) {
-			throw new ReferenceError(`Shader (${ this.name }): ${ Context.enumToString(error).join(' | ') }`);
-		}
-	}
-
 	public setColor(name: string, value: Color, check: boolean = true): void {
 		const uniform: WebGLUniformLocation = this.getUniform(name, 'Color', check) as WebGLUniformLocation;
 
-		if (!uniform) {
+		if (uniform === undefined) {
 			return;
 		}
 
 		Context.uniform4fv(uniform, value.linear);
-
-		if (check) {
-			this.check();
-		}
 	}
 
 	public setFloat(name: string, value: GLfloat, check: boolean = true): void {
 		const uniform: WebGLUniformLocation = this.getUniform(name, 'float', check) as WebGLUniformLocation;
 
-		if (!uniform) {
+		if (uniform === undefined) {
 			return;
 		}
 
 		Context.uniform1f(uniform, value);
-
-		if (check) {
-			this.check();
-		}
 	}
 
 	public setInt(name: string, value: GLint, check: boolean = true): void {
 		const uniform: WebGLUniformLocation = this.getUniform(name, 'int', check) as WebGLUniformLocation;
 
-		if (!uniform) {
+		if (uniform === undefined) {
 			return;
 		}
 
 		Context.uniform1i(uniform, value);
-
-		if (check) {
-			this.check();
-		}
 	}
 
 	public setMatrix4x4(name: string, value: Matrix4x4, check: boolean = true): void {
 		const uniform: WebGLUniformLocation = this.getUniform(name, 'Matrix4x4', check) as WebGLUniformLocation;
 
-		if (!uniform) {
+		if (uniform === undefined) {
 			return;
 		}
 
 		Context.uniformMatrix4fv(uniform, false, value);
-
-		if (check) {
-			this.check();
-		}
 	}
 
 	public setVector(name: string, value: Vector, check: boolean = true): void {
 		const uniform: WebGLUniformLocation = this.getUniform(name, `Vector${ value.length }`, check) as WebGLUniformLocation;
 
-		if (!uniform) {
+		if (uniform === undefined) {
 			return;
 		}
 
@@ -221,40 +212,32 @@ class Shader extends BindableObject<Shader> implements Disposable {
 			case Vector4.LENGTH:
 				Context.uniform4fv(uniform, value);
 				break;
-
-			default:
-				throw new TypeError(`Shader (${ this.name }): uniform ${ name } has invalid length ${ value.length }`);
-		}
-
-		if (check) {
-			this.check();
 		}
 	}
 
 	public setTexture(name: string, texture: Texture, check: boolean = true): void {
-		const uniform: WebGLUniformLocation = this.getUniform(name, 'texture', check) as WebGLUniformLocation;
+		if (!texture || texture.disposed) {
+			throw new ReferenceError(`Shader (${ this.name }): invalid Texture '${ name }'`);
+		}
 
-		if (!uniform) {
+		const uniform: WebGLUniformLocation = this.getUniform(name, 'Texture', check) as WebGLUniformLocation;
+
+		if (uniform === undefined) {
 			return;
 		}
 
 		if (texture instanceof Texture2D) {
 			const uniform2: WebGLUniformLocation = this.getUniform(`${ name }_TexelSize`, 'Vector4', false) as WebGLUniformLocation;
 
-			if (uniform2) {
+			if (uniform2 !== undefined) {
 				Context.uniform4fv(uniform2, texture.texelSize);
-
-				if (check) {
-					this.check();
-				}
 			}
 		}
 
 		let index: number = this.textureIndices.indexOf(name);
 
 		if (index === -1) {
-			index = this.textureIndex++;
-			this.textureIndices[index] = name;
+			index = this.textureIndices.push(name) - 1;
 		}
 
 		Context.activeTexture(Context.TEXTURE0 + index);
@@ -262,10 +245,6 @@ class Shader extends BindableObject<Shader> implements Disposable {
 		texture.bind();
 
 		Context.uniform1i(uniform, index);
-
-		if (check) {
-			this.check();
-		}
 	}
 
 	public static setFloat(name: string, value: number): void {
@@ -356,24 +335,27 @@ class Shader extends BindableObject<Shader> implements Disposable {
 				Context.colorMask(r, g, b, a);
 				break;
 			}
-
-			default:
-				throw new RangeError(`Shader (${ this.name }): unknown cap '${ cap }'`);
 		}
 	}
 
-	protected unbinding(): void {
-		this.variant.unbind();
-	}
-
-	protected binding(): void {
-		Shader.bound = this;
-
-		for (let cap of Object.values(ShaderCapability)) {
-			this.setCap(cap);
+	public unbind(): boolean {
+		if (!this._variant.unbind()) {
+			return false;
 		}
 
-		this.variant.bind();
+		Shader._bound = null;
+
+		return true;
+	}
+
+	public bind(): boolean {
+		if (!this._variant.bind()) {
+			return false;
+		}
+
+		Shader._bound = this;
+
+		Object.values(ShaderCapability).forEach((cap) => this.setCap(cap));
 
 		Shader.floats.forEach((value, name) => this.setFloat(name, value));
 		Shader.ints.forEach((value, name) => this.setInt(name, value));
@@ -381,10 +363,12 @@ class Shader extends BindableObject<Shader> implements Disposable {
 		Shader.matrices.forEach((value, name) => this.setMatrix4x4(name, value));
 		Shader.textures.forEach((value, name) => this.setTexture(name, value));
 		Shader.colors.forEach((value, name) => this.setColor(name, value));
+
+		return true;
 	}
 
 	protected disposing(): void {
-		this.variants.forEach((variant: ShaderProgram) => variant.dispose());
+		this.variants.forEach((variant: ShaderProgram): void => variant.dispose());
 		this.variants.clear();
 	}
 }

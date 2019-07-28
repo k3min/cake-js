@@ -1,7 +1,8 @@
-import { Base, Updatable } from '../Core';
+import { Updatable } from '../Core';
 import { Matrix4x4, Vector3 } from '../Math';
+import SceneObject from './SceneObject';
 
-abstract class Transform extends Base implements Updatable {
+abstract class Transform extends SceneObject implements Updatable {
 	public readonly position: Vector3 = Vector3.zero;
 
 	public readonly worldToLocal: Matrix4x4 = Matrix4x4.identity;
@@ -18,8 +19,6 @@ abstract class Transform extends Base implements Updatable {
 	public get right(): Vector3 {
 		return this.worldToLocal.right;
 	}
-
-	public abstract update(): void;
 }
 
 export default Transform;

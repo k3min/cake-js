@@ -22,7 +22,7 @@ class Renderer extends Transform implements Drawable {
 
 	protected readonly prevLocalToWorld: Matrix4x4 = Matrix4x4.identity;
 
-	public update(): void {
+	public updating(): void {
 		this.localToWorld.copyTo(this.prevLocalToWorld);
 
 		this.localToWorld.translation = this.position;
@@ -43,6 +43,10 @@ class Renderer extends Transform implements Drawable {
 	}
 
 	public draw(): void {
+		if (!this.enabled) {
+			return;
+		}
+
 		this.material.use();
 		this.model.draw();
 	}

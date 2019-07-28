@@ -12,7 +12,7 @@ declare class Renderer extends Transform implements Drawable {
     protected readonly modelView: Matrix4x4;
     protected readonly modelViewProjection: Matrix4x4;
     protected readonly prevLocalToWorld: Matrix4x4;
-    update(): void;
+    updating(): void;
     draw(): void;
     protected disposing(): void;
 }

@@ -5,3 +5,4 @@ export { default as Graphics } from './Graphics';
 export { default as Camera } from './Camera';
 export { default as Renderer } from './Renderer';
 export { default as Scene } from './Scene';
+export { default as SceneObject } from './SceneObject';

@@ -61,10 +61,10 @@ class Texture2D extends Texture<WebGLTexture> {
 	public apply(updateMipmaps: boolean = true): void {
 		super.apply();
 
-		this.texelSize[0] = this.width;
-		this.texelSize[1] = this.height;
-		this.texelSize[2] = 1 / this.width;
-		this.texelSize[3] = 1 / this.height;
+		this.texelSize[0] = 1 / this.width;
+		this.texelSize[1] = 1 / this.height;
+		this.texelSize[2] = this.width;
+		this.texelSize[3] = this.height;
 
 		if (this.data === null) {
 			Context.texImage2D(

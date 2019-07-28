@@ -12,10 +12,13 @@ declare class ShaderProgram extends BindableGraphicsObject<ShaderProgram, WebGLP
     private fragment;
     vertexSource: string;
     fragmentSource: string;
+    readonly id: string;
+    readonly keywords: string[];
     protected readonly identifier: string;
-    constructor();
+    constructor(keywords: string[]);
     apply(): void;
     attach(type: ShaderType, sources: string[]): boolean;
+    private logCompileStatus;
     protected disposing(): void;
 }
 export default ShaderProgram;

@@ -1,18 +1,19 @@
-import { Disposable } from '../Core';
-import { BindableObject, Null, Storage } from '../Core/Helpers';
+import { Base, Bindable } from '../Core';
+import { Null, Storage } from '../Core/Helpers';
 import { Color, Matrix4x4, Vector } from '../Math';
+import ShaderProgram from './ShaderProgram';
 import Texture from './Texture';
 /**
  * @todo Unset uniforms without (valid) value
  * @todo Warn about wrong attribute type
  */
-declare class Shader extends BindableObject<Shader> implements Disposable {
+declare class Shader extends Base implements Bindable {
     name: string;
+    private static _bound;
     private variants;
     private readonly parser;
     private textureIndices;
-    private textureIndex;
-    private variant;
+    private _variant;
     static floats: Storage<GLfloat>;
     static ints: Storage<GLint>;
     static vectors: Storage<Vector>;
@@ -20,16 +21,15 @@ declare class Shader extends BindableObject<Shader> implements Disposable {
     static textures: Storage<Texture>;
     static colors: Storage<Color>;
     private readonly log;
-    static bound: Null<Shader>;
+    static readonly bound: Null<Shader>;
     readonly attributes: Storage<number>;
     readonly uniforms: Storage<WebGLUniformLocation>;
+    readonly variant: ShaderProgram;
     keywords: Null<string[]>;
-    protected readonly identifier: string;
     static load(uri: string): Promise<Shader>;
     apply(): void;
     private logUniformNotFound;
     private getUniform;
-    private check;
     setColor(name: string, value: Color, check?: boolean): void;
     setFloat(name: string, value: GLfloat, check?: boolean): void;
     setInt(name: string, value: GLint, check?: boolean): void;
@@ -43,8 +43,8 @@ declare class Shader extends BindableObject<Shader> implements Disposable {
     static setTexture(name: string, value: Texture): void;
     static setColor(name: string, value: Color): void;
     private setCap;
-    protected unbinding(): void;
-    protected binding(): void;
+    unbind(): boolean;
+    bind(): boolean;
     protected disposing(): void;
 }
 export default Shader;

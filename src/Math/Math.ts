@@ -19,6 +19,8 @@ interface MathEx extends Math {
 	linear(x: number): number;
 
 	gamma(x: number): number;
+
+	exp2(x: number): number;
 }
 
 Object.defineProperties(Math, {
@@ -32,6 +34,10 @@ Object.defineProperties(Math, {
 
 	lerp: {
 		value: (a: number, b: number, t: number): number => a + t * (b - a),
+	},
+
+	exp2: {
+		value: (x: number): number => Math.exp(x * 0.69314718055994530941723212145818),
 	},
 
 	nextPowerOfTwo: {
