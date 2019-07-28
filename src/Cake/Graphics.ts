@@ -23,7 +23,7 @@ class Graphics implements Disposable {
 		return true;
 	}
 
-	public setRenderTarget(color: Null<Texture | Texture[]> = null, depth: Null<Texture> = null): void {
+	public setRenderTarget(color: Null<Texture | ArrayLike<Texture>> = null, depth: Null<Texture> = null): void {
 		if (color === null) {
 			this.framebuffer.unbind();
 			return;
@@ -32,7 +32,7 @@ class Graphics implements Disposable {
 		this.framebuffer.bind();
 
 		if (isArrayLike(color)) {
-			const buffers: Texture[] = color as Texture[];
+			const buffers: ArrayLike<Texture> = color as ArrayLike<Texture>;
 			Context.viewport(0, 0, buffers[0].width, buffers[0].height);
 		} else {
 			const buffer: Texture = color as Texture;

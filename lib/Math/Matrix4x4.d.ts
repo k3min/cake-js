@@ -1,6 +1,14 @@
+import Copyable from '../Core/Copyable';
+import Quaternion from './Quaternion';
 import Vector3 from './Vector3';
 import Vector4 from './Vector4';
-declare class Matrix4x4 extends Float32Array {
+/**
+ *  0  1  2  3
+ *  4  5  6  7
+ *  8  9 10 11
+ * 12 13 14 15
+ */
+declare class Matrix4x4 extends Float32Array implements Copyable<Matrix4x4> {
     d00: number;
     d01: number;
     d02: number;
@@ -17,8 +25,16 @@ declare class Matrix4x4 extends Float32Array {
     d13: number;
     d14: number;
     d15: number;
+    readonly right: Vector3;
+    readonly up: Vector3;
+    readonly forward: Vector3;
+    translation: Vector3;
+    rotation: Quaternion;
+    scaling: Vector3;
     static readonly identity: Matrix4x4;
     constructor();
+    copyTo(result: Matrix4x4): void;
+    copy(): Matrix4x4;
     static inverse(matrix: Matrix4x4, result: Matrix4x4): void;
     static multiply(a: Matrix4x4, b: Matrix4x4, result: Matrix4x4): void;
     static perspective(fov: number, aspect: number, near: number, far: number, result: Matrix4x4): Matrix4x4;

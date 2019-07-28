@@ -7,7 +7,7 @@ class Vector4 extends Vector {
 		super(Vector4.LENGTH, x, y, z, w);
 	}
 
-	public clone(): Vector4 {
+	public copy(): Vector4 {
 		return new Vector4(this[0], this[1], this[2], this[3]);
 	}
 }

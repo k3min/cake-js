@@ -12,8 +12,9 @@ declare class Camera extends Transform {
     readonly position: Vector3;
     readonly target: Vector3;
     readonly projection: Matrix4x4;
-    readonly invP: Matrix4x4;
+    readonly invProjection: Matrix4x4;
     readonly viewProjection: Matrix4x4;
+    readonly prevViewProjection: Matrix4x4;
     constructor();
     update(): void;
     protected disposing(): void;

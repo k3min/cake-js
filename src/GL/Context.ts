@@ -3,12 +3,23 @@ import Storage from '../Core/Helpers/Storage';
 import Vector4 from '../Math/Vector4';
 import { Capability } from './Helpers';
 
+export enum ContextError {
+	None = 0x0000, // GL_NONE
+	InvalidEnum = 0x0500, // GL_Invalid_Enum
+	InvalidValue = 0x0501, // GL_Invalid_value
+	InvalidOperation = 0x0502, // GL_Invalid_operation
+	OutOfMemory = 0x0505, // GL_Out_Of_Memory
+	InvalidFramebufferOperation = 0x0506, // GL_Invalid_Framebuffer_Operation
+}
+
 interface Context extends Omit<WebGLRenderingContext, 'clear' | 'enable' | 'disable' | 'getExtension'> {
 	_enabled: Toggle<Capability>;
 	_extensions: Storage<any>;
 
 	ext: WEBGL_draw_buffers;
 	depth: WEBGL_depth_texture;
+
+	getErrorRaw(): GLenum;
 
 	clearRaw(mask: GLbitfield): void;
 
@@ -31,6 +42,12 @@ interface Context extends Omit<WebGLRenderingContext, 'clear' | 'enable' | 'disa
 	clear(color?: Vector4 | boolean, depth?: GLclampf | boolean, stencil?: GLint | boolean): void;
 
 	drawBuffers(buffers: GLenum[]): void;
+
+	enumToString(value: GLenum): string[];
+
+	getError(): ContextError;
+
+	readonly [key: string]: any;
 }
 
 if (!('gl' in window)) {
@@ -44,10 +61,32 @@ if (!('gl' in window)) {
 		_enabled: { value: new Toggle<Capability>() },
 		_extensions: { value: new Storage<any>() },
 
+		getErrorRaw: { value: ((window as any).gl as WebGLRenderingContext).getError },
 		getExtensionRaw: { value: ((window as any).gl as WebGLRenderingContext).getExtension },
 		enableRaw: { value: ((window as any).gl as WebGLRenderingContext).enable },
 		disableRaw: { value: ((window as any).gl as WebGLRenderingContext).disable },
 		clearRaw: { value: ((window as any).gl as WebGLRenderingContext).clear },
+
+		enumToString: {
+			value: function (value: GLenum): string[] {
+				const _this: Context = this as Context;
+				const _result: string[] = [];
+
+				for (let key in _this) {
+					if (typeof _this[key] === 'number' && _this[key] === value) {
+						_result.push(`gl.${ key }`);
+					}
+				}
+
+				return _result;
+			},
+		},
+
+		getError: {
+			value: function (): ContextError {
+				return (this as Context).getErrorRaw();
+			},
+		},
 
 		getExtension: {
 			value: function <T>(name: string): Null<T> {

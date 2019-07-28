@@ -29,6 +29,7 @@ declare class Shader extends BindableObject<Shader> implements Disposable {
     apply(): void;
     private logUniformNotFound;
     private getUniform;
+    private check;
     setColor(name: string, value: Color, check?: boolean): void;
     setFloat(name: string, value: GLfloat, check?: boolean): void;
     setInt(name: string, value: GLint, check?: boolean): void;

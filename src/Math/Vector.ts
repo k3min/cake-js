@@ -1,3 +1,4 @@
+import Copyable from '../Core/Copyable';
 import { isArrayLike } from '../Core/Helpers';
 import Math from './Math';
 
@@ -5,7 +6,7 @@ const bOrA = (a: number, b?: number): number => ((b !== undefined) ? b : a);
 
 export type X = ArrayLike<number> | number;
 
-abstract class Vector extends Float32Array {
+abstract class Vector extends Float32Array implements Copyable<Vector> {
 	public get x(): number {
 		return this[0];
 	}
@@ -47,7 +48,7 @@ abstract class Vector extends Float32Array {
 	}
 
 	public get normalized(): Vector {
-		return this.clone().normalize();
+		return this.copy().normalize();
 	}
 
 	protected constructor(components: number, x?: X, y: number = 0, z: number = 0, w: number = 0) {
@@ -63,7 +64,13 @@ abstract class Vector extends Float32Array {
 	}
 
 	public normalize(): Vector {
-		return this.div(this.magnitude);
+		const length: number = this.magnitude;
+
+		if (length < Number.EPSILON) {
+			return this.set(0, 0, 0, 0);
+		}
+
+		return this.mul(Math.rsqrt(length));
 	}
 
 	protected op(op: (a: number, b: number) => number, x: X, y?: number, z?: number, w?: number): Vector {
@@ -103,31 +110,31 @@ abstract class Vector extends Float32Array {
 	}
 
 	public static lerp(a: Vector, b: Vector, t: number): Vector {
-		return a.clone().op((a, b) => Math.lerp(a, b, t), b);
+		return a.copy().op((a, b) => Math.lerp(a, b, t), b);
 	}
 
 	public static min(a: Vector, b: Vector): Vector {
-		return a.clone().op((a, b) => Math.min(a, b), b);
+		return a.copy().op((a, b) => Math.min(a, b), b);
 	}
 
 	public static max(a: Vector, b: Vector): Vector {
-		return a.clone().op((a, b) => Math.max(a, b), b);
+		return a.copy().op((a, b) => Math.max(a, b), b);
 	}
 
 	public '-'(x: X, y?: number, z?: number, w?: number): Vector {
-		return this.clone().sub(x, y, z, w);
+		return this.copy().sub(x, y, z, w);
 	}
 
 	public '/'(x: X, y?: number, z?: number, w?: number): Vector {
-		return this.clone().div(x, y, z, w);
+		return this.copy().div(x, y, z, w);
 	}
 
 	public '*'(x: X, y?: number, z?: number, w?: number): Vector {
-		return this.clone().mul(x, y, z, w);
+		return this.copy().mul(x, y, z, w);
 	}
 
 	public '+'(x: X, y?: number, z?: number, w?: number): Vector {
-		return this.clone().add(x, y, z, w);
+		return this.copy().add(x, y, z, w);
 	}
 
 	public '-='(x: X, y?: number, z?: number, w?: number): Vector {
@@ -150,7 +157,7 @@ abstract class Vector extends Float32Array {
 		return this.op((_, b) => b, x, y, z, w);
 	}
 
-	public abstract clone(): Vector;
+	public abstract copy(): Vector;
 }
 
 export default Vector;

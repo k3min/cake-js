@@ -5,3 +5,4 @@ export { default as Path } from './Path';
 export { default as Updatable } from './Updatable';
 export { default as Resource, ResourceType } from './Resource';
 export { default as Exception } from './Exception';
+export { default as Copyable } from './Copyable';

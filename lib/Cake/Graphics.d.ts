@@ -9,7 +9,7 @@ declare class Graphics implements Disposable {
     readonly framebuffer: FrameBuffer;
     readonly quad: Quad;
     dispose(): boolean;
-    setRenderTarget(color?: Null<Texture | Texture[]>, depth?: Null<Texture>): void;
+    setRenderTarget(color?: Null<Texture | ArrayLike<Texture>>, depth?: Null<Texture>): void;
     blit(a: Null<Texture>, b: Null<Texture>, material: Material): void;
 }
 declare const graphics: Graphics;

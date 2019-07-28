@@ -1,5 +1,6 @@
+import Copyable from '../Core/Copyable';
 export declare type X = ArrayLike<number> | number;
-declare abstract class Vector extends Float32Array {
+declare abstract class Vector extends Float32Array implements Copyable<Vector> {
     x: number;
     y: number;
     z: number;
@@ -27,6 +28,6 @@ declare abstract class Vector extends Float32Array {
     '*='(x: X, y?: number, z?: number, w?: number): Vector;
     '+='(x: X, y?: number, z?: number, w?: number): Vector;
     set(x: X, y?: number, z?: number, w?: number): Vector;
-    abstract clone(): Vector;
+    abstract copy(): Vector;
 }
 export default Vector;

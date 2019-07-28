@@ -31,7 +31,7 @@ class Vector2 extends Vector {
 		super(Vector2.LENGTH, x, y, 0, 0);
 	}
 
-	public clone(): Vector2 {
+	public copy(): Vector2 {
 		return new Vector2(this[0], this[1]);
 	}
 }

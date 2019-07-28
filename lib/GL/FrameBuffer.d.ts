@@ -10,10 +10,10 @@ export declare enum FrameBufferAttachment {
 declare class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> {
     name: string;
     readonly attachments: Map<FrameBufferAttachment, Texture>;
-    color: Null<Texture | Texture[]>;
+    color: Null<Texture | ArrayLike<Texture>>;
     depth: Null<Texture>;
     protected readonly identifier: string;
-    constructor(color?: Null<Texture | Texture[]>, depth?: Null<Texture>);
+    constructor(color?: Null<Texture | ArrayLike<Texture>>, depth?: Null<Texture>);
     apply(check?: boolean): void;
     check(): void;
     private setAttachment;

@@ -1,8 +1,17 @@
+import Copyable from '../Core/Copyable';
 import Math from './Math';
+import Quaternion from './Quaternion';
 import Vector3 from './Vector3';
 import Vector4 from './Vector4';
 
-class Matrix4x4 extends Float32Array {
+/**
+ *  0  1  2  3
+ *  4  5  6  7
+ *  8  9 10 11
+ * 12 13 14 15
+ */
+
+class Matrix4x4 extends Float32Array implements Copyable<Matrix4x4> {
 	public get d00(): number {
 		return this[0];
 	}
@@ -131,6 +140,68 @@ class Matrix4x4 extends Float32Array {
 		this[15] = value;
 	}
 
+	public get right(): Vector3 {
+		return new Vector3(this[0], this[4], this[8]);
+	}
+
+	public get up(): Vector3 {
+		return new Vector3(this[1], this[5], this[9]);
+	}
+
+	public get forward(): Vector3 {
+		return new Vector3(this[2], this[6], this[10]);
+	}
+
+	public get translation(): Vector3 {
+		return new Vector3(this[12], this[13], this[14]);
+	}
+
+	public set translation(value: Vector3) {
+		this[12] = value[0];
+		this[13] = value[1];
+		this[14] = value[2];
+	}
+
+	public set rotation(value: Quaternion) {
+		const [x, y, z, w] = value;
+
+		const x2 = x + x;
+		const y2 = y + y;
+		const z2 = z + z;
+
+		const xx = x * x2;
+		const xy = x * y2;
+		const xz = x * z2;
+		const yy = y * y2;
+		const yz = y * z2;
+		const zz = z * z2;
+		const wx = w * x2;
+		const wy = w * y2;
+		const wz = w * z2;
+
+		this[0] = 1 - (yy + zz);
+		this[1] = xy + wz;
+		this[2] = xz - wy;
+
+		this[4] = xy - wz;
+		this[5] = 1 - (xx + zz);
+		this[6] = yz + wx;
+
+		this[8] = xz + wy;
+		this[9] = yz - wx;
+		this[10] = 1 - (xx + yy);
+	}
+
+	public get scaling(): Vector3 {
+		return new Vector3(this[0], this[5], this[10]);
+	}
+
+	public set scaling(value: Vector3) {
+		this[0] = value[0];
+		this[5] = value[1];
+		this[10] = value[2];
+	}
+
 	public static get identity(): Matrix4x4 {
 		const result = new Matrix4x4();
 
@@ -159,6 +230,20 @@ class Matrix4x4 extends Float32Array {
 
 	public constructor() {
 		super(16);
+	}
+
+	public copyTo(result: Matrix4x4): void {
+		for (let i = 0; i < 16; i++) {
+			result[i] = this[i];
+		}
+	}
+
+	public copy(): Matrix4x4 {
+		const result: Matrix4x4 = new Matrix4x4();
+
+		this.copyTo(result);
+
+		return result;
 	}
 
 	public static inverse(matrix: Matrix4x4, result: Matrix4x4): void {
@@ -298,54 +383,54 @@ class Matrix4x4 extends Float32Array {
 		let z1 = yPos - yTarget;
 		let z2 = zPos - zTarget;
 
-		let len = (z0 * z0) + (z1 * z1) + (z2 * z2);
+		let len2 = (z0 * z0) + (z1 * z1) + (z2 * z2);
 
-		if (len < Number.EPSILON) {
+		if (len2 < Number.EPSILON) {
 			z0 = 0;
 			z1 = 0;
 			z2 = 0;
 		} else {
-			len = Math.rsqrt(len);
+			const lenInv = Math.rsqrt(len2);
 
-			z0 *= len;
-			z1 *= len;
-			z2 *= len;
+			z0 *= lenInv;
+			z1 *= lenInv;
+			z2 *= lenInv;
 		}
 
 		let x0 = (yUp * z2) - (zUp * z1);
 		let x1 = (zUp * z0) - (xUp * z2);
 		let x2 = (xUp * z1) - (yUp * z0);
 
-		len = (x0 * x0) + (x1 * x1) + (x2 * x2);
+		len2 = (x0 * x0) + (x1 * x1) + (x2 * x2);
 
-		if (len < Number.EPSILON) {
+		if (len2 < Number.EPSILON) {
 			x0 = 0;
 			x1 = 0;
 			x2 = 0;
 		} else {
-			len = Math.rsqrt(len);
+			const lenInv = Math.rsqrt(len2);
 
-			x0 *= len;
-			x1 *= len;
-			x2 *= len;
+			x0 *= lenInv;
+			x1 *= lenInv;
+			x2 *= lenInv;
 		}
 
 		let y0 = (z1 * x2) - (z2 * x1);
 		let y1 = (z2 * x0) - (z0 * x2);
 		let y2 = (z0 * x1) - (z1 * x0);
 
-		len = (y0 * y0) + (y1 * y1) + (y2 * y2);
+		len2 = (y0 * y0) + (y1 * y1) + (y2 * y2);
 
-		if (len < Number.EPSILON) {
+		if (len2 < Number.EPSILON) {
 			y0 = 0;
 			y1 = 0;
 			y2 = 0;
 		} else {
-			len = Math.rsqrt(len);
+			const lenInv = Math.rsqrt(len2);
 
-			y0 *= len;
-			y1 *= len;
-			y2 *= len;
+			y0 *= lenInv;
+			y1 *= lenInv;
+			y2 *= lenInv;
 		}
 
 		let x3 = -((x0 * xPos) + (x1 * yPos) + (x2 * zPos));

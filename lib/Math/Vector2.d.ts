@@ -8,6 +8,6 @@ declare class Vector2 extends Vector {
     static readonly up: Vector2;
     static readonly down: Vector2;
     constructor(x: Vector2 | X, y?: number);
-    clone(): Vector2;
+    copy(): Vector2;
 }
 export default Vector2;

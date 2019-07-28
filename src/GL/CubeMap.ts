@@ -1,6 +1,7 @@
+import { Exception, Path } from '../Core';
+import { CubeMapFlags, DirectDrawSurfaceParser } from '../Parsers';
 import Context from './Context';
-import { Path, Exception } from '../Core';
-import { DirectDrawSurfaceParser, CubeMapFlags } from '../Parsers';
+import TextureFilterMode from './Helpers/TextureFilterMode';
 import Texture, { CubeMapFace, Mipmap, TextureFormat, TextureTarget } from './Texture';
 
 /**
@@ -32,6 +33,10 @@ class CubeMap extends Texture<WebGLTexture> {
 
 		result.name = name;
 		result.mipmapCount = dds.mipmapCount;
+
+		if (result.mipmapCount) {
+			result.filterMode = TextureFilterMode.Trilinear;
+		}
 
 		result.parse(dds);
 

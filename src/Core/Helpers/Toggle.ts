@@ -22,7 +22,7 @@ class Toggle<T = string> {
 	}
 
 	public toArray(): T[] {
-		return this.enabled;
+		return [...this.enabled];
 	}
 }
 

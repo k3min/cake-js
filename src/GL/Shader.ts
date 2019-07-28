@@ -48,7 +48,7 @@ class Shader extends BindableObject<Shader> implements Disposable {
 	}
 
 	public set keywords(value: Null<string[]>) {
-		let id = '';
+		let id: string = '';
 
 		if (value && value.length > 0) {
 			id = value.sort().join(',');
@@ -125,7 +125,7 @@ class Shader extends BindableObject<Shader> implements Disposable {
 	private getUniform(name: string, type: string, check: boolean = true): Null<WebGLUniformLocation> {
 		this.bind();
 
-		const uniform: WebGLUniformLocation = this.uniforms.get(name) as WebGLUniformLocation;
+		const uniform: WebGLUniformLocation = this.variant.uniforms.get(name) as WebGLUniformLocation;
 
 		if (uniform) {
 			return uniform;
@@ -138,6 +138,14 @@ class Shader extends BindableObject<Shader> implements Disposable {
 		return null;
 	}
 
+	private check() {
+		const error = Context.getError();
+
+		if (error) {
+			throw new ReferenceError(`Shader (${ this.name }): ${ Context.enumToString(error).join(' | ') }`);
+		}
+	}
+
 	public setColor(name: string, value: Color, check: boolean = true): void {
 		const uniform: WebGLUniformLocation = this.getUniform(name, 'Color', check) as WebGLUniformLocation;
 
@@ -146,6 +154,10 @@ class Shader extends BindableObject<Shader> implements Disposable {
 		}
 
 		Context.uniform4fv(uniform, value.linear);
+
+		if (check) {
+			this.check();
+		}
 	}
 
 	public setFloat(name: string, value: GLfloat, check: boolean = true): void {
@@ -156,6 +168,10 @@ class Shader extends BindableObject<Shader> implements Disposable {
 		}
 
 		Context.uniform1f(uniform, value);
+
+		if (check) {
+			this.check();
+		}
 	}
 
 	public setInt(name: string, value: GLint, check: boolean = true): void {
@@ -166,6 +182,10 @@ class Shader extends BindableObject<Shader> implements Disposable {
 		}
 
 		Context.uniform1i(uniform, value);
+
+		if (check) {
+			this.check();
+		}
 	}
 
 	public setMatrix4x4(name: string, value: Matrix4x4, check: boolean = true): void {
@@ -176,6 +196,10 @@ class Shader extends BindableObject<Shader> implements Disposable {
 		}
 
 		Context.uniformMatrix4fv(uniform, false, value);
+
+		if (check) {
+			this.check();
+		}
 	}
 
 	public setVector(name: string, value: Vector, check: boolean = true): void {
@@ -197,6 +221,13 @@ class Shader extends BindableObject<Shader> implements Disposable {
 			case Vector4.LENGTH:
 				Context.uniform4fv(uniform, value);
 				break;
+
+			default:
+				throw new TypeError(`Shader (${ this.name }): uniform ${ name } has invalid length ${ value.length }`);
+		}
+
+		if (check) {
+			this.check();
 		}
 	}
 
@@ -212,6 +243,10 @@ class Shader extends BindableObject<Shader> implements Disposable {
 
 			if (uniform2) {
 				Context.uniform4fv(uniform2, texture.texelSize);
+
+				if (check) {
+					this.check();
+				}
 			}
 		}
 
@@ -227,6 +262,10 @@ class Shader extends BindableObject<Shader> implements Disposable {
 		texture.bind();
 
 		Context.uniform1i(uniform, index);
+
+		if (check) {
+			this.check();
+		}
 	}
 
 	public static setFloat(name: string, value: number): void {

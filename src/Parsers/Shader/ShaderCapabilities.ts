@@ -1,3 +1,4 @@
+import Context from '../../GL/Context';
 import BlendFunction from '../../GL/Helpers/BlendFunction';
 import CompareFunction from '../../GL/Helpers/CompareFunction';
 import CullingMode from '../../GL/Helpers/CullingMode';
@@ -113,7 +114,7 @@ const cast = <From, To>(input: From, from: Object, to: Object): To => {
 
 	const value = Object.values(to)[valueIndex];
 
-	console.debug(`ShaderCapability: ${ input } → ${ value }`);
+	console.debug(`ShaderCapability: '${ input }' → ${ Context.enumToString(value).join(' | ') } (${ value })`);
 
 	return value;
 };

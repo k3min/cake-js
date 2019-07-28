@@ -11,6 +11,7 @@ declare class Renderer extends Transform implements Drawable {
     readonly scale: Vector3;
     protected readonly modelView: Matrix4x4;
     protected readonly modelViewProjection: Matrix4x4;
+    protected readonly prevLocalToWorld: Matrix4x4;
     update(): void;
     draw(): void;
     protected disposing(): void;

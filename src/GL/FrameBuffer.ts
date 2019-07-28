@@ -15,14 +15,14 @@ class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> 
 
 	public readonly attachments: Map<FrameBufferAttachment, Texture> = new Map<FrameBufferAttachment, Texture>();
 
-	public color: Null<Texture | Texture[]> = null;
+	public color: Null<Texture | ArrayLike<Texture>> = null;
 	public depth: Null<Texture> = null;
 
 	protected get identifier(): string {
 		return 'FrameBuffer';
 	}
 
-	public constructor(color: Null<Texture | Texture[]> = null, depth: Null<Texture> = null) {
+	public constructor(color: Null<Texture | ArrayLike<Texture>> = null, depth: Null<Texture> = null) {
 		super(() => Context.createFramebuffer(), (handle) => Context.bindFramebuffer(Context.FRAMEBUFFER, handle), (handle) => Context.deleteFramebuffer(handle));
 
 		this.color = color;
@@ -63,19 +63,25 @@ class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> 
 					this.detach(FrameBufferAttachment.Stencil);
 					this.attach(FrameBufferAttachment.DepthStencil, this.depth);
 					break;
+
+				default:
+					throw new TypeError(`FrameBuffer (${ this.name }): unknown depth format '${ this.depth.format }'`);
 			}
 		}
 
 		if (this.color !== null) {
 			if (isArrayLike(this.color)) {
-				const textures: Texture[] = this.color as Texture[];
+				const textures: ArrayLike<Texture> = this.color as ArrayLike<Texture>;
+				const buffers: FrameBufferAttachment[] = new Array<FrameBufferAttachment>(textures.length);
 
-				Context.drawBuffers(textures.map((_, index: number): FrameBufferAttachment => {
-					return FrameBufferAttachment.Color + index;
-				}));
+				for (let index = 0; index < buffers.length; index++) {
+					buffers[index] = FrameBufferAttachment.Color + index;
+				}
 
-				textures.forEach((texture: Texture, index: number): void => {
-					this.attach(FrameBufferAttachment.Color + index, texture);
+				Context.drawBuffers(buffers);
+
+				buffers.forEach((buffer: FrameBufferAttachment, index: number): void => {
+					this.attach(buffer, textures[index]);
 				});
 			} else {
 				const texture: Texture = this.color as Texture;
@@ -111,6 +117,9 @@ class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> 
 
 			case Context.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
 				throw new Error('FrameBuffer: incomplete missing attachment');
+
+			default:
+				break;
 		}
 	}
 

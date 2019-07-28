@@ -39,15 +39,13 @@ class Vector3 extends Vector {
 		super(Vector3.LENGTH, x, y, z, 0);
 	}
 
-	public static cross(a: Vector3, b: Vector3): Vector3 {
-		return new Vector3([
-			(a[1] * b[2]) - (a[2] * b[1]),
-			(a[2] * b[0]) - (a[0] * b[2]),
-			(a[0] * b[1]) - (a[1] * b[0]),
-		]);
+	public static cross(a: Vector3, b: Vector3, result: Vector3): void {
+		result[0] = (a[1] * b[2]) - (a[2] * b[1]);
+		result[1] = (a[2] * b[0]) - (a[0] * b[2]);
+		result[2] = (a[0] * b[1]) - (a[1] * b[0]);
 	}
 
-	public clone(): Vector3 {
+	public copy(): Vector3 {
 		return new Vector3(this[0], this[1], this[2]);
 	}
 }
