@@ -12,6 +12,7 @@ export enum TextureFormat {
 	R5G5B5A1,
 	RGBA16,
 	RGBAFloat,
+	RGBAHalf,
 	Depth,
 	Depth16,
 	Depth32,

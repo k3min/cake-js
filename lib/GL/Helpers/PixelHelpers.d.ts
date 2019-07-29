@@ -14,7 +14,8 @@ export declare enum PixelType {
     Ushort4444 = 32819,
     Ushort5551 = 32820,
     Ushort565 = 33635,
-    DepthStencil = 34042
+    DepthStencil = 34042,
+    Half = 36193
 }
 export declare const pixelFormat: (format: TextureFormat) => PixelFormat;
 export declare const pixelType: (format: TextureFormat) => PixelType;

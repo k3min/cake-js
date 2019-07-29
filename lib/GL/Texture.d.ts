@@ -10,11 +10,12 @@ export declare enum TextureFormat {
     R5G5B5A1 = 4,
     RGBA16 = 5,
     RGBAFloat = 6,
-    Depth = 7,
-    Depth16 = 8,
-    Depth32 = 9,
-    Stencil = 10,
-    DepthStencil = 11
+    RGBAHalf = 7,
+    Depth = 8,
+    Depth16 = 9,
+    Depth32 = 10,
+    Stencil = 11,
+    DepthStencil = 12
 }
 export interface Mipmap {
     data: Null<ArrayBufferView>;

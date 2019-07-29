@@ -1,7 +1,7 @@
 import { Resource, ResourceType } from '../../Core';
+import Exception from '../../Core/Exception';
 import { BinaryReader } from '../../Core/Helpers';
 import { TextureFormat } from '../../GL';
-import Exception from '../../Core/Exception';
 import DXGIFormat from './DXGIFormat';
 import { CubeMapFlags, HeaderFlags, PixelFormatFlags, SurfaceFlags } from './Flags';
 import { DirectDrawSurfaceHeader, DX10Header, PixelFormatHeader } from './Headers';
@@ -118,6 +118,9 @@ class DirectDrawSurfaceParser {
 			case DXGIFormat.rgba32_float:
 			case PixelFormat.A32B32G32R32F:
 				return TextureFormat.RGBAFloat;
+
+			case DXGIFormat.rgba16_float:
+				return TextureFormat.RGBAHalf;
 
 			case DXGIFormat.rgba8_sint:
 			case DXGIFormat.rgba8_snorm:

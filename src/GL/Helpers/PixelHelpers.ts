@@ -17,6 +17,7 @@ export enum PixelType {
 	Ushort5551 = 0x8034, // GL_UNSIGNED_SHORT_5_5_5_1
 	Ushort565 = 0x8363, // GL_UNSIGNED_SHORT_5_6_5
 	DepthStencil = 0x84FA, // EXT_UNSIGNED_INT_24_8_WEBGL
+	Half = 0x8D61, // EXT_HALF
 }
 
 export const pixelFormat = (format: TextureFormat): PixelFormat => {
@@ -27,6 +28,7 @@ export const pixelFormat = (format: TextureFormat): PixelFormat => {
 		case TextureFormat.RGBA32:
 		case TextureFormat.RGBA16:
 		case TextureFormat.RGBAFloat:
+		case TextureFormat.RGBAHalf:
 		case TextureFormat.R5G5B5A1:
 			return PixelFormat.RGBA;
 
@@ -40,7 +42,7 @@ export const pixelFormat = (format: TextureFormat): PixelFormat => {
 
 		case TextureFormat.DepthStencil:
 			return PixelFormat.DepthStencil;
-			
+
 		default:
 			throw new RangeError();
 	}
@@ -64,6 +66,9 @@ export const pixelType = (format: TextureFormat): PixelType => {
 
 		case TextureFormat.RGBAFloat:
 			return PixelType.Float;
+
+		case TextureFormat.RGBAHalf:
+			return PixelType.Half;
 
 		case TextureFormat.Depth16:
 			return PixelType.Ushort;
