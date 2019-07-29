@@ -18,7 +18,6 @@ interface Context extends Omit<WebGLRenderingContext, 'clear' | 'enable' | 'disa
 	_extensions: Storage<any>;
 
 	ext: WEBGL_draw_buffers;
-	depth: WEBGL_depth_texture;
 
 	getErrorRaw(): GLenum;
 
@@ -51,7 +50,7 @@ interface Context extends Omit<WebGLRenderingContext, 'clear' | 'enable' | 'disa
 
 if (!('gl' in window)) {
 	Object.defineProperty(window, 'gl', {
-		value: document.createElement('canvas').getContext('webgl', {
+		value: document.createElement('canvas').getContext('webgl2', {
 			antialias: false,
 		}),
 	});
@@ -206,7 +205,6 @@ if (!('gl' in window)) {
 
 	Object.defineProperties((window as any).gl, {
 		ext: { value: ((window as any).gl as Context).requireExtension<WEBGL_draw_buffers>('WEBGL_draw_buffers') },
-		depth: { value: ((window as any).gl as Context).requireExtension<WEBGL_depth_texture>('WEBGL_depth_texture') },
 	});
 
 	Log.debug('Context: created');

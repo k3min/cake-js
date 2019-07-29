@@ -14,7 +14,6 @@ interface Context extends Omit<WebGLRenderingContext, 'clear' | 'enable' | 'disa
     _enabled: Toggle<Capability>;
     _extensions: Storage<any>;
     ext: WEBGL_draw_buffers;
-    depth: WEBGL_depth_texture;
     getErrorRaw(): GLenum;
     clearRaw(mask: GLbitfield): void;
     enableRaw(cap: Capability): void;
