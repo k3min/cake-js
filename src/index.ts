@@ -32,6 +32,7 @@ export {
 	ResourceType,
 	Exception,
 	Copyable,
+	Log,
 } from './Core';
 
 export {

@@ -1,6 +1,5 @@
-import { BinaryReader, Indexable, TextReader } from './Helpers';
+import { BinaryReader, Indexable, TextReader, fetch, ResponseType } from './Helpers';
 import Exception from './Exception';
-import { Path } from './index';
 
 type Resourceable = BinaryReader | TextReader | Indexable<any> | ArrayLike<any>;
 
@@ -13,18 +12,10 @@ export enum ResourceType {
 
 class Resource {
 	public static async load<T extends Resourceable>(uri: string, type: ResourceType): Promise<T> {
-		let response: Response;
-
-		console.debug(`Resource: loading '${ uri }'`);
+		let response: any;
 
 		try {
-
-			response = await fetch(Resource.url(uri), {
-				method: 'GET',
-				headers: {
-					'accept': type,
-				},
-			});
+			response = await fetch(uri, Resource.responseType(type));
 		} catch (e) {
 			throw new Exception(`Resource: failed to load '${ uri }'`, e);
 		}
@@ -32,31 +23,31 @@ class Resource {
 		return await Resource.parse<T>(response, type);
 	}
 
-	public static url(uri: string): string {
-		const origin = location.origin;
-		const pathname = location.pathname;
-
-		const url: URL = new URL(`${ origin }/${ Path.combine(pathname, uri) }`);
-
-		url.searchParams.append('timestamp', Date.now().toString());
-
-		return url.toString();
-	}
-
-	private static async parse<T extends Resourceable>(response: Response, type: ResourceType): Promise<T> {
+	private static responseType(type: ResourceType): ResponseType {
 		switch (type) {
 			case ResourceType.DDS:
-				return new BinaryReader(await response.arrayBuffer()) as T;
+				return ResponseType.ArrayBuffer;
 
 			case ResourceType.OBJ:
 			case ResourceType.GLSL:
-				return new TextReader(await response.text()) as T;
+				return ResponseType.Text;
 
 			case ResourceType.JSON:
-				return await response.json() as T;
+				return ResponseType.JSON;
+		}
+	}
 
-			default:
-				throw new RangeError();
+	private static parse<T extends Resourceable>(response: any, type: ResourceType): T {
+		switch (type) {
+			case ResourceType.DDS:
+				return new BinaryReader(response) as T;
+
+			case ResourceType.OBJ:
+			case ResourceType.GLSL:
+				return new TextReader(response) as T;
+
+			case ResourceType.JSON:
+				return response as T;
 		}
 	}
 }

@@ -1,5 +1,5 @@
-import { Exception, Path, Resource } from '../Core';
-import { isArrayLike } from '../Core/Helpers';
+import { Exception, Path } from '../Core';
+import { isArrayLike, version } from '../Core/Helpers';
 import Math, { Vector4 } from '../Math';
 import { DirectDrawSurfaceParser } from '../Parsers';
 import Context from './Context';
@@ -54,7 +54,7 @@ class Texture2D extends Texture<WebGLTexture> {
 				resolve(result);
 			});
 
-			image.src = Resource.url(uri);
+			image.src = version(uri);
 		});
 	}
 

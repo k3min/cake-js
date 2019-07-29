@@ -8,7 +8,7 @@ export declare enum ResourceType {
 }
 declare class Resource {
     static load<T extends Resourceable>(uri: string, type: ResourceType): Promise<T>;
-    static url(uri: string): string;
+    private static responseType;
     private static parse;
 }
 export default Resource;

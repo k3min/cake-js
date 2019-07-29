@@ -1,4 +1,4 @@
-import { Exception, Path, Base, Bindable } from '../Core';
+import { Exception, Path, Base, Bindable, Log } from '../Core';
 import { Null, Storage } from '../Core/Helpers';
 import { Color, Matrix4x4, Vector, Vector2, Vector3, Vector4 } from '../Math';
 
@@ -132,7 +132,7 @@ class Shader extends Base implements Bindable {
 			return;
 		}
 
-		console.warn(log);
+		Log.warn(log);
 
 		this.log.push(log);
 	}

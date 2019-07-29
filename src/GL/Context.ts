@@ -1,3 +1,4 @@
+import { Log } from '../Core';
 import { Null, Toggle, Omit } from '../Core/Helpers';
 import Storage from '../Core/Helpers/Storage';
 import Vector4 from '../Math/Vector4';
@@ -208,7 +209,7 @@ if (!('gl' in window)) {
 		depth: { value: ((window as any).gl as Context).requireExtension<WEBGL_depth_texture>('WEBGL_depth_texture') },
 	});
 
-	console.debug('Context: created');
+	Log.debug('Context: created');
 }
 
 export default (window as any).gl as Context;

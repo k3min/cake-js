@@ -1,3 +1,4 @@
+import { Log } from '../Core';
 import { Null, Storage } from '../Core/Helpers';
 import { BindableGraphicsObject } from './Helpers';
 import Context from './Context';
@@ -123,7 +124,7 @@ class ShaderProgram extends BindableGraphicsObject<ShaderProgram, WebGLProgram> 
 
 		const error: string = errors.filter((error: string): boolean => !!error).join('\n');
 
-		console.error(`ShaderProgram (${ this.name }): SyntaxError\n${ error }\n`);
+		Log.error(`ShaderProgram (${ this.name }): SyntaxError\n${ error }\n`);
 	}
 
 	protected disposing(): void {

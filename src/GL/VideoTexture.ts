@@ -1,4 +1,5 @@
-import { Path, Resource } from '../Core';
+import { Path } from '../Core';
+import { version } from '../Core/Helpers';
 import { TextureFormat } from './Texture';
 import Texture2D from './Texture2D';
 
@@ -10,7 +11,7 @@ class VideoTexture extends Texture2D {
 		video.muted = true;
 		video.loop = true;
 
-		video.src = Resource.url(uri);
+		video.src = version(uri);
 
 		await video.play();
 

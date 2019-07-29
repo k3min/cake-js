@@ -1,4 +1,4 @@
-import { Bindable } from '../../Core';
+import { Bindable, Log } from '../../Core';
 import { Indexable } from '../../Core/Helpers';
 import Storage from '../../Core/Helpers/Storage';
 import Context from '../Context';
@@ -138,7 +138,7 @@ class VertexArrayBuffer<T extends Indexable<VertexAttribute>> extends ArrayBuffe
 
 		const log: string = `VertexArrayBuffer: attribute ${ name } not found`;
 
-		console.warn(log);
+		Log.warn(log);
 
 		this.log[name] = log;
 	}

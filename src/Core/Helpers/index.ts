@@ -6,4 +6,5 @@ export { default as Indexable } from './Indexable';
 export { default as BindableObject } from './BindableObject';
 export { default as TextReader } from './TextReader';
 export { default as BinaryReader } from './BinaryReader';
+export { default as fetch, ResponseType, version } from './Fetch';
 export { isArrayLike } from './ArrayHelpers';
