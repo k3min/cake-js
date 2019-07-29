@@ -180,7 +180,7 @@ class ShaderParser {
 		this.extensions.push(extension);
 
 		if (Context.getExtension(extension) !== null) {
-			line += `\n#define ${ extension }`;
+			line += `\n#define ${ extension } 1`;
 		}
 
 		return line;

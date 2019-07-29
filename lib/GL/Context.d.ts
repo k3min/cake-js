@@ -1,6 +1,6 @@
-import { Null, Toggle, Omit } from '../Core/Helpers';
-import Storage from '../Core/Helpers/Storage';
-import Vector4 from '../Math/Vector4';
+/// <reference types="webgl2" />
+import { Null, Toggle, Omit, Storage } from '../Core/Helpers';
+import { Vector4 } from '../Math';
 import { Capability } from './Helpers';
 export declare enum ContextError {
     None = 0,
@@ -10,11 +10,15 @@ export declare enum ContextError {
     OutOfMemory = 1285,
     InvalidFramebufferOperation = 1286
 }
-interface Context extends Omit<WebGLRenderingContext, 'clear' | 'enable' | 'disable' | 'getExtension'> {
-    _enabled: Toggle<Capability>;
-    _extensions: Storage<any>;
-    ext: WEBGL_draw_buffers;
+declare type Override = 'clear' | 'enable' | 'disable' | 'getExtension' | 'getError' | 'drawBuffers';
+declare type RenderingContext = WebGLRenderingContext & WebGL2RenderingContext;
+interface Context extends Omit<RenderingContext, Override> {
+    readonly _enabled: Toggle<Capability>;
+    readonly _extensions: Storage<any>;
+    readonly ext?: WEBGL_draw_buffers;
+    readonly isWebGL2: boolean;
     getErrorRaw(): GLenum;
+    drawBuffersRaw?(buffers: GLenum[]): void;
     clearRaw(mask: GLbitfield): void;
     enableRaw(cap: Capability): void;
     disableRaw(cap: Capability): void;

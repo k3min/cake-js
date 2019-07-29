@@ -1,7 +1,6 @@
 import { Log } from '../Core';
-import { Null, Toggle, Omit } from '../Core/Helpers';
-import Storage from '../Core/Helpers/Storage';
-import Vector4 from '../Math/Vector4';
+import { Null, Toggle, Omit, Storage } from '../Core/Helpers';
+import { Vector4 } from '../Math';
 import { Capability } from './Helpers';
 
 export enum ContextError {
@@ -13,13 +12,20 @@ export enum ContextError {
 	InvalidFramebufferOperation = 0x0506, // GL_Invalid_Framebuffer_Operation
 }
 
-interface Context extends Omit<WebGLRenderingContext, 'clear' | 'enable' | 'disable' | 'getExtension'> {
-	_enabled: Toggle<Capability>;
-	_extensions: Storage<any>;
+type Override = 'clear' | 'enable' | 'disable' | 'getExtension' | 'getError' | 'drawBuffers';
+type RenderingContext = WebGLRenderingContext & WebGL2RenderingContext;
 
-	ext: WEBGL_draw_buffers;
+interface Context extends Omit<RenderingContext, Override> {
+	readonly _enabled: Toggle<Capability>;
+	readonly _extensions: Storage<any>;
+
+	readonly ext?: WEBGL_draw_buffers;
+
+	readonly isWebGL2: boolean;
 
 	getErrorRaw(): GLenum;
+
+	drawBuffersRaw?(buffers: GLenum[]): void;
 
 	clearRaw(mask: GLbitfield): void;
 
@@ -50,20 +56,33 @@ interface Context extends Omit<WebGLRenderingContext, 'clear' | 'enable' | 'disa
 
 if (!('gl' in window)) {
 	Object.defineProperty(window, 'gl', {
-		value: document.createElement('canvas').getContext('webgl2', {
+		value: document.createElement('canvas').getContext('webgl', {
 			antialias: false,
 		}),
 	});
 
-	Object.defineProperties((window as any).gl, {
+	const gl: Context = (window as any).gl;
+
+	Object.defineProperties(gl, {
 		_enabled: { value: new Toggle<Capability>() },
 		_extensions: { value: new Storage<any>() },
 
-		getErrorRaw: { value: ((window as any).gl as WebGLRenderingContext).getError },
-		getExtensionRaw: { value: ((window as any).gl as WebGLRenderingContext).getExtension },
-		enableRaw: { value: ((window as any).gl as WebGLRenderingContext).enable },
-		disableRaw: { value: ((window as any).gl as WebGLRenderingContext).disable },
-		clearRaw: { value: ((window as any).gl as WebGLRenderingContext).clear },
+		drawBuffersRaw: { value: gl.drawBuffers },
+		getErrorRaw: { value: gl.getError },
+		getExtensionRaw: { value: gl.getExtension },
+		enableRaw: { value: gl.enable },
+		disableRaw: { value: gl.disable },
+		clearRaw: { value: gl.clear },
+
+		isWebGL2: {
+			enumerable: true,
+			value: (gl instanceof WebGL2RenderingContext),
+		},
+
+		canvas: {
+			enumerable: true,
+			value: gl.canvas,
+		},
 
 		enumToString: {
 			value: function (value: GLenum): string[] {
@@ -81,12 +100,14 @@ if (!('gl' in window)) {
 		},
 
 		getError: {
+			enumerable: true,
 			value: function (): ContextError {
 				return (this as Context).getErrorRaw();
 			},
 		},
 
 		getExtension: {
+			enumerable: true,
 			value: function <T>(name: string): Null<T> {
 				const _this: Context = this as Context;
 				const _cache: Null<T> = _this._extensions.get(name);
@@ -108,12 +129,13 @@ if (!('gl' in window)) {
 		},
 
 		requireExtension: {
+			enumerable: true,
 			value: function <T>(name: string): T {
 				const _this: Context = this as Context;
 				const _ext: Null<T> = _this.getExtension<T>(name);
 
 				if (_ext === null) {
-					throw new ReferenceError(`'${ name }' not supported!`);
+					throw new ReferenceError(`Context: '${ name }' not supported`);
 				}
 
 				return _ext;
@@ -121,6 +143,7 @@ if (!('gl' in window)) {
 		},
 
 		getExtensions: {
+			enumerable: true,
 			value: function (names: string[]): void {
 				const _this: Context = this as Context;
 
@@ -131,12 +154,22 @@ if (!('gl' in window)) {
 		},
 
 		drawBuffers: {
+			enumerable: true,
 			value: function (buffers: GLenum[]): void {
-				(this as Context).ext.drawBuffersWEBGL(buffers);
+				const _this: Context = this as Context;
+
+				if (_this.ext) {
+					_this.ext.drawBuffersWEBGL(buffers);
+				} else if (_this.drawBuffersRaw) {
+					_this.drawBuffersRaw(buffers);
+				} else {
+					throw new ReferenceError(`Context: 'drawBuffers' not supported`);
+				}
 			},
 		},
 
 		enable: {
+			enumerable: true,
 			value: function (cap: Capability): boolean {
 				const _this: Context = this as Context;
 				const _enable: boolean = _this._enabled.set(cap, true);
@@ -150,6 +183,7 @@ if (!('gl' in window)) {
 		},
 
 		disable: {
+			enumerable: true,
 			value: function (cap: Capability): void {
 				const _this: Context = this as Context;
 
@@ -160,6 +194,7 @@ if (!('gl' in window)) {
 		},
 
 		clear: {
+			enumerable: true,
 			value: function (color: Vector4 | boolean = false, depth: GLclampf | boolean = false, stencil: GLint | boolean = false): void {
 				const _this: Context = this as Context;
 
@@ -203,8 +238,11 @@ if (!('gl' in window)) {
 		},
 	});
 
-	Object.defineProperties((window as any).gl, {
-		ext: { value: ((window as any).gl as Context).requireExtension<WEBGL_draw_buffers>('WEBGL_draw_buffers') },
+	Object.defineProperties(gl, {
+		ext: {
+			enumerable: true,
+			value: gl.getExtension<WEBGL_draw_buffers>('WEBGL_draw_buffers'),
+		},
 	});
 
 	Log.debug('Context: created');

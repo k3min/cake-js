@@ -106,11 +106,17 @@ class Shader extends Base implements Bindable {
 
 			attachment.name = `${ this.name } (${ id })`;
 
-			if (!attachment.attach(ShaderType.Vertex, defines.concat(this.parser.vertexSource))) {
+			const es: string[] = [`#define WEBGL2 ${ Context.isWebGL2 ? 1 : 0 }`];
+
+			if (Context.isWebGL2) {
+				es.unshift('#version 100');
+			}
+
+			if (!attachment.attach(ShaderType.Vertex, [...es, ...defines, ...this.parser.vertexSource])) {
 				return;
 			}
 
-			if (!attachment.attach(ShaderType.Fragment, defines.concat(this.parser.fragmentSource))) {
+			if (!attachment.attach(ShaderType.Fragment, [...es, ...defines, ...this.parser.fragmentSource])) {
 				return;
 			}
 
