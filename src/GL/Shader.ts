@@ -97,7 +97,7 @@ class Shader extends Base implements Bindable {
 		return shader;
 	}
 
-	public apply(): void {
+	private apply(): void {
 		this.parser.keywords.forEach((keywords: string[]) => {
 			const defines: string[] = keywords.map((keyword: string): string => `#define ${ keyword }`);
 			const id: string = keywords.sort().toString() || 'default';

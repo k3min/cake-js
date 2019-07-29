@@ -1,4 +1,4 @@
-import Copyable from '../Core/Copyable';
+import { Copyable } from '../Core';
 export declare type X = ArrayLike<number> | number;
 declare abstract class Vector extends Float32Array implements Copyable<Vector> {
     x: number;

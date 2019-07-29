@@ -6,6 +6,9 @@ export enum BufferType {
 	ElementArray = 0x8893, // GL_ELEMENT_ARRAY_BUFFER
 }
 
+/**
+ * @todo Implement observable pattern
+ */
 abstract class Buffer<T extends ArrayBuffer> extends BindableGraphicsObject<Buffer<T>, WebGLBuffer> implements Drawable {
 	public name: string = 'Buffer';
 

@@ -6,7 +6,8 @@ import Material from './Material';
 import Quad from './Quad';
 
 class Graphics implements Disposable {
-	private disposed: boolean = false;
+	public disposed: boolean = false;
+
 	public readonly framebuffer: FrameBuffer = new FrameBuffer();
 	public readonly quad: Quad = new Quad();
 
@@ -48,7 +49,7 @@ class Graphics implements Disposable {
 		this.framebuffer.color = color;
 		this.framebuffer.depth = depth;
 
-		this.framebuffer.apply(false);
+		this.framebuffer.apply();
 	}
 
 	public blit(a: Null<Texture>, b: Null<Texture>, material: Material): void {

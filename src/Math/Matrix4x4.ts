@@ -1,4 +1,4 @@
-import Copyable from '../Core/Copyable';
+import { Copyable } from '../Core';
 import Math from './Math';
 import Quaternion from './Quaternion';
 import Vector3 from './Vector3';

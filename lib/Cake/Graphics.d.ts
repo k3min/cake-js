@@ -5,7 +5,7 @@ import { Null } from '../Core/Helpers';
 import Material from './Material';
 import Quad from './Quad';
 declare class Graphics implements Disposable {
-    private disposed;
+    disposed: boolean;
     readonly framebuffer: FrameBuffer;
     readonly quad: Quad;
     dispose(): void;

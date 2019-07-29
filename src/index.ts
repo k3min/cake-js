@@ -23,6 +23,18 @@ export {
 } from './Cake';
 
 export {
+	Bindable,
+	Disposable,
+	Base,
+	Path,
+	Updatable,
+	Resource,
+	ResourceType,
+	Exception,
+	Copyable,
+} from './Core';
+
+export {
 	default as Math,
 	Vector2,
 	Vector3,

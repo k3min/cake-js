@@ -10,7 +10,7 @@ declare class Texture2D extends Texture<WebGLTexture> {
     /**
      * @todo Make this more generic
      */
-    static loadRaw(uri: string): Promise<Texture2D>;
+    static loadRaw(uri: string, mipChain?: boolean): Promise<Texture2D>;
     static load(uri: string, format: TextureFormat, mipChain?: boolean): Promise<Texture2D>;
     apply(updateMipmaps?: boolean): void;
 }

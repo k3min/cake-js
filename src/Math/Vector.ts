@@ -1,4 +1,4 @@
-import Copyable from '../Core/Copyable';
+import { Copyable } from '../Core';
 import { isArrayLike } from '../Core/Helpers';
 import Math from './Math';
 

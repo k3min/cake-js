@@ -1,21 +1,17 @@
 import Disposable from './Disposable';
 
 abstract class Base implements Disposable {
+	public disposed: boolean = false;
 	public abstract name: string;
-	protected _disposed: boolean = false;
-
-	public get disposed(): boolean {
-		return this._disposed;
-	}
 
 	public dispose(): void {
-		if (this._disposed) {
+		if (this.disposed) {
 			throw new ReferenceError(`Base ${ this.name }: already disposed`);
 		}
 
 		this.disposing();
 
-		this._disposed = true;
+		this.disposed = true;
 	}
 
 	protected abstract disposing(): void;

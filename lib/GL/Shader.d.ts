@@ -27,7 +27,7 @@ declare class Shader extends Base implements Bindable {
     readonly variant: ShaderProgram;
     keywords: Null<string[]>;
     static load(uri: string): Promise<Shader>;
-    apply(): void;
+    private apply;
     private logUniformNotFound;
     private getUniform;
     setColor(name: string, value: Color, check?: boolean): void;

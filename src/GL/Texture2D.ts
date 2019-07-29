@@ -20,7 +20,7 @@ class Texture2D extends Texture<WebGLTexture> {
 	/**
 	 * @todo Make this more generic
 	 */
-	public static async loadRaw(uri: string): Promise<Texture2D> {
+	public static async loadRaw(uri: string, mipChain: boolean = false): Promise<Texture2D> {
 		const name: string = Path.getFileName(uri);
 
 		let raw: DirectDrawSurfaceParser;
@@ -34,7 +34,7 @@ class Texture2D extends Texture<WebGLTexture> {
 		const result: Texture2D = new Texture2D(raw.width, raw.height, raw.textureFormat);
 
 		result.data = new Float32Array(raw.reader.buffer, 4 + raw.ddsHeader.size, raw.width * raw.height * 4);
-		result.apply(false);
+		result.apply(mipChain);
 
 		return result;
 	}
@@ -58,7 +58,7 @@ class Texture2D extends Texture<WebGLTexture> {
 		});
 	}
 
-	public apply(updateMipmaps: boolean = true): void {
+	public apply(updateMipmaps: boolean = false): void {
 		super.apply();
 
 		this.texelSize[0] = 1 / this.width;

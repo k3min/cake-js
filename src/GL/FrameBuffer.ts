@@ -29,11 +29,11 @@ class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFramebuffer> 
 		this.depth = depth;
 
 		if (this.color !== null || this.depth !== null) {
-			this.apply();
+			this.apply(true);
 		}
 	}
 
-	public apply(check: boolean = true): void {
+	public apply(check: boolean = false): void {
 		this.bind();
 
 		this.detach();

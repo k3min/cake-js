@@ -10,7 +10,7 @@ abstract class BindableObject<T extends BindableObject<T>> extends Base implemen
 	protected abstract get identifier(): string;
 
 	public bind(): boolean {
-		if (this._disposed) {
+		if (this.disposed) {
 			throw new ReferenceError(`${ this.identifier } (${ this.name }): disposed`);
 		}
 

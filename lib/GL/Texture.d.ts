@@ -29,6 +29,9 @@ export declare enum TextureTarget {
     RenderBuffer = 36161
 }
 declare type TextureData = TexImageSource | ArrayBufferView | Mipmap[] | CubeMapFace[];
+/**
+ * @todo Implement observable pattern
+ */
 declare abstract class Texture<T extends WebGLObject = WebGLObject> extends BindableGraphicsObject<Texture<T>, T> {
     name: string;
     readonly target: TextureTarget;

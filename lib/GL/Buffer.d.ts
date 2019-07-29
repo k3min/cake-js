@@ -3,6 +3,9 @@ export declare enum BufferType {
     Array = 34962,
     ElementArray = 34963
 }
+/**
+ * @todo Implement observable pattern
+ */
 declare abstract class Buffer<T extends ArrayBuffer> extends BindableGraphicsObject<Buffer<T>, WebGLBuffer> implements Drawable {
     name: string;
     protected readonly data: T;

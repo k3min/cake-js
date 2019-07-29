@@ -36,6 +36,9 @@ export enum TextureTarget {
 
 type TextureData = TexImageSource | ArrayBufferView | Mipmap[] | CubeMapFace[];
 
+/**
+ * @todo Implement observable pattern
+ */
 abstract class Texture<T extends WebGLObject = WebGLObject> extends BindableGraphicsObject<Texture<T>, T> {
 	public name: string = 'Texture';
 
