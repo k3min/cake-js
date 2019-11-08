@@ -16,7 +16,6 @@ import Context from './Context';
 import { CompareFunction, Capability, CullingMode } from './Helpers';
 import ShaderProgram, { ShaderType } from './ShaderProgram';
 import Texture from './Texture';
-import Texture2D from './Texture2D';
 
 /**
  * @todo Unset uniforms without (valid) value
@@ -106,17 +105,13 @@ class Shader extends Base implements Bindable {
 
 			attachment.name = `${ this.name } (${ id })`;
 
-			const es: string[] = [`#define WEBGL2 ${ Context.isWebGL2 ? 1 : 0 }`];
+			defines.unshift('#version 300 es');
 
-			if (Context.isWebGL2) {
-				es.unshift('#version 100');
-			}
-
-			if (!attachment.attach(ShaderType.Vertex, [...es, ...defines, ...this.parser.vertexSource])) {
+			if (!attachment.attach(ShaderType.Vertex, [...defines, ...this.parser.vertexSource])) {
 				return;
 			}
 
-			if (!attachment.attach(ShaderType.Fragment, [...es, ...defines, ...this.parser.fragmentSource])) {
+			if (!attachment.attach(ShaderType.Fragment, [...defines, ...this.parser.fragmentSource])) {
 				return;
 			}
 
@@ -232,7 +227,7 @@ class Shader extends Base implements Bindable {
 			return;
 		}
 
-		if (texture instanceof Texture2D) {
+		if (texture instanceof Texture) {
 			const uniform2: WebGLUniformLocation = this.getUniform(`${ name }_TexelSize`, 'Vector4', false) as WebGLUniformLocation;
 
 			if (uniform2 !== undefined) {

@@ -30,6 +30,9 @@ abstract class Buffer<T extends ArrayBuffer> extends BindableGraphicsObject<Buff
 		this.apply();
 	}
 
+	/**
+	 * @todo Context.DYNAMIC_DRAW
+	 */
 	public apply(): void {
 		this.bind();
 
@@ -37,6 +40,8 @@ abstract class Buffer<T extends ArrayBuffer> extends BindableGraphicsObject<Buff
 	}
 
 	public abstract draw(type: PrimitiveType): void;
+
+	public abstract drawInstanced(type: PrimitiveType, count: number): void;
 }
 
 export default Buffer;

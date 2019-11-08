@@ -1,21 +1,24 @@
 import { Null } from '../Core/Helpers';
-import { BindableGraphicsObject, PixelFormat, PixelType } from './Helpers';
+import { Vector4 } from '../Math';
+import { BindableGraphicsObject, Pixel } from './Helpers';
 import TextureFilterMode from './Helpers/TextureFilterMode';
 import TextureWrapMode from './Helpers/TextureWrapMode';
 export declare enum TextureFormat {
-    Alpha8 = 0,
-    RGB24 = 1,
-    RGBA32 = 2,
-    R5G6B5 = 3,
-    R5G5B5A1 = 4,
-    RGBA16 = 5,
-    RGBAFloat = 6,
-    RGBAHalf = 7,
-    Depth = 8,
-    Depth16 = 9,
-    Depth32 = 10,
-    Stencil = 11,
-    DepthStencil = 12
+    ARGB32 = 0,
+    Depth = 1,
+    ARGBHalf = 2,
+    RGB565 = 3,
+    ARGB4444 = 4,
+    ARGB1555 = 5,
+    ARGB2101010 = 6,
+    ARGBFloat = 7,
+    RGFloat = 8,
+    RGHalf = 9,
+    RFloat = 10,
+    RHalf = 11,
+    R8 = 12,
+    RGB111110Float = 13,
+    RG16 = 14
 }
 export interface Mipmap {
     data: Null<ArrayBufferView>;
@@ -25,6 +28,7 @@ export interface Mipmap {
 export declare type CubeMapFace = Mipmap[];
 export declare enum TextureTarget {
     Texture2D = 3553,
+    Texture2DArray = 35866,
     CubeMap = 34067,
     RenderBuffer = 36161
 }
@@ -36,15 +40,15 @@ declare abstract class Texture<T extends WebGLObject = WebGLObject> extends Bind
     name: string;
     readonly target: TextureTarget;
     private readonly parameters;
-    protected data: Null<TextureData>;
+    data: Null<TextureData>;
     readonly format: TextureFormat;
     filterMode: TextureFilterMode;
     wrapMode: TextureWrapMode;
-    protected readonly pixelFormat: PixelFormat;
-    protected readonly pixelType: PixelType;
+    protected readonly pixel: Pixel;
     mipmapCount: number;
     width: number;
     height: number;
+    readonly texelSize: Vector4;
     protected readonly identifier: string;
     protected constructor(width: number, height: number, format: TextureFormat, target: TextureTarget, genFn: () => Null<T>, bindFn: (handle: Null<T>) => void, releaseFn: (handle: T) => void);
     set(name: GLenum, value: GLenum): void;

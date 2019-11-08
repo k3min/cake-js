@@ -39,10 +39,16 @@ class Vector3 extends Vector {
 		super(Vector3.LENGTH, x, y, z, 0);
 	}
 
-	public static cross(a: Vector3, b: Vector3, result: Vector3): void {
+	public static cross(a: Vector3, b: Vector3, result?: Vector3): Vector3 {
+		if (!result) {
+			result = Vector3.zero;
+		}
+
 		result[0] = (a[1] * b[2]) - (a[2] * b[1]);
 		result[1] = (a[2] * b[0]) - (a[0] * b[2]);
 		result[2] = (a[0] * b[1]) - (a[1] * b[0]);
+
+		return result;
 	}
 
 	public copy(): Vector3 {

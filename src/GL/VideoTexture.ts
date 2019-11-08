@@ -15,7 +15,7 @@ class VideoTexture extends Texture2D {
 
 		await video.play();
 
-		const result = new VideoTexture(video.videoWidth, video.videoHeight, TextureFormat.RGBA32);
+		const result = new VideoTexture(video.videoWidth, video.videoHeight, TextureFormat.ARGB32);
 
 		result.name = Path.getFileName(uri);
 		result.data = video;

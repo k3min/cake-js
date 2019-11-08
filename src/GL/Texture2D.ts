@@ -1,6 +1,6 @@
 import { Exception, Path } from '../Core';
 import { isArrayLike, version } from '../Core/Helpers';
-import Math, { Vector4 } from '../Math';
+import Math from '../Math';
 import { DirectDrawSurfaceParser } from '../Parsers';
 import Context from './Context';
 import Texture, { Mipmap, TextureFormat, TextureTarget } from './Texture';
@@ -10,8 +10,6 @@ import Texture, { Mipmap, TextureFormat, TextureTarget } from './Texture';
  */
 class Texture2D extends Texture<WebGLTexture> {
 	public name: string = 'Texture2D';
-
-	public readonly texelSize: Vector4 = new Vector4(0, 0, 0, 0);
 
 	public constructor(width: number, height: number, format: TextureFormat) {
 		super(width, height, format, TextureTarget.Texture2D, () => Context.createTexture(), (handle) => Context.bindTexture(TextureTarget.Texture2D, handle), (handle) => Context.deleteTexture(handle));
@@ -39,7 +37,7 @@ class Texture2D extends Texture<WebGLTexture> {
 		return result;
 	}
 
-	public static async load(uri: string, format: TextureFormat, mipChain: boolean = true): Promise<Texture2D> {
+	public static async load(uri: string, format: TextureFormat = TextureFormat.ARGB32, mipChain: boolean = true): Promise<Texture2D> {
 		return new Promise<Texture2D>((resolve) => {
 			const image = new Image();
 
@@ -61,21 +59,18 @@ class Texture2D extends Texture<WebGLTexture> {
 	public apply(updateMipmaps: boolean = false): void {
 		super.apply();
 
-		this.texelSize[0] = 1 / this.width;
-		this.texelSize[1] = 1 / this.height;
-		this.texelSize[2] = this.width;
-		this.texelSize[3] = this.height;
+		const { internalFormat, format, type } = this.pixel;
 
 		if (this.data === null) {
 			Context.texImage2D(
 				this.target,
 				0,
-				this.pixelFormat,
+				internalFormat,
 				this.width,
 				this.height,
 				0,
-				this.pixelFormat,
-				this.pixelType,
+				format,
+				type,
 				null,
 			);
 		} else {
@@ -83,12 +78,12 @@ class Texture2D extends Texture<WebGLTexture> {
 				Context.texImage2D(
 					this.target,
 					0,
-					this.pixelFormat,
+					internalFormat,
 					this.width,
 					this.height,
 					0,
-					this.pixelFormat,
-					this.pixelType,
+					format,
+					type,
 					this.data as ArrayBufferView,
 				);
 			} else if (isArrayLike(this.data)) {
@@ -98,24 +93,26 @@ class Texture2D extends Texture<WebGLTexture> {
 					Context.texImage2D(
 						this.target,
 						level,
-						this.pixelFormat,
+						internalFormat,
 						mipmap.width,
 						mipmap.height,
 						0,
-						this.pixelFormat,
-						this.pixelType,
+						format,
+						type,
 						mipmap.data,
 					);
 				}
 			} else {
+				Context.pixelStorei(Context.UNPACK_FLIP_Y_WEBGL, true);
 				Context.texImage2D(
 					this.target,
 					0,
-					this.pixelFormat,
-					this.pixelFormat,
-					this.pixelType,
+					internalFormat,
+					format,
+					type,
 					this.data as TexImageSource,
 				);
+				Context.pixelStorei(Context.UNPACK_FLIP_Y_WEBGL, false);
 			}
 		}
 

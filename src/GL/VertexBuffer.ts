@@ -1,9 +1,9 @@
 import Context from './Context';
 import { Indexable } from '../Core/Helpers';
 import Buffer, { BufferType } from './Buffer';
-import { PrimitiveType, VertexArrayBuffer, VertexAttribute } from './Helpers';
+import { PrimitiveType, VertexArrayBuffer } from './Helpers';
 
-class VertexBuffer<T extends Indexable<VertexAttribute>> extends Buffer<VertexArrayBuffer<T>> {
+class VertexBuffer<T extends Indexable<ArrayLike<number>>> extends Buffer<VertexArrayBuffer<T>> {
 	public name: string = 'VertexBuffer';
 
 	public constructor(data: T[]) {
@@ -26,6 +26,10 @@ class VertexBuffer<T extends Indexable<VertexAttribute>> extends Buffer<VertexAr
 		this.bind();
 
 		Context.drawArrays(type, 0, this.length);
+	}
+
+	public drawInstanced(type: PrimitiveType, count: number): void {
+		Context.drawArraysInstanced(type, 0, this.length, count);
 	}
 }
 

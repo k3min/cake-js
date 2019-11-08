@@ -3,10 +3,13 @@ import { DataType } from '../GL/Helpers';
 interface MathEx extends Math {
 	readonly deg2Rad: number;
 	readonly rad2Deg: number;
+	readonly TWO_PI: number;
 
 	clamp(x: number, lower?: number, upper?: number): number;
 
 	lerp(a: number, b: number, t: number): number;
+
+	fmod(x: number, n: number): number;
 
 	nextPowerOfTwo(x: number): number;
 
@@ -16,17 +19,22 @@ interface MathEx extends Math {
 
 	rsqrt(x: number): number;
 
-	linear(x: number): number;
+	srgbToLinear(x: number): number;
+
+	linearToSrgb(x: number): number;
 
 	gamma(x: number): number;
 
 	exp2(x: number): number;
+
+	isZero(x: number): boolean;
 }
 
 Object.defineProperties(Math, {
 
 	deg2Rad: { value: 0.0174532925 },
 	rad2Deg: { value: 57.2957795 },
+	TWO_PI: { value: 6.28318530718 },
 
 	clamp: {
 		value: (x: number, lower: number = 0, upper: number = 1): number => Math.max(lower, Math.min(upper, x)),
@@ -34,6 +42,10 @@ Object.defineProperties(Math, {
 
 	lerp: {
 		value: (a: number, b: number, t: number): number => a + t * (b - a),
+	},
+
+	fmod: {
+		value: (x: number, n: number) => ((x % n) + n) % n,
 	},
 
 	exp2: {
@@ -92,16 +104,20 @@ Object.defineProperties(Math, {
 		},
 	},
 
-	linear: {
+	srgbToLinear: {
 		value: (x: number): number => {
-			return x * (x * ((x * 0.305306011) + 0.682171111) + 0.012522878);
+			return Math.pow(x, 2.2);
 		},
 	},
 
-	gamma: {
+	linearToSrgb: {
 		value: (x: number): number => {
-			return Math.max((Math.pow(Math.max(x, 0), 0.416666667) * 1.055) - 0.055, 0);
+			return Math.pow(x, 0.45454545);
 		},
+	},
+
+	isZero: {
+		value: (x: number): boolean => (x > -Number.EPSILON && x < Number.EPSILON),
 	},
 });
 

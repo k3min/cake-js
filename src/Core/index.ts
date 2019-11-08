@@ -7,3 +7,4 @@ export { default as Resource, ResourceType } from './Resource';
 export { default as Exception } from './Exception';
 export { default as Copyable } from './Copyable';
 export { default as Log } from './Log';
+export { Indexable } from './Helpers';

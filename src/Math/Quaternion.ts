@@ -94,7 +94,7 @@ class Quaternion extends Vector4 {
 	}
 
 	public normalize(): Quaternion {
-		const length = this.magnitude2;
+		const length = this.magnitudeSq;
 
 		if (length < Number.EPSILON) {
 			return this.set(0, 0, 0, 1) as Quaternion;

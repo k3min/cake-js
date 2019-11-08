@@ -8,7 +8,9 @@
 	"scripts": {
 		"build": "tsc"
 	},
-	"dependencies": {},
+	"dependencies": {
+		"reflect-metadata": "^0.1.13"
+	},
 	"devDependencies": {
 		"@types/webgl2": "^0.0.5",
 		"typescript": "^3.5.3"

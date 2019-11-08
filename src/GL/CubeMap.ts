@@ -79,6 +79,8 @@ class CubeMap extends Texture<WebGLTexture> {
 	public apply(): void {
 		super.apply();
 
+		const { internalFormat, format, type } = this.pixel;
+
 		for (let face = 0; face < 6; face++) {
 			const data: CubeMapFace = (this.data as CubeMapFace[])[face];
 
@@ -88,12 +90,12 @@ class CubeMap extends Texture<WebGLTexture> {
 				Context.texImage2D(
 					Context.TEXTURE_CUBE_MAP_POSITIVE_X + face,
 					level,
-					this.pixelFormat,
+					internalFormat,
 					mipmap.width,
 					mipmap.height,
 					0,
-					this.pixelFormat,
-					this.pixelType,
+					format,
+					type,
 					mipmap.data,
 				);
 			}

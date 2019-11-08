@@ -10,6 +10,8 @@
 		"noImplicitReturns": true,
 		"declaration": true,
 		"allowJs": false,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
 		"outDir": "lib"
 	},
 	"include": [

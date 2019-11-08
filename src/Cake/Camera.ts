@@ -27,6 +27,8 @@ class Camera extends Transform {
 		super();
 
 		Camera.main = this;
+
+		this.update();
 	}
 
 	public updating(): void {

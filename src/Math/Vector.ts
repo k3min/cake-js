@@ -40,15 +40,23 @@ abstract class Vector extends Float32Array implements Copyable<Vector> {
 	}
 
 	public get magnitude(): number {
-		return Math.sqrt(this.magnitude2);
+		return Math.sqrt(this.magnitudeSq);
 	}
 
-	public get magnitude2(): number {
+	public get magnitudeSq(): number {
 		return Vector.dot(this, this);
 	}
 
 	public get normalized(): Vector {
 		return this.copy().normalize();
+	}
+
+	public get min(): number {
+		return Math.min(...this);
+	}
+
+	public get max(): number {
+		return Math.max(...this);
 	}
 
 	protected constructor(components: number, x?: X, y: number = 0, z: number = 0, w: number = 0) {
@@ -64,17 +72,17 @@ abstract class Vector extends Float32Array implements Copyable<Vector> {
 	}
 
 	public normalize(): Vector {
-		const length: number = this.magnitude;
+		const length: number = this.magnitudeSq;
 
 		if (length < Number.EPSILON) {
 			return this.set(0, 0, 0, 0);
 		}
 
-		return this.mul(Math.rsqrt(length));
+		return this.div(Math.sqrt(length));
 	}
 
 	protected op(op: (a: number, b: number) => number, x: X, y?: number, z?: number, w?: number): Vector {
-		const data = isArrayLike(x) ? x : [x, bOrA(x, y), bOrA(x, z), bOrA(x, w)];
+		const data: ArrayLike<number> = isArrayLike(x) ? x : [x, bOrA(x, y), bOrA(x, z), bOrA(x, w)];
 
 		for (let i = 0; i < this.length; i++) {
 			this[i] = op(this[i], data[i]);
@@ -99,8 +107,12 @@ abstract class Vector extends Float32Array implements Copyable<Vector> {
 		return this.op((a, b) => (a + b), x, y, z, w);
 	}
 
+	public set(x: X, y?: number, z?: number, w?: number): Vector {
+		return this.op((_, b) => b, x, y, z, w);
+	}
+
 	public static dot(a: Vector, b: Vector): number {
-		let result = 0;
+		let result: number = 0;
 
 		for (let i = 0; i < a.length; i++) {
 			result += a[i] * b[i];
@@ -119,6 +131,16 @@ abstract class Vector extends Float32Array implements Copyable<Vector> {
 
 	public static max(a: Vector, b: Vector): Vector {
 		return a.copy().op((a, b) => Math.max(a, b), b);
+	}
+
+	public static distance(a: Vector, b: Vector): number {
+		return Math.sqrt(Vector.distanceSq(a, b));
+	}
+
+	public static distanceSq(a: Vector, b: Vector): number {
+		const result: Vector = (a)['-'](b);
+
+		return Vector.dot(result, result);
 	}
 
 	public '-'(x: X, y?: number, z?: number, w?: number): Vector {
@@ -153,8 +175,18 @@ abstract class Vector extends Float32Array implements Copyable<Vector> {
 		return this.add(x, y, z, w);
 	}
 
-	public set(x: X, y?: number, z?: number, w?: number): Vector {
-		return this.op((_, b) => b, x, y, z, w);
+	public '='(x: X, y?: number, z?: number, w?: number): Vector {
+		return this.set(x, y, z, w);
+	}
+
+	public inverse(): Vector {
+		for (let i = 0; i < this.length; i++) {
+			if (this[i] < -Number.EPSILON || this[i] > Number.EPSILON) {
+				this[i] = 1 / this[i];
+			}
+		}
+
+		return this;
 	}
 
 	public abstract copy(): Vector;

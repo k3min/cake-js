@@ -97,6 +97,8 @@ class ShaderProgram extends BindableGraphicsObject<ShaderProgram, WebGLProgram> 
 	}
 
 	private logCompileStatus(log: string, source: string): void {
+		console.error(log);
+
 		const logs: string[] = log.split('\n');
 		const sources: string[] = source.split('\n');
 

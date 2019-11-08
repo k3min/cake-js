@@ -14,6 +14,12 @@ class IndexBuffer extends Buffer<Uint16Array> {
 
 		Context.drawElements(type, this.length, DataType.Uint16, 0);
 	}
+
+	public drawInstanced(type: PrimitiveType, count: number): void {
+		this.bind();
+
+		Context.drawElementsInstanced(type, this.length, DataType.Uint16, 0, count);
+	}
 }
 
 export default IndexBuffer;

@@ -149,7 +149,7 @@ class Matrix4x4 extends Float32Array implements Copyable<Matrix4x4> {
 	}
 
 	public get forward(): Vector3 {
-		return new Vector3(this[2], this[6], this[10]);
+		return new Vector3(-this[2], -this[6], -this[10]);
 	}
 
 	public get translation(): Vector3 {
@@ -338,10 +338,10 @@ class Matrix4x4 extends Float32Array implements Copyable<Matrix4x4> {
 	}
 
 	public static perspective(fov: number, aspect: number, near: number, far: number, result: Matrix4x4): Matrix4x4 {
-		const top = near * Math.tan(fov * Math.deg2Rad * 0.5);
-		const right = top * aspect;
-		const left = -right;
-		const bottom = -top;
+		const top: number = near * Math.tan(fov * Math.deg2Rad * 0.5);
+		const right: number = top * aspect;
+		const left: number = -right;
+		const bottom: number = -top;
 
 		result[0] = (2 * near) / (right - left);
 		result[1] = 0;
@@ -362,6 +362,42 @@ class Matrix4x4 extends Float32Array implements Copyable<Matrix4x4> {
 		result[13] = 0;
 		result[14] = -(2 * far * near) / (far - near);
 		result[15] = 0;
+
+		return result;
+	}
+
+	public static ortho(left: number, right: number, top: number, bottom: number, near: number, far: number, result?: Matrix4x4): Matrix4x4 {
+		if (!result) {
+			result = new Matrix4x4();
+		}
+
+		const width: number = 1.0 / (right - left);
+		const height: number = 1.0 / (top - bottom);
+		const p: number = 1.0 / (far - near);
+
+		const x: number = (right + left) * width;
+		const y: number = (top + bottom) * height;
+		const z: number = (far + near) * p;
+
+		result[0] = 2 * width;
+		result[1] = 0;
+		result[2] = 0;
+		result[3] = 0;
+
+		result[4] = 0;
+		result[5] = 2 * height;
+		result[6] = 0;
+		result[7] = 0;
+
+		result[8] = 0;
+		result[9] = 0;
+		result[10] = -2 * p;
+		result[11] = 0;
+
+		result[12] = -x;
+		result[13] = -y;
+		result[14] = -z;
+		result[15] = 1;
 
 		return result;
 	}
@@ -460,10 +496,36 @@ class Matrix4x4 extends Float32Array implements Copyable<Matrix4x4> {
 		return result;
 	}
 
-	setRow(i: number, v: Vector4) {
+	public setRow(i: number, v: Vector4) {
 		for (let j = 0; j < 4; j++) {
 			this[(i * 4) + j] = v[j] || 0;
 		}
+	}
+
+	public multiplyPoint(v: Vector3, result?: Vector3): Vector3 {
+		if (!result) {
+			result = Vector3.zero;
+		}
+
+		result[0] = (this[0] * v[0] + this[1] * v[1] + this[2] * v[2]) + this[3];
+		result[1] = (this[4] * v[0] + this[5] * v[1] + this[6] * v[2]) + this[7];
+		result[2] = (this[8] * v[0] + this[9] * v[1] + this[10] * v[2]) + this[11];
+
+		result['*='](1 / ((this[12] * v[0] + this[13] * v[1] + this[14] * v[2]) + this[15]));
+
+		return result;
+	}
+
+	public multiplyVector(v: Vector3, result?: Vector3): Vector3 {
+		if (!result) {
+			result = Vector3.zero;
+		}
+
+		result[0] = (this[0] * v[0]) + (this[1] * v[1]) + (this[2] * v[2]);
+		result[1] = (this[4] * v[0]) + (this[5] * v[1]) + (this[6] * v[2]);
+		result[2] = (this[8] * v[0]) + (this[9] * v[1]) + (this[10] * v[2]);
+
+		return result;
 	}
 }
 

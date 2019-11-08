@@ -1,10 +1,10 @@
 import { Disposable } from '../Core';
-import { Drawable, PrimitiveType, VertexAttribute } from './Helpers';
+import { Drawable, PrimitiveType } from './Helpers';
 import IndexBuffer from './IndexBuffer';
 import VertexBuffer from './VertexBuffer';
 import { BindableObject, Indexable, Null } from '../Core/Helpers';
 
-class Mesh<T extends Indexable<VertexAttribute>> extends BindableObject<Mesh<T>> implements Drawable, Disposable {
+class Mesh<T extends Indexable<ArrayLike<number>>> extends BindableObject<Mesh<T>> implements Drawable, Disposable {
 	public name: string = 'Mesh';
 
 	protected indexBuffer: Null<IndexBuffer> = null;
@@ -49,6 +49,20 @@ class Mesh<T extends Indexable<VertexAttribute>> extends BindableObject<Mesh<T>>
 			this.vertexBuffer.draw(type);
 		} else {
 			this.indexBuffer.draw(type);
+		}
+	}
+
+	public drawInstanced(type: PrimitiveType, count: number): void {
+		this.bind();
+
+		if (this.indexBuffer === null) {
+			if (this.vertexBuffer === null) {
+				throw new ReferenceError(`Model (${ this.name }): no vertices`);
+			}
+
+			this.vertexBuffer.drawInstanced(type, count);
+		} else {
+			this.indexBuffer.drawInstanced(type, count);
 		}
 	}
 

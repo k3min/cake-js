@@ -13,7 +13,11 @@ declare abstract class Buffer<T extends ArrayBuffer> extends BindableGraphicsObj
     readonly length: number;
     protected readonly identifier: string;
     protected constructor(target: BufferType, data: T, length: number);
+    /**
+     * @todo Context.DYNAMIC_DRAW
+     */
     apply(): void;
     abstract draw(type: PrimitiveType): void;
+    abstract drawInstanced(type: PrimitiveType, count: number): void;
 }
 export default Buffer;

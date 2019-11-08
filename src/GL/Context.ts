@@ -12,20 +12,13 @@ export enum ContextError {
 	InvalidFramebufferOperation = 0x0506, // GL_Invalid_Framebuffer_Operation
 }
 
-type Override = 'clear' | 'enable' | 'disable' | 'getExtension' | 'getError' | 'drawBuffers';
-type RenderingContext = WebGLRenderingContext & WebGL2RenderingContext;
+type Override = 'clear' | 'enable' | 'disable' | 'getExtension' | 'getError';
 
-interface Context extends Omit<RenderingContext, Override> {
+interface Context extends Omit<WebGL2RenderingContext, Override> {
 	readonly _enabled: Toggle<Capability>;
 	readonly _extensions: Storage<any>;
 
-	readonly ext?: WEBGL_draw_buffers;
-
-	readonly isWebGL2: boolean;
-
 	getErrorRaw(): GLenum;
-
-	drawBuffersRaw?(buffers: GLenum[]): void;
 
 	clearRaw(mask: GLbitfield): void;
 
@@ -56,8 +49,8 @@ interface Context extends Omit<RenderingContext, Override> {
 
 if (!('gl' in window)) {
 	Object.defineProperty(window, 'gl', {
-		value: document.createElement('canvas').getContext('webgl', {
-			antialias: false,
+		value: document.createElement('canvas').getContext('webgl2', {
+			antialias: true,
 		}),
 	});
 
@@ -73,11 +66,6 @@ if (!('gl' in window)) {
 		enableRaw: { value: gl.enable },
 		disableRaw: { value: gl.disable },
 		clearRaw: { value: gl.clear },
-
-		isWebGL2: {
-			enumerable: true,
-			value: (gl instanceof WebGL2RenderingContext),
-		},
 
 		canvas: {
 			enumerable: true,
@@ -153,21 +141,6 @@ if (!('gl' in window)) {
 			},
 		},
 
-		drawBuffers: {
-			enumerable: true,
-			value: function (buffers: GLenum[]): void {
-				const _this: Context = this as Context;
-
-				if (_this.ext) {
-					_this.ext.drawBuffersWEBGL(buffers);
-				} else if (_this.drawBuffersRaw) {
-					_this.drawBuffersRaw(buffers);
-				} else {
-					throw new ReferenceError(`Context: 'drawBuffers' not supported`);
-				}
-			},
-		},
-
 		enable: {
 			enumerable: true,
 			value: function (cap: Capability): boolean {
@@ -235,13 +208,6 @@ if (!('gl' in window)) {
 					_this.clearRaw(mask);
 				}
 			},
-		},
-	});
-
-	Object.defineProperties(gl, {
-		ext: {
-			enumerable: true,
-			value: gl.getExtension<WEBGL_draw_buffers>('WEBGL_draw_buffers'),
 		},
 	});
 

@@ -1,20 +1,25 @@
 import { Resource, ResourceType, Exception } from '../Core';
-import { VertexAttribute, DataType } from '../GL/Helpers';
+import { DataType, vertexAttribute } from '../GL/Helpers';
 import { Indexable, TextReader } from '../Core/Helpers';
 import { Vector2, Vector3, Vector4 } from '../Math';
 
-export class Vertex implements Indexable<VertexAttribute> {
-	public readonly position: VertexAttribute<Vector3>;
-	public readonly normal: VertexAttribute<Vector3>;
-	public readonly texcoord: VertexAttribute<Vector2>;
+export class Vertex implements Indexable<ArrayLike<number>> {
+	@vertexAttribute({ location: 0, type: DataType.Float32, normalized: false })
+	public readonly position: Vector3;
+
+	@vertexAttribute({ location: 1, type: DataType.Int8, normalized: true })
+	public readonly normal: Vector3;
+
+	@vertexAttribute({ location: 2, type: DataType.Int16, normalized: false })
+	public readonly texcoord: Vector2;
 
 	public constructor(position: Vector3, normal: Vector4, texcoord: Vector2) {
-		this.position = new VertexAttribute<Vector3>(position, DataType.Float32, false);
-		this.normal = new VertexAttribute<Vector4>(normal, DataType.Int8, true);
-		this.texcoord = new VertexAttribute<Vector2>(texcoord, DataType.Int16, false);
+		this.position = position;
+		this.normal = normal;
+		this.texcoord = texcoord;
 	}
 
-	readonly [index: string]: VertexAttribute;
+	readonly [index: string]: ArrayLike<number>;
 }
 
 enum Token {

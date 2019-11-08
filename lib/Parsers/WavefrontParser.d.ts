@@ -1,12 +1,11 @@
-import { VertexAttribute } from '../GL/Helpers';
 import { Indexable } from '../Core/Helpers';
 import { Vector2, Vector3, Vector4 } from '../Math';
-export declare class Vertex implements Indexable<VertexAttribute> {
-    readonly position: VertexAttribute<Vector3>;
-    readonly normal: VertexAttribute<Vector3>;
-    readonly texcoord: VertexAttribute<Vector2>;
+export declare class Vertex implements Indexable<ArrayLike<number>> {
+    readonly position: Vector3;
+    readonly normal: Vector3;
+    readonly texcoord: Vector2;
     constructor(position: Vector3, normal: Vector4, texcoord: Vector2);
-    readonly [index: string]: VertexAttribute;
+    readonly [index: string]: ArrayLike<number>;
 }
 declare class WavefrontParser {
     private readonly raw;

@@ -1,8 +1,7 @@
 import { Camera, Material, Model, Renderer } from '../../Cake';
-import { Shader, Texture2D, TextureFormat } from '../../GL';
+import { Shader, Texture2D } from '../../GL';
 import { Exception, Resource, ResourceType } from '../../Core';
-import { Vector, Vector2, Vector3, Vector4 } from '../../Math';
-import Color from '../../Math/Color';
+import { Vector, Vector2, Vector3, Vector4, Color } from '../../Math';
 
 import {
 	SceneBase,
@@ -67,7 +66,7 @@ class SceneParser {
 			switch (type) {
 				case SceneMaterialPropertyType.Texture: {
 					try {
-						renderer.material.setTexture(name, await Texture2D.load(value as string, TextureFormat.RGBA32));
+						renderer.material.setTexture(name, await Texture2D.load(value as string));
 					} catch (e) {
 						throw new Exception(`SceneParser: failed to load texture '${ value }'`, e);
 					}

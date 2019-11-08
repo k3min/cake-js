@@ -12,12 +12,13 @@ declare class FrameBuffer extends BindableGraphicsObject<FrameBuffer, WebGLFrame
     readonly attachments: Map<FrameBufferAttachment, Texture>;
     color: Null<Texture | ArrayLike<Texture>>;
     depth: Null<Texture>;
+    readonly buffers: FrameBufferAttachment[];
     protected readonly identifier: string;
     constructor(color?: Null<Texture | ArrayLike<Texture>>, depth?: Null<Texture>);
     apply(check?: boolean): void;
     check(): void;
     private setAttachment;
-    attach(slot: FrameBufferAttachment, texture: Texture): void;
-    detach(slot?: FrameBufferAttachment): void;
+    attach(slot: FrameBufferAttachment, texture: Texture, level?: number, layer?: number): void;
+    detach(slot?: FrameBufferAttachment, level?: number, layer?: number): void;
 }
 export default FrameBuffer;

@@ -10,7 +10,7 @@ declare class Vector3 extends Vector {
     static readonly forward: Vector3;
     static readonly backward: Vector3;
     constructor(x: Vector3 | X, y?: number, z?: number);
-    static cross(a: Vector3, b: Vector3, result: Vector3): void;
+    static cross(a: Vector3, b: Vector3, result?: Vector3): Vector3;
     copy(): Vector3;
 }
 export default Vector3;

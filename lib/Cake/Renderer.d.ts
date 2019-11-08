@@ -1,6 +1,5 @@
 import { Drawable } from '../GL/Helpers';
-import { Matrix4x4 } from '../Math';
-import Vector3 from '../Math/Vector3';
+import { Matrix4x4, Vector3 } from '../Math';
 import Material from './Material';
 import Model from './Model';
 import Transform from './Transform';

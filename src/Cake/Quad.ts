@@ -1,18 +1,20 @@
-import { VertexAttribute, DataType, PrimitiveType } from '../GL/Helpers';
-import IndexBuffer from '../GL/IndexBuffer';
-import VertexBuffer from '../GL/VertexBuffer';
-import Mesh from '../GL/Mesh';
 import { Indexable } from '../Core/Helpers';
+import { vertexAttribute } from '../GL/Helpers';
+import DataType from '../GL/Helpers/DataType';
+import IndexBuffer from '../GL/IndexBuffer';
+import Mesh from '../GL/Mesh';
+import VertexBuffer from '../GL/VertexBuffer';
 import { Vector2 } from '../Math';
 
-class Vertex implements Indexable<VertexAttribute> {
-	public readonly position: VertexAttribute;
+class Vertex implements Indexable<ArrayLike<number>> {
+	@vertexAttribute({ location: 0, type: DataType.Float32, normalized: false })
+	public readonly position: Vector2;
 
-	public constructor(position: Vector2) {
-		this.position = new VertexAttribute(position, DataType.Float32, false);
+	public constructor(x: number, y: number) {
+		this.position = new Vector2(x, y);
 	}
 
-	readonly [index: string]: VertexAttribute;
+	readonly [index: string]: ArrayLike<number>;
 }
 
 class Quad extends Mesh<Vertex> {
@@ -24,15 +26,11 @@ class Quad extends Mesh<Vertex> {
 		this.indexBuffer = new IndexBuffer([3, 2, 1, 3, 1, 0]);
 
 		this.vertexBuffer = new VertexBuffer<Vertex>([
-			new Vertex(new Vector2(-1.0, +1.0)),
-			new Vertex(new Vector2(-1.0, -1.0)),
-			new Vertex(new Vector2(+1.0, -1.0)),
-			new Vertex(new Vector2(+1.0, +1.0)),
+			new Vertex(-1.0, +1.0),
+			new Vertex(-1.0, -1.0),
+			new Vertex(+1.0, -1.0),
+			new Vertex(+1.0, +1.0),
 		]);
-	}
-
-	public draw(): void {
-		super.draw(PrimitiveType.Triangles);
 	}
 }
 

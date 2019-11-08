@@ -1,23 +1,34 @@
 import { Indexable, Null } from '../Core/Helpers';
+import { Vector4 } from '../Math';
 import Context from './Context';
-import { BindableGraphicsObject, pixelFormat, PixelFormat, pixelType, PixelType } from './Helpers';
+import { BindableGraphicsObject, pixel, Pixel } from './Helpers';
 import TextureFilterMode from './Helpers/TextureFilterMode';
 import TextureWrapMode from './Helpers/TextureWrapMode';
 
 export enum TextureFormat {
-	Alpha8,
-	RGB24,
-	RGBA32,
-	R5G6B5,
-	R5G5B5A1,
-	RGBA16,
-	RGBAFloat,
-	RGBAHalf,
+	ARGB32,
 	Depth,
-	Depth16,
-	Depth32,
-	Stencil,
-	DepthStencil
+	ARGBHalf,
+	RGB565,
+	ARGB4444,
+	ARGB1555,
+	ARGB2101010,
+	//ARGB64,
+	ARGBFloat,
+	RGFloat,
+	RGHalf,
+	RFloat,
+	RHalf,
+	R8,
+	//ARGBInt,
+	//RGInt,
+	//RInt,
+	//BGRA32,
+	RGB111110Float,
+	//RG32,
+	//RGBAUShort,
+	RG16,
+	//R16
 }
 
 export interface Mipmap {
@@ -30,6 +41,7 @@ export type CubeMapFace = Mipmap[];
 
 export enum TextureTarget {
 	Texture2D = 0x0DE1, // GL_TEXTURE_2D
+	Texture2DArray = 0x8c1a, //GL_TEXTURE_2D_ARRAY
 	CubeMap = 0x8513, // GL_TEXTURE_CUBE_MAP
 	RenderBuffer = 0x8D41, // GL_RENDERBUFFER
 }
@@ -45,20 +57,21 @@ abstract class Texture<T extends WebGLObject = WebGLObject> extends BindableGrap
 	public readonly target: TextureTarget;
 	private readonly parameters: Indexable<GLenum> = {};
 
-	protected data: Null<TextureData> = null;
+	public data: Null<TextureData> = null;
 
 	public readonly format: TextureFormat;
 
 	public filterMode: TextureFilterMode = TextureFilterMode.Bilinear;
 	public wrapMode: TextureWrapMode = TextureWrapMode.Clamp;
 
-	protected readonly pixelFormat: PixelFormat;
-	protected readonly pixelType: PixelType;
+	protected readonly pixel: Pixel;
 
 	public mipmapCount: number = 0;
 
 	public width: number;
 	public height: number;
+
+	public readonly texelSize: Vector4 = new Vector4(0, 0, 0, 0);
 
 	protected get identifier(): string {
 		return 'Texture';
@@ -72,8 +85,9 @@ abstract class Texture<T extends WebGLObject = WebGLObject> extends BindableGrap
 		this.format = format;
 		this.target = target;
 
-		this.pixelFormat = pixelFormat(format);
-		this.pixelType = pixelType(format);
+		this.pixel = {
+			...pixel(format),
+		};
 	}
 
 	public set(name: GLenum, value: GLenum): void {
@@ -129,6 +143,11 @@ abstract class Texture<T extends WebGLObject = WebGLObject> extends BindableGrap
 
 		this.setWrapMode();
 		this.setFilterMode();
+
+		this.texelSize[0] = 1 / this.width;
+		this.texelSize[1] = 1 / this.height;
+		this.texelSize[2] = this.width;
+		this.texelSize[3] = this.height;
 	}
 }
 

@@ -7,20 +7,19 @@ class TextReader implements IterableIterator<string> {
 	}
 
 	public next(): IteratorResult<string> {
-		if (this.index < this.buffer.length) {
-			return {
-				value: this.buffer[this.index++],
-				done: false,
-			};
+		if (this.index >= this.buffer.length) {
+			return { done: true, value: '' };
 		}
 
 		return {
-			value: '',
-			done: true,
+			done: false,
+			value: this.buffer[this.index++],
 		};
 	}
 
 	[Symbol.iterator](): IterableIterator<string> {
+		this.index = 0;
+
 		return this;
 	}
 }
